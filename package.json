@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/Re9iNee/Sabkad/issues"
   },
-  "homepage": "https://github.com/Re9iNee/Sabkad#readme"
+  "homepage": "https://github.com/Re9iNee/Sabkad#readme",
+  "dependencies": {
+    "mssql": "^6.3.1"
+  }
 }
