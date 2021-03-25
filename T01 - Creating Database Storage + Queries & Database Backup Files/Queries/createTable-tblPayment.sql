@@ -1,5 +1,5 @@
 CREATE TABLE tblPayment (
-    PaymentId int PRIMARY KEY NOT NULL,
+    PaymentId int  IDENTITY(1,1) PRIMARY KEY NOT NULL,
     DonatorId int,
     CashAssistanceDetailId int NOT NULL,
     PaymentPrice MONEY NOT NULL,
