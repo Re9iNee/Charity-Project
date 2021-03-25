@@ -1,5 +1,5 @@
 CREATE TABLE tblAssignNeedyToPlans (
-    AssignNeedyPlanId int PRIMARY KEY NOT NULL,
+    AssignNeedyPlanId int IDENTITY(1, 1) PRIMARY KEY NOT NULL,
     NeedyId int NOT NULL UNIQUE,
     PlanId int NOT NULL UNIQUE,
     Fdate VARCHAR(10) NOT NULL,

@@ -1,5 +1,5 @@
 CREATE TABLE tblNeedyAccounts (
-    NeedyAccountId int PRIMARY KEY NOT NULL,
+    NeedyAccountId int IDENTITY(1, 1) PRIMARY KEY NOT NULL,
     BankId int NOT NULL,
     NeedyId int NOT NULL UNIQUE,
     OwnerName NVARCHAR(1000) NOT NULL,

@@ -1,5 +1,5 @@
 CREATE TABLE tblPersonal (
-    PersonId int PRIMARY KEY NOT NULL,
+    PersonId int IDENTITY(1, 1) PRIMARY KEY NOT NULL,
     Name NVARCHAR(500) NOT NULL,
     Family NVARCHAR(500) NOT NULL,
     NationalCode VARCHAR(10),

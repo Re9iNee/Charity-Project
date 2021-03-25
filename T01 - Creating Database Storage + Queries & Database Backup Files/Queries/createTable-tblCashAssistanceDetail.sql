@@ -1,5 +1,5 @@
 CREATE TABLE tblCashAssistanceDetail (
-    CashAssistanceDetailId int PRIMARY KEY NOT NULL,
+    CashAssistanceDetailId int IDENTITY(1, 1) PRIMARY KEY NOT NULL,
     AssignNeedyPlanId int UNIQUE,
     PlanId int NOT NULL UNIQUE,
     NeededPrice MONEY NOT NULL,

@@ -1,5 +1,5 @@
 CREATE TABLE tblPlans (
-    PlanId int PRIMARY KEY NOT NULL,
+    PlanId int IDENTITY(1, 1) PRIMARY KEY NOT NULL,
     PlanName NVARCHAR(1000) NOT NULL,
     Description text,
     PlanNature BIT NOT NULL UNIQUE DEFAULT 1,

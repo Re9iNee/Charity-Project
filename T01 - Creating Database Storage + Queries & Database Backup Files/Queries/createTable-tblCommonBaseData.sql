@@ -1,5 +1,5 @@
 CREATE TABLE tblCommonBaseData (
-    CommonBaseDataId int PRIMARY KEY NOT NULL,
+    CommonBaseDataId int IDENTITY(1, 1) PRIMARY KEY NOT NULL,
     BaseCode VARCHAR(6),
     BaseValue NVARCHAR(800),
     CommonBaseTypeId int,

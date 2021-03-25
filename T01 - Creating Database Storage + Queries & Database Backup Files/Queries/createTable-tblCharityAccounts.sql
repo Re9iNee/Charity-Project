@@ -1,5 +1,5 @@
 CREATE TABLE tblCharityAccounts (
-    CharityAccountId int PRIMARY KEY NOT NULL,
+    CharityAccountId int IDENTITY(1, 1) PRIMARY KEY NOT NULL,
     BankID int NOT NULL,
     BranchName NVARCHAR(500) NOT NULL,
     OwnerName NVARCHAR(1000) NOT NULL,
