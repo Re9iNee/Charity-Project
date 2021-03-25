@@ -25,6 +25,9 @@ const {ws_loadBaseType, ws_createBaseType} = require("./T02-Creating Constant Id
 
 
 
-
-
-// ws_createBaseType();
+// Exmaple: Task 02. Method 02
+(async () => {
+    const result = await ws_createBaseType({pool, poolConnect}, 'Ame', '14')
+    console.log("Created Row has an Id Of, CommonBaseTypeId: ", result)
+})();
+// ws_createBaseType({pool, poolConnect}, 'AsgharDAYI', 4);
