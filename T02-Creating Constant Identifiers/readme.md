@@ -3,7 +3,8 @@
 ## Method 1 - Fetching CommonBaseType table
 - Start: 4 Farvardin 9:00
 - End: 4 Farvardin 13:00
-- 
+
+
 ## Method 2 - Inserting into CommonBaseType table
  - Start: 5 Farvardin 12:52
  - End: 5 Farvardin 13:40
