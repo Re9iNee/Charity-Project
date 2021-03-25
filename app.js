@@ -10,7 +10,10 @@ const poolConnect = pool.connect();
 pool.on("error", err => {
     console.log("Could not Connect to the Database", err);
 })
-const {ws_loadBaseType, ws_createBaseType} = require("./T02-Creating Constant Identifiers/commonBaseMethods");
+const {
+    ws_loadBaseType,
+    ws_createBaseType
+} = require("./T02-Creating Constant Identifiers/commonBaseMethods");
 
 
 /* Examples: Task 02. Method 01 */
@@ -27,7 +30,10 @@ const {ws_loadBaseType, ws_createBaseType} = require("./T02-Creating Constant Id
 
 // Exmaple: Task 02. Method 02
 (async () => {
-    const result = await ws_createBaseType({pool, poolConnect}, 'Ame', '14')
+    const result = await ws_createBaseType({
+        pool,
+        poolConnect
+    }, 'Ame', '14')
     console.log("Created Row has an Id Of, CommonBaseTypeId: ", result)
 })();
 // ws_createBaseType({pool, poolConnect}, 'AsgharDAYI', 4);
