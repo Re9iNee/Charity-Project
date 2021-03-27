@@ -35,6 +35,8 @@ exports.ws_createBaseValue = async (connection, baseCode, baseValue, commonBaseT
     // ensures that the pool has been created
     await poolConnect;
     try {
+        if (!baseCode || !baseCode || !commonBaseTypeId)
+            throw new Error("Error Creating Row, Fill Parameters Utterly");
         // Select Scope Identity is for returning id of affected row(s)
         let queryString = `INSERT INTO 
         [SabkadV01].[dbo].[tblCommonBaseData]
