@@ -8,6 +8,9 @@
  - SQL Insertion won't return Id of the affected row. so by using SELCET Query right after insertion we can use CommonBaseTypeId and the return it.
 */
 
+
+const {normalizeQueryString} = require("../others/commonModules");
+
 // Task 02 Method 01
 exports.ws_loadBaseType = async (connection, filters, resultLimit = 1000) => {
     const {
@@ -31,21 +34,6 @@ exports.ws_loadBaseType = async (connection, filters, resultLimit = 1000) => {
         console.error("SQL error: ", err);
     }
 }
-
-
-function normalizeQueryString(queryString, filters) {
-    for (let property in filters) {
-        const filterValue = filters[property];
-        if (filterValue) {
-            if (typeof filterValue !== "string")
-                queryString += ` AND ${property}=${filterValue}`;
-            else
-                queryString += ` AND ${property}='${filterValue}'`;
-        }
-    }
-    return queryString;
-}
-
 
 
 // Task 02 Method 02
