@@ -4,5 +4,6 @@ CREATE TABLE tblCommonBaseData (
     BaseValue NVARCHAR(800),
     CommonBaseTypeId int,
     CONSTRAINT FK_CommonBaseData FOREIGN KEY (CommonBaseTypeId)
-    REFERENCES [SabkadV01].[dbo].[tblCommonBaseType]
+    REFERENCES [SabkadV01].[dbo].[tblCommonBaseType],
+    UNIQUE (BaseCode, CommonBaseTypeId),
 )
