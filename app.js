@@ -1,9 +1,12 @@
+require("dotenv").config();
+
+
 const sql = require("mssql");
 const config = {
-    user: "sa",
-    password: "Rainbow78951",
-    server: "localhost",
-    database: "SabkadV01",
+    user: process.env.DB_USER,
+    password: process.env.DB_PWD,
+    server: process.env.DB_SERVER,
+    database: process.env.DB_DATABASE,
 }
 const pool = new sql.ConnectionPool(config);
 const poolConnect = pool.connect();
@@ -15,6 +18,7 @@ pool.on("error", err => {
 
 const express = require("express");
 const app = express();
+
 
 /*  TASK 2 */ 
 
