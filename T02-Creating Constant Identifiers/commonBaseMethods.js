@@ -9,7 +9,11 @@
 */
 
 
-const {normalizeQueryString, toHex, toInt} = require("../others/commonModules");
+const {
+    normalizeQueryString,
+    toHex,
+    toInt
+} = require("../others/commonModules");
 
 
 
@@ -27,7 +31,7 @@ const ws_loadBaseType = async (connection, filters, costumeQuery = null, resultL
     FROM [SabkadV01].[dbo].[tblCommonBaseType]
     WHERE 1=1`
     queryString = normalizeQueryString(queryString, filters)
-    if (costumeQuery) 
+    if (costumeQuery)
         queryString += ` ${costumeQuery}`
     try {
         const request = pool.request();
@@ -66,7 +70,7 @@ const ws_createBaseType = async (connection, baseTypeTitle) => {
         console.error("ws_createBaseType error: ", err)
     }
 }
-async function getLastBaseCode(connection){
+async function getLastBaseCode(connection) {
     let code = await ws_loadBaseType(connection, null, "ORDER BY BaseTypeCode DESC;", 1);
     code = code.recordset[0].BaseTypeCode;
     code = toInt(code);

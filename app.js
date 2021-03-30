@@ -20,7 +20,7 @@ const express = require("express");
 const app = express();
 
 
-/*  TASK 2 */ 
+/*  TASK 2 */
 
 const {
     ws_loadBaseType,
@@ -59,8 +59,8 @@ const {
     ws_loadBaseValue,
     ws_createBaseValue
 } = require("./T03 - BaseInfo Services - Constant Values Task/constantValues");
-(async() => {
-        // Method 01
+(async () => {
+    // Method 01
     // const result = await ws_loadBaseValue({
     //     pool,
     //     poolConnect
@@ -70,7 +70,7 @@ const {
     //     BaseCode: '2',
     //     BaseValue: 'dwad',
     // })
-        // Method 02
+    // Method 02
     // const result = await ws_createBaseValue({
     //     pool,
     //     poolConnect
