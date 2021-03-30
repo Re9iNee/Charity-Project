@@ -9,10 +9,12 @@
 */
 
 
-const {normalizeQueryString} = require("../others/commonModules");
+const {normalizeQueryString, toHex, toInt} = require("../others/commonModules");
+
+
 
 // Task 02 Method 01
-exports.ws_loadBaseType = async (connection, filters, resultLimit = 1000) => {
+const ws_loadBaseType = async (connection, filters, costumeQuery = null, resultLimit = 1000) => {
     const {
         pool,
         poolConnect
@@ -25,6 +27,8 @@ exports.ws_loadBaseType = async (connection, filters, resultLimit = 1000) => {
     FROM [SabkadV01].[dbo].[tblCommonBaseType]
     WHERE 1=1`
     queryString = normalizeQueryString(queryString, filters)
+    if (costumeQuery) 
+        queryString += ` ${costumeQuery}`
     try {
         const request = pool.request();
         const result = await request.query(queryString);
@@ -37,8 +41,10 @@ exports.ws_loadBaseType = async (connection, filters, resultLimit = 1000) => {
 
 
 // Task 02 Method 02
-exports.ws_createBaseType = async (connection, baseTypeTitle, baseTypeCode) => {
-
+const ws_createBaseType = async (connection, baseTypeTitle) => {
+    // read last baseCode from table and create hex index then insert into table
+    const lastBaseCode = await getLastBaseCode(connection);
+    let baseTypeCode = toHex(lastBaseCode + 1);
     const {
         pool,
         poolConnect
@@ -59,4 +65,16 @@ exports.ws_createBaseType = async (connection, baseTypeTitle, baseTypeCode) => {
     } catch (err) {
         console.error("ws_createBaseType error: ", err)
     }
+}
+async function getLastBaseCode(connection){
+    let code = await ws_loadBaseType(connection, null, "ORDER BY BaseTypeCode DESC;", 1);
+    code = code.recordset[0].BaseTypeCode;
+    code = toInt(code);
+    return code;
+}
+
+
+module.exports = {
+    ws_loadBaseType,
+    ws_createBaseType,
 }

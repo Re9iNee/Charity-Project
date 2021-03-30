@@ -10,3 +10,5 @@ exports.normalizeQueryString = (queryString, filters) => {
     }
     return queryString;
 }
+exports.toHex = int => int.toString(16);
+exports.toInt = hex => parseInt(hex, 16);
