@@ -78,7 +78,26 @@ async function getLastBaseCode(connection) {
 }
 
 
+const ws_updateBaseType = async (connection, filters, newBaseTypeTitle) => {
+    const {
+        pool,
+        poolConnect
+    } = connection;
+    // ensures that the pool has been created
+    await poolConnect;
+    let queryString = `UPDATE [SabkadV01].[dbo].[tblCommonBaseType] SET BaseTypeTitle = '${newBaseTypeTitle}' WHERE 1=1 `
+    queryString = normalizeQueryString(queryString, filters)
+    try {
+        const request = pool.request();
+        const result = await request.query(queryString);
+        return result;
+    } catch (err) {
+        console.error("SQL error: ", err);
+    }
+}
+
 module.exports = {
     ws_loadBaseType,
     ws_createBaseType,
+    ws_updateBaseType
 }

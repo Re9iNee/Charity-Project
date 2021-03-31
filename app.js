@@ -51,14 +51,21 @@ app.route("/commonBaseType")
             pool,
             poolConnect
         }, req.body.BaseTypeTitle)
-        res.send({result})
+        res.send({
+            result
+        })
     })
-
+    
 const {
     ws_loadBaseType,
     ws_createBaseType,
+    ws_updateBaseType,
 } = require("./T02-Creating Constant Identifiers/commonBaseMethods");
 
+
+(async () => {
+    ws_updateBaseType({pool, poolConnect}, {BaseTypeCode: '6'}, 'J')
+})();
 
 
 
