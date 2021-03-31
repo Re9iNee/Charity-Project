@@ -46,7 +46,7 @@ app.route("/commonBaseType")
     })
     .post(async (req, res) => {
         // T02 - Method 02
-        // Attach BaseTypeTitle vai JSON File to request.body
+        // Attach BaseTypeTitle via JSON File to request.body
         const result = await ws_createBaseType({
             pool,
             poolConnect
@@ -55,17 +55,24 @@ app.route("/commonBaseType")
             result
         })
     })
-    
+    .put(async (req, res) => {
+        // T02 - Method 03
+        // Attach BaseTypeTitle And Filter Object via JSON File to request.body
+        // PostMan Request: 
+        let filters = req.body.filters;
+        let newTitle = req.body.BaseTypeTitle;
+        const result = await ws_updateBaseType({
+            pool,
+            poolConnect
+        }, filters, newTitle);
+        res.send(result);
+    })
+
 const {
     ws_loadBaseType,
     ws_createBaseType,
     ws_updateBaseType,
 } = require("./T02-Creating Constant Identifiers/commonBaseMethods");
-
-
-(async () => {
-    ws_updateBaseType({pool, poolConnect}, {BaseTypeCode: '6'}, 'J')
-})();
 
 
 
