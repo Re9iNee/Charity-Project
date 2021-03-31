@@ -44,6 +44,15 @@ app.route("/commonBaseType")
         });
         res.send(result)
     })
+    .post(async (req, res) => {
+        // T02 - Method 02
+        // Attach BaseTypeTitle vai JSON File to request.body
+        const result = await ws_createBaseType({
+            pool,
+            poolConnect
+        }, req.body.BaseTypeTitle)
+        res.send({result})
+    })
 
 const {
     ws_loadBaseType,
