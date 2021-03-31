@@ -18,35 +18,40 @@ pool.on("error", err => {
 
 const express = require("express");
 const app = express();
+const port = 3000;
+app.listen(port, () => {
+    console.log(`Listening on ${port}`)
+});
+app.use(express.json({
+    limit: '1mb'
+}));
 
 
 /*  TASK 2 */
 
+app.route("/commonBaseType")
+    .get(async (req, res) => {
+        let query = req.query;
+        // T02 - Method 01
+        // path: /commonBaseType/?CommonBaseTypeId=4&BaseTypeCode=3&BaseTypeTitle=Asghar
+        const result = await ws_loadBaseType({
+            pool,
+            poolConnect
+        }, {
+            BaseTypeCode: query.BaseTypeCode,
+            BaseTypeTitle: query.BaseTypeTitle,
+            CommonBaseTypeId: query.CommonBaseTypeId
+        });
+        res.send(result)
+    })
+
 const {
     ws_loadBaseType,
-    ws_createBaseType
+    ws_createBaseType,
 } = require("./T02-Creating Constant Identifiers/commonBaseMethods");
 
-/* Examples: Task 02. Method 01 */
-// ws_loadBaseType({pool, poolConnect}, {BaseTypeCode: 23, BaseTypeTitle: "Asghar", CommonBaseTypeId: 2});
-// Usuage: 
-// (async () => {
-//     const result = await ws_loadBaseType({pool, poolConnect}, {BaseTypeCode: null, BaseTypeTitle: null, CommonBaseTypeId: null});
-//     console.dir(result)
-// })();
 
 
-
-
-
-// Exmaple: Task 02. Method 02
-(async () => {
-    const result = await ws_createBaseType({
-        pool,
-        poolConnect
-    }, 'E')
-    console.log("Created Row has an Id Of, CommonBaseTypeId: ", result)
-})();
 
 
 
