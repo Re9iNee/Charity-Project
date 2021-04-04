@@ -1,0 +1,1 @@
+UPDATE [SabkadV01].[dbo].[tblCommonBaseType] SET BaseTypeTitle = 'F' WHERE CommonBaseTypeId = 9
