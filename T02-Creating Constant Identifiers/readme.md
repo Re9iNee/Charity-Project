@@ -11,12 +11,12 @@
 
 
 ## Method 3 - Updating into CommonBaseType table
- - Start: 
- - End:
+ - Start: 11 Farvardin - 13:54
+ - End: 11 Farvardin - 15:26
 
 ## Method 4 - Deleting from CommonBaseType table
- - Start: 
- - End:
+ - Start: 15 Farvardin - 14:15
+ - End: 15 Farvardin - 15
 
 ## PostMan Documentation
 
