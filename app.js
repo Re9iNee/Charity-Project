@@ -72,11 +72,15 @@ const {
     ws_loadBaseType,
     ws_createBaseType,
     ws_updateBaseType,
+    ws_deleteBaseType
 } = require("./T02-Creating Constant Identifiers/commonBaseMethods");
 
 
 
-
+(async () => {
+    const result = await ws_deleteBaseType({pool, poolConnect}, 6)
+    console.log(result);
+})();
 
 
 
@@ -102,5 +106,5 @@ const {
     // const result = await ws_createBaseValue({
     //     pool,
     //     poolConnect
-    // }, '23', '24', '4')
+    // }, '1', '1', '1')
 })();
