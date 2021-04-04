@@ -19,10 +19,14 @@
  - End:
 
 ## PostMan Documentation
+
+
  All Postman Requests for this table included:
   https://documenter.getpostman.com/view/6106774/TzCQa6DK#6aabc499-27dd-4775-a982-6aa6a29a4710
+
+
  Postman Collection JSON:
- /docs/SabkadV01.postman_collection.json
+ https://github.com/Re9iNee/Sabkad/blob/master/T02-Creating%20Constant%20Identifiers/docs/SabkadV01.postman_collection.json
 
 ## Questions
 
