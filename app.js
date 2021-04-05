@@ -74,8 +74,12 @@ app.route("/commonBaseType")
             pool,
             poolConnect
         }, id);
-        res.send({result});
+        res.send({
+            result
+        });
     })
+
+
 
 const {
     ws_loadBaseType,
@@ -86,12 +90,31 @@ const {
 
 
 
-// Example: Task 03, Method 01
 /*  TASK 3 */
 const {
     ws_loadBaseValue,
     ws_createBaseValue
 } = require("./T03 - BaseInfo Services - Constant Values Task/constantValues");
+
+app.route("/commonBaseData")
+    .get(async (req, res) => {
+        let query = req.query;
+        // T03 - Method 01
+        // path: /commonBaseData/?CommonBaseDataId=4&BaseCode=3&BaseValue=Asghar&CommonBaseTypeId=1
+        const result = await ws_loadBaseValue({
+            pool,
+            poolConnect
+        }, {
+            CommonBaseDataId: query.CommonBaseDataId,
+            BaseCode: query.BaseCode,
+            BaseValue: query.BaseValue,
+            CommonBaseTypeId: query.CommonBaseTypeId
+        });
+        res.send(result)
+    });
+
+
+
 (async () => {
     // Method 01
     // const result = await ws_loadBaseValue({
