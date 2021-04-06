@@ -12,22 +12,24 @@
 
 
 ## Method 3 - Updating into CommonBaseData table
- - Start: 
- - End: 
+ - Start: 17 Farvardin 13:02
+ - End: 17 Farvardin 14:26
 
 
-## Method 4 - Deleting from CommonBaseData table
+<!-- ## Method 4 - Deleting from CommonBaseData table
  - Start: 
- - End: 
+ - End:  -->
 
 ## PostMan Documentation
 
 
  All Postman Requests for this table included:
-  https://documenter.getpostman.com/view/6106774/TzCQa6DK#6aabc499-27dd-4775-a982-6aa6a29a4710
 
+  https://documenter.getpostman.com/view/6106774/TzCQa6DK#8d8bd00c-dce0-4de4-ae86-4e6453bb9edb
 
- Postman Collection JSON:
+<!-- 
+ Postman Collection JSON: -->
+
  <!-- https://github.com/Re9iNee/Sabkad/blob/master/T02-Creating%20Constant%20Identifiers/docs/SabkadV01.postman_collection.json -->
 
 ## Questions
