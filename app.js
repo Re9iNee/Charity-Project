@@ -112,6 +112,19 @@ app.route("/commonBaseData")
         });
         res.send(result)
     })
+    .post(async (req, res) => {
+        // T03 - Method 02
+        // Attach baseValue and commonBaseTypeId to request body
+        let {
+            baseValue,
+            commonBaseTypeId
+        } = req.body;
+        const result = await ws_createBaseValue({
+            pool,
+            poolConnect
+        }, baseValue, commonBaseTypeId)
+        res.send(result);
+    });
 
 
 
@@ -127,8 +140,8 @@ app.route("/commonBaseData")
     //     BaseValue: 'dwad',
     // })
     // Method 02
-    const result = await ws_createBaseValue({
-        pool,
-        poolConnect
-    }, '2', '4')
+    // const result = await ws_createBaseValue({
+    //     pool,
+    //     poolConnect
+    // }, '2', '4')
 })();
