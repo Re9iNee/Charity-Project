@@ -12,3 +12,11 @@ exports.normalizeQueryString = (queryString, filters) => {
 }
 exports.toHex = int => int.toString(16);
 exports.toInt = hex => parseInt(hex, 16);
+exports.addZero = (number, length) => {
+    number = String(number).split('');
+    while(number.length < length){
+        number.unshift(0);
+    }
+    number = number.join('');
+    return number;
+}

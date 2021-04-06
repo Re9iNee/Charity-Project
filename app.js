@@ -111,7 +111,7 @@ app.route("/commonBaseData")
             CommonBaseTypeId: query.CommonBaseTypeId
         });
         res.send(result)
-    });
+    })
 
 
 
@@ -127,8 +127,8 @@ app.route("/commonBaseData")
     //     BaseValue: 'dwad',
     // })
     // Method 02
-    // const result = await ws_createBaseValue({
-    //     pool,
-    //     poolConnect
-    // }, '1', '1', '1')
+    const result = await ws_createBaseValue({
+        pool,
+        poolConnect
+    }, '2', '4')
 })();
