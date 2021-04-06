@@ -93,7 +93,8 @@ const {
 /*  TASK 3 */
 const {
     ws_loadBaseValue,
-    ws_createBaseValue
+    ws_createBaseValue,
+    ws_updateBaseValue,
 } = require("./T03 - BaseInfo Services - Constant Values Task/constantValues");
 
 app.route("/commonBaseData")
@@ -144,4 +145,13 @@ app.route("/commonBaseData")
     //     pool,
     //     poolConnect
     // }, '2', '4')
+    // Method 03
+    const result = await ws_updateBaseValue({
+        pool,
+        poolConnect
+    }, {
+        CommonBaseTypeId: 4
+    }, {
+        baseValue: 256
+    })
 })();
