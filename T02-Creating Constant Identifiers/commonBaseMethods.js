@@ -89,8 +89,9 @@ const ws_updateBaseType = async (connection, filters, newBaseTypeTitle) => {
     queryString = normalizeQueryString(queryString, filters)
     try {
         const request = pool.request();
-        const result = await request.query(queryString);
-        return result;
+        const updateResult = await request.query(queryString);
+        const table = await ws_loadBaseType(connection)
+        return table;
     } catch (err) {
         console.error("SQL error: ", err);
     }
