@@ -125,8 +125,16 @@ app.route("/commonBaseData")
             poolConnect
         }, baseValue, commonBaseTypeId)
         res.send(result);
+    })
+    .put(async (req, res) => {
+        // Attach filters object and newValues to request body
+        // 
+        const result = await ws_updateBaseValue({
+            pool,
+            poolConnect
+        }, req.body.filters , req.body.newValues);
+        res.send(result);
     });
-
 
 
 (async () => {
@@ -146,12 +154,12 @@ app.route("/commonBaseData")
     //     poolConnect
     // }, '2', '4')
     // Method 03
-    const result = await ws_updateBaseValue({
-        pool,
-        poolConnect
-    }, {
-        CommonBaseTypeId: 4
-    }, {
-        baseValue: 256
-    })
+    // const result = await ws_updateBaseValue({
+    //     pool,
+    //     poolConnect
+    // }, {
+    //     CommonBaseTypeId: 4
+    // }, {
+    //     baseValue: 256
+    // })
 })();

@@ -98,9 +98,9 @@ const ws_updateBaseValue = async (connection, filters, newValues) => {
     } = newValues;
     let queryString = `UPDATE [SabkadV01].[dbo].[tblCommonBaseData] SET `
     if (commonBaseTypeId && baseValue)
-        queryString += ` CommonBaseTypeId = ${commonBaseTypeId}, baseValue = ${baseValue} `;
+        queryString += ` CommonBaseTypeId = ${commonBaseTypeId}, BaseValue = ${baseValue} `;
     else if (baseValue)
-        queryString += ` baseValue = ${baseValue}`;
+        queryString += ` BaseValue = ${baseValue}`;
     else if (commonBaseTypeId)
         queryString += ` CommonBaseTypeId = ${commonBaseTypeId}`;
 
