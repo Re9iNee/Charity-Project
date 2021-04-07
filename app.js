@@ -95,6 +95,7 @@ const {
     ws_loadBaseValue,
     ws_createBaseValue,
     ws_updateBaseValue,
+    ws_deleteBaseValue,
 } = require("./T03 - BaseInfo Services - Constant Values Task/constantValues");
 
 app.route("/commonBaseData")
@@ -162,4 +163,6 @@ app.route("/commonBaseData")
     // }, {
     //     baseValue: 256
     // })
+    // Method 04
+    const result = await ws_deleteBaseValue({pool, poolConnect}, "1");
 })();

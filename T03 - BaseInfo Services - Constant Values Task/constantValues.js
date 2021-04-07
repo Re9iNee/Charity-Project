@@ -121,8 +121,44 @@ const ws_updateBaseValue = async (connection, filters, newValues) => {
 }
 
 
+const ws_deleteBaseValue = async (connection, commonBaseDataId) => {
+    const canRemove = await checkForeignKey(connection, {
+        CommonBaseDataId: commonBaseDataId
+    }, "tblCommonBaseData");
+    console.log(canRemove);
+}
+
+
+
+async function checkForeignKey(connection, filters, ...tables) {
+    const {
+        pool,
+        poolConnect
+    } = connection;
+    // ensures that the pool has been created
+    await poolConnect;
+    for (let table of tables) {
+        let queryString = `SELECT TOP (1) [${Object.keys(filters)[0]}]
+        FROM [SabkadV01].[dbo].[${table}]
+        WHERE 1=1`
+        queryString = normalizeQueryString(queryString, filters);
+        try {
+            const request = pool.request();
+            const result = await request.query(queryString);
+            const canRemove = !result.recordset.length;
+            if (!canRemove) 
+                throw new Error(`This Foreign key depends on ${table} table, and can not be removed`)
+        } catch (err) {
+            console.error("SQL error: ", err);
+            return false;
+        }
+    }
+    return true;
+}
+
 module.exports = {
     ws_loadBaseValue,
     ws_createBaseValue,
     ws_updateBaseValue,
+    ws_deleteBaseValue,
 }
