@@ -93,7 +93,9 @@ const {
 /*  TASK 3 */
 const {
     ws_loadBaseValue,
-    ws_createBaseValue
+    ws_createBaseValue,
+    ws_updateBaseValue,
+    ws_deleteBaseValue,
 } = require("./T03 - BaseInfo Services - Constant Values Task/constantValues");
 
 app.route("/commonBaseData")
@@ -111,8 +113,35 @@ app.route("/commonBaseData")
             CommonBaseTypeId: query.CommonBaseTypeId
         });
         res.send(result)
+    })
+    .post(async (req, res) => {
+        // T03 - Method 02
+        // Attach baseValue and commonBaseTypeId to request body
+        let {
+            baseValue,
+            commonBaseTypeId
+        } = req.body;
+        const result = await ws_createBaseValue({
+            pool,
+            poolConnect
+        }, baseValue, commonBaseTypeId)
+        res.send(result);
+    })
+    .put(async (req, res) => {
+        // T03 - Method 03
+        // Attach filters object and newValues to request body
+        const result = await ws_updateBaseValue({
+            pool,
+            poolConnect
+        }, req.body.filters, req.body.newValues);
+        res.send(result);
+    })
+    .delete(async (req, res) => {
+        // T03 - Method 04
+        // Attach commonBaseDataId to request body
+        const result = await ws_deleteBaseValue({pool, poolConnect}, req.body.commonBaseDataId);
+        res.send(result);
     });
-
 
 
 (async () => {
@@ -130,5 +159,17 @@ app.route("/commonBaseData")
     // const result = await ws_createBaseValue({
     //     pool,
     //     poolConnect
-    // }, '1', '1', '1')
+    // }, '2', '4')
+    // Method 03
+    // const result = await ws_updateBaseValue({
+    //     pool,
+    //     poolConnect
+    // }, {
+    //     CommonBaseTypeId: 4
+    // }, {
+    //     baseValue: 256
+    // })
+    // Method 04
+    // const result = await ws_deleteBaseValue({pool, poolConnect}, "3");
+    // console.log(result)
 })();
