@@ -27,9 +27,9 @@
 
   https://documenter.getpostman.com/view/6106774/TzCQa6DK#8d8bd00c-dce0-4de4-ae86-4e6453bb9edb
 
- <!-- Postman Collection JSON: -->
+ Postman Collection JSON:
 
- <!-- https://github.com/Re9iNee/Sabkad/blob/master/T02-Creating%20Constant%20Identifiers/docs/SabkadV01.postman_collection.json -->
+ https://github.com/Re9iNee/Sabkad/blob/master/T03%20-%20BaseInfo%20Services%20-%20Constant%20Values%20Task/Docs/SabkadV01.postman_collection.json
 
 ## Questions
 
@@ -42,4 +42,7 @@
  SQL Insertion won't return Id of the affected row. so by using SELCET Query right after insertion we can use CommonBaseTypeId and the return it.
 
  4. Why Using outputDependencies? 
- As in Issue #15 this method has one disadvatange that is: it contains bug when a primary key or 2 keys from a table make up to a foreign key.
+ As in Issue #15
+ > https://github.com/Re9iNee/Sabkad/issues/15#issue-852374633
+ 
+  this method has one disadvatange that is: it contains bug when a primary key or 2 keys from a table make up to a foreign key.
