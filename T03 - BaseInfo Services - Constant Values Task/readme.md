@@ -19,6 +19,7 @@
 ## Method 4 - Deleting from CommonBaseData table
  - Start: 17 Farvardin
  - End: 19 Farvardin 17:27
+ - Estimate written time: 3Hours
 
 ## PostMan Documentation
 
