@@ -128,12 +128,18 @@ app.route("/commonBaseData")
         res.send(result);
     })
     .put(async (req, res) => {
+        // T03 - Method 03
         // Attach filters object and newValues to request body
-        // 
         const result = await ws_updateBaseValue({
             pool,
             poolConnect
-        }, req.body.filters , req.body.newValues);
+        }, req.body.filters, req.body.newValues);
+        res.send(result);
+    })
+    .delete(async (req, res) => {
+        // T03 - Method 04
+        // Attach commonBaseDataId to request body
+        const result = await ws_deleteBaseValue({pool, poolConnect}, req.body.commonBaseDataId);
         res.send(result);
     });
 
@@ -164,6 +170,6 @@ app.route("/commonBaseData")
     //     baseValue: 256
     // })
     // Method 04
-    const result = await ws_deleteBaseValue({pool, poolConnect}, "3");
-    console.log(result)
+    // const result = await ws_deleteBaseValue({pool, poolConnect}, "3");
+    // console.log(result)
 })();
