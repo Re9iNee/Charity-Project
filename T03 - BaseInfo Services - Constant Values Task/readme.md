@@ -16,9 +16,9 @@
  - End: 17 Farvardin 14:26
 
 
-<!-- ## Method 4 - Deleting from CommonBaseData table
- - Start: 
- - End:  -->
+## Method 4 - Deleting from CommonBaseData table
+ - Start: 17 Farvardin
+ - End: 19 Farvardin 17:27
 
 ## PostMan Documentation
 
@@ -27,8 +27,7 @@
 
   https://documenter.getpostman.com/view/6106774/TzCQa6DK#8d8bd00c-dce0-4de4-ae86-4e6453bb9edb
 
-<!-- 
- Postman Collection JSON: -->
+ <!-- Postman Collection JSON: -->
 
  <!-- https://github.com/Re9iNee/Sabkad/blob/master/T02-Creating%20Constant%20Identifiers/docs/SabkadV01.postman_collection.json -->
 
@@ -42,4 +41,5 @@
 3. Why Scope Identity?
  SQL Insertion won't return Id of the affected row. so by using SELCET Query right after insertion we can use CommonBaseTypeId and the return it.
 
-
+ 4. Why Using outputDependencies? 
+ As in Issue #15 this method has one disadvatange that is: it contains bug when a primary key or 2 keys from a table make up to a foreign key.
