@@ -164,5 +164,6 @@ app.route("/commonBaseData")
     //     baseValue: 256
     // })
     // Method 04
-    const result = await ws_deleteBaseValue({pool, poolConnect}, "1");
+    const result = await ws_deleteBaseValue({pool, poolConnect}, "3");
+    console.log(result)
 })();

@@ -1,4 +1,7 @@
 const {
+    connect
+} = require("http2");
+const {
     normalizeQueryString,
     addZero
 } = require("../others/commonModules");
@@ -122,38 +125,25 @@ const ws_updateBaseValue = async (connection, filters, newValues) => {
 
 
 const ws_deleteBaseValue = async (connection, commonBaseDataId) => {
-    const canRemove = await checkForeignKey(connection, {
-        CommonBaseDataId: commonBaseDataId
-    }, "tblCommonBaseData");
-    console.log(canRemove);
-}
-
-
-
-async function checkForeignKey(connection, filters, ...tables) {
+    const {checkForeignKey} = require("../others/commonModules");
+    const canRemove = await checkForeignKey(connection, "tblCommonBaseData", commonBaseDataId);
+    if (!canRemove) return {status: "Failed", msg: "Can not remove this ID"};
     const {
         pool,
         poolConnect
     } = connection;
     // ensures that the pool has been created
     await poolConnect;
-    for (let table of tables) {
-        let queryString = `SELECT TOP (1) [${Object.keys(filters)[0]}]
-        FROM [SabkadV01].[dbo].[${table}]
-        WHERE 1=1`
-        queryString = normalizeQueryString(queryString, filters);
-        try {
-            const request = pool.request();
-            const result = await request.query(queryString);
-            const canRemove = !result.recordset.length;
-            if (!canRemove) 
-                throw new Error(`This Foreign key depends on ${table} table, and can not be removed`)
-        } catch (err) {
-            console.error("SQL error: ", err);
-            return false;
-        }
+
+    let queryString = `DELETE [SabkadV01].[dbo].[tblCommonBaseData] WHERE CommonBaseDataId = ${commonBaseDataId};`
+    try {
+        const request = pool.request();
+        const deleteResult = await request.query(queryString);
+        const table = await ws_loadBaseValue(connection);
+        return table;
+    } catch (err) {
+        console.error("SQL error: ", err)
     }
-    return true;
 }
 
 module.exports = {
