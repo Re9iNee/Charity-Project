@@ -1,9 +1,9 @@
 # Task 4 - Basic Information Services - Charity Accounts
 
 ## Method 1 - Fetching charityAccounts table
-<!-- - Start: 4 Farvardin 9:00
-- End: 4 Farvardin 13:00
- -->
+- Start: 22 Farvardin 16:50
+- End: 22 Farvardin 17:34
+
 
 <!-- ## Method 2 - Inserting into CommonBaseType table
  - Start: 16 Farvardin 11:56
@@ -24,11 +24,11 @@
 ## PostMan Documentation
 
 
- <!-- All Postman Requests for this table included:
+ All Postman Requests for this table included:
 
-  https://documenter.getpostman.com/view/6106774/TzCQa6DK#8d8bd00c-dce0-4de4-ae86-4e6453bb9edb
+  https://documenter.getpostman.com/view/6106774/TzCQa6DK#9de17519-f477-406e-bd66-7cf8461d7d52
 
- Postman Collection JSON:
+ <!-- Postman Collection JSON:
 
  https://github.com/Re9iNee/Sabkad/blob/master/T03%20-%20BaseInfo%20Services%20-%20Constant%20Values%20Task/Docs/SabkadV01.postman_collection.json -->
 
