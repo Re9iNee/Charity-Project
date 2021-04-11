@@ -139,11 +139,24 @@ app.route("/commonBaseData")
     .delete(async (req, res) => {
         // T03 - Method 04
         // Attach commonBaseDataId to request body
-        const result = await ws_deleteBaseValue({pool, poolConnect}, req.body.commonBaseDataId);
+        const result = await ws_deleteBaseValue({
+            pool,
+            poolConnect
+        }, req.body.commonBaseDataId);
         res.send(result);
     });
 
-
+/* Task 04 */
+const {
+    ws_loadCharityAccounts
+} = require("./T04 - Charity Accounts/charityAccounts");
 (async () => {
-    
+    const result = await ws_loadCharityAccounts({
+        pool,
+        poolConnect
+    }, {
+        BankId: 6,
+        BaseTypeCode: '1'
+    })
+    console.log(result)
 })();
