@@ -145,31 +145,5 @@ app.route("/commonBaseData")
 
 
 (async () => {
-    // Method 01
-    // const result = await ws_loadBaseValue({
-    //     pool,
-    //     poolConnect
-    // }, {
-    //     CommonBaseDataId: 1,
-    //     CommonBaseTypeId: '5',
-    //     BaseCode: '2',
-    //     BaseValue: 'dwad',
-    // })
-    // Method 02
-    // const result = await ws_createBaseValue({
-    //     pool,
-    //     poolConnect
-    // }, '2', '4')
-    // Method 03
-    // const result = await ws_updateBaseValue({
-    //     pool,
-    //     poolConnect
-    // }, {
-    //     CommonBaseTypeId: 4
-    // }, {
-    //     baseValue: 256
-    // })
-    // Method 04
-    // const result = await ws_deleteBaseValue({pool, poolConnect}, "3");
-    // console.log(result)
+    
 })();

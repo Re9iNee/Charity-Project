@@ -1,7 +1,4 @@
 const {
-    connect
-} = require("http2");
-const {
     normalizeQueryString,
     addZero
 } = require("../others/commonModules");
