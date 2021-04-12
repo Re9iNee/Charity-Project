@@ -183,5 +183,11 @@ const {
     //     BaseTypeCode: '1'
     // })
     // console.log(result)
-    
+
 })();
+
+
+
+const {validateCreditCard} = require("./others/bank");
+// returns true if valid.
+console.log(validateCreditCard("6037697579081792"));
