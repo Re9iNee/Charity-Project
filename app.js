@@ -171,7 +171,9 @@ app.route("/charityAccounts")
 
 /* Task 04 */
 const {
-    ws_loadCharityAccounts
+    ws_loadCharityAccounts,
+    ws_createCharityAccounts,
+
 } = require("./T04 - Charity Accounts/charityAccounts");
 (async () => {
     // Task 04 Method 01
@@ -183,11 +185,16 @@ const {
     //     BaseTypeCode: '1'
     // })
     // console.log(result)
-
+    // Task 04 Method 02
+    const result = await ws_createCharityAccounts({
+        pool,
+        poolConnect
+    }, {
+        BankId: 7,
+        BranchName: "Ahmadabad",
+        OwnerName: "Ali",
+        CardNumber: "5022291045970124",
+        AccountNumber: "1",
+        AccountName: "Nam-e-Hesab"
+    });
 })();
-
-
-
-const {validateCreditCard} = require("./others/bank");
-// returns true if valid.
-console.log(validateCreditCard("6037697579081792"));
