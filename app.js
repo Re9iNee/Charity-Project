@@ -177,6 +177,17 @@ app.route("/charityAccounts")
             poolConnect
         }, req.body);
         res.send(result)
+    })
+    .put(async (req, res) => {
+        // T04 - Method 03
+        // Attach filters object and newValues to request body
+        // parameters: sql connection, filters, newValues
+        // returns charityAccounts Table
+        const result = await ws_updateCharityAccounts({
+            pool,
+            poolConnect
+        }, req.body.filters, req.body.newValues);
+        res.send(result);
     });
 
 /* Task 04 */
@@ -209,14 +220,14 @@ const {
     // });
     // Task 04 Method 03
     // parameters: sql connection, filters, newValues
-    const result = await ws_updateCharityAccounts({
-        pool,
-        poolConnect
-    }, {
-        CharityAccountId: "1"
-    }, {
-        CardNumber: "6037691596008235",
-        BranchName: "Molasadra",
-    });
-    console.log(result);
+    // const result = await ws_updateCharityAccounts({
+    //     pool,
+    //     poolConnect
+    // }, {
+    //     CharityAccountId: "1"
+    // }, {
+    //     CardNumber: "6037691596008235",
+    //     BranchName: "Molasadra",
+    // });
+    // console.log(result);
 })();
