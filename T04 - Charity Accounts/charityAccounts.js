@@ -101,7 +101,37 @@ const ws_createCharityAccounts = async (connection, details) => {
 
 }
 
+const ws_updateCharityAccounts = async (connection, filters, newValues) => {
+
+    let queryString = `UPDATE [SabkadV01].[dbo].[tblCharityAccounts] SET `
+    const {setToQueryString} = require("../others/commonModules")
+    // setToQueryString returns: Update ... SET sth = 2, test = 3
+    queryString = setToQueryString(queryString, newValues) + " WHERE 1=1 ";
+    queryString = normalizeQueryString(queryString, filters);
+    console.log(queryString)
+    // Can we Do this? queryString= ... SET BranchName = "Ahmad Abad",;
+    // Or this? queryString = ... SET , BranchName = "Ahmad Abad";
+
+    const {
+        pool,
+        poolConnect
+    } = connection;
+    // ensures that the pool has been created
+    await poolConnect;
+    
+    try {
+        const request = pool.request();
+        const updateResult = await request.query(queryString);
+        // return table records
+        const table = await ws_loadCharityAccounts(connection);
+        return table;
+    } catch (err) {
+        console.error("SQL error: ", err);
+    }
+}
+
 module.exports = {
     ws_loadCharityAccounts,
     ws_createCharityAccounts,
+    ws_updateCharityAccounts,
 }

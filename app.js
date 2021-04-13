@@ -1,18 +1,18 @@
 require("dotenv").config();
 
 
-// const sql = require("mssql");
-// const config = {
-//     user: process.env.DB_USER,
-//     password: process.env.DB_PWD,
-//     server: process.env.DB_SERVER,
-//     database: process.env.DB_DATABASE,
-// }
-// const pool = new sql.ConnectionPool(config);
-// const poolConnect = pool.connect();
-// pool.on("error", err => {
-//     console.log("Could not Connect to the Database", err);
-// })
+const sql = require("mssql");
+const config = {
+    user: process.env.DB_USER,
+    password: process.env.DB_PWD,
+    server: process.env.DB_SERVER,
+    database: process.env.DB_DATABASE,
+}
+const pool = new sql.ConnectionPool(config);
+const poolConnect = pool.connect();
+pool.on("error", err => {
+    console.log("Could not Connect to the Database", err);
+})
 
 
 
@@ -183,7 +183,7 @@ app.route("/charityAccounts")
 const {
     ws_loadCharityAccounts,
     ws_createCharityAccounts,
-
+    ws_updateCharityAccounts,
 } = require("./T04 - Charity Accounts/charityAccounts");
 (async () => {
     // Task 04 Method 01
@@ -207,4 +207,16 @@ const {
     //     AccountNumber: "1",
     //     AccountName: "Nam-e-Hesab"
     // });
+    // Task 04 Method 03
+    // parameters: sql connection, filters, newValues
+    const result = await ws_updateCharityAccounts({
+        pool,
+        poolConnect
+    }, {
+        CharityAccountId: "1"
+    }, {
+        CardNumber: "6037691596008235",
+        BranchName: "Molasadra",
+    });
+    console.log(result);
 })();
