@@ -5,18 +5,17 @@
 - End: 22 Farvardin 17:34
 
 
-<!-- ## Method 2 - Inserting into CommonBaseType table
- - Start: 16 Farvardin 11:56
- - End: 16 Farvardin 13:15
- - Modification #1 (generating key #35aa101): 40 Minutes on 17 Farvardin
+## Method 2 - Inserting into CharityAccounts table
+ - Start: 23 Farvardin 20:00
+ - End: 23 Farvardin 21:15
 
 
-## Method 3 - Updating into CommonBaseData table
+<!-- ## Method 3 - Updating into CommonBaseData table
  - Start: 17 Farvardin 13:02
- - End: 17 Farvardin 14:26
+ - End: 17 Farvardin 14:26 -->
 
 
-## Method 4 - Deleting from CommonBaseData table
+<!-- ## Method 4 - Deleting from CommonBaseData table
  - Start: 17 Farvardin
  - End: 19 Farvardin 17:27
  - Estimate written time: 3Hours -->

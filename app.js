@@ -1,18 +1,18 @@
 require("dotenv").config();
 
 
-const sql = require("mssql");
-const config = {
-    user: process.env.DB_USER,
-    password: process.env.DB_PWD,
-    server: process.env.DB_SERVER,
-    database: process.env.DB_DATABASE,
-}
-const pool = new sql.ConnectionPool(config);
-const poolConnect = pool.connect();
-pool.on("error", err => {
-    console.log("Could not Connect to the Database", err);
-})
+// const sql = require("mssql");
+// const config = {
+//     user: process.env.DB_USER,
+//     password: process.env.DB_PWD,
+//     server: process.env.DB_SERVER,
+//     database: process.env.DB_DATABASE,
+// }
+// const pool = new sql.ConnectionPool(config);
+// const poolConnect = pool.connect();
+// pool.on("error", err => {
+//     console.log("Could not Connect to the Database", err);
+// })
 
 
 
@@ -167,6 +167,16 @@ app.route("/charityAccounts")
         });
         // Easier way to send request is to send query object itself, but when it comes to typo it throws an error
         res.send(result)
+    })
+    .post(async (req, res) => {
+        // T04 - Method 02
+        // Attach params to body as an JSON format - Postman Request:
+        // https://documenter.getpostman.com/view/6106774/TzCQa6DK#4b0dc741-d2e1-46d4-b63a-e763d1d32ac4
+        const result = await ws_createCharityAccounts({
+            pool,
+            poolConnect
+        }, req.body);
+        res.send(result)
     });
 
 /* Task 04 */
@@ -186,15 +196,15 @@ const {
     // })
     // console.log(result)
     // Task 04 Method 02
-    const result = await ws_createCharityAccounts({
-        pool,
-        poolConnect
-    }, {
-        BankId: 7,
-        BranchName: "Ahmadabad",
-        OwnerName: "Ali",
-        CardNumber: "5022291045970124",
-        AccountNumber: "1",
-        AccountName: "Nam-e-Hesab"
-    });
+    // const result = await ws_createCharityAccounts({
+    //     pool,
+    //     poolConnect
+    // }, {
+    //     BankId: 7,
+    //     BranchName: "Ahmadabad",
+    //     OwnerName: "Ali",
+    //     CardNumber: "5022291045970124",
+    //     AccountNumber: "1",
+    //     AccountName: "Nam-e-Hesab"
+    // });
 })();
