@@ -81,10 +81,25 @@ const outputDependencies = async (connection, table) => {
     }
 }
 
+const setToQueryString = (queryString, newValues) => {
+    // queryString = 'UPDATE ... SET '
+    // newValues = {sth: 2, test: 3}
+    // returns: Update ... SET sth = 2, test = 3
+    let objEntries = Object.entries(newValues);
+    for (const [i, [property, value]] of objEntries.entries()) {
+        if (i == 0) 
+            queryString += ` ${property} = '${value}'`
+        else if (i < objEntries.length)
+            queryString += `, ${property} = '${value}'`
+    }
+    return queryString;
+}
+
 module.exports = {
     normalizeQueryString,
     toHex,
     toInt,
     addZero,
     checkForeignKey,
+    setToQueryString,
 }
