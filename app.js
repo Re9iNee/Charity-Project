@@ -167,13 +167,34 @@ app.route("/charityAccounts")
         });
         // Easier way to send request is to send query object itself, but when it comes to typo it throws an error
         res.send(result)
+    })
+    .post(async (req, res) => {
+        // T04 - Method 02
+        // Attach params to body as an JSON format - Postman Request:
+        // https://documenter.getpostman.com/view/6106774/TzCQa6DK#4b0dc741-d2e1-46d4-b63a-e763d1d32ac4
+        const result = await ws_createCharityAccounts({
+            pool,
+            poolConnect
+        }, req.body);
+        res.send(result)
+    })
+    .put(async (req, res) => {
+        // T04 - Method 03
+        // Attach filters object and newValues to request body
+        // parameters: sql connection, filters, newValues
+        // returns charityAccounts Table
+        const result = await ws_updateCharityAccounts({
+            pool,
+            poolConnect
+        }, req.body.filters, req.body.newValues);
+        res.send(result);
     });
 
 /* Task 04 */
 const {
     ws_loadCharityAccounts,
     ws_createCharityAccounts,
-
+    ws_updateCharityAccounts,
 } = require("./T04 - Charity Accounts/charityAccounts");
 (async () => {
     // Task 04 Method 01
@@ -186,15 +207,27 @@ const {
     // })
     // console.log(result)
     // Task 04 Method 02
-    const result = await ws_createCharityAccounts({
-        pool,
-        poolConnect
-    }, {
-        BankId: 7,
-        BranchName: "Ahmadabad",
-        OwnerName: "Ali",
-        CardNumber: "5022291045970124",
-        AccountNumber: "1",
-        AccountName: "Nam-e-Hesab"
-    });
+    // const result = await ws_createCharityAccounts({
+    //     pool,
+    //     poolConnect
+    // }, {
+    //     BankId: 7,
+    //     BranchName: "Ahmadabad",
+    //     OwnerName: "Ali",
+    //     CardNumber: "5022291045970124",
+    //     AccountNumber: "1",
+    //     AccountName: "Nam-e-Hesab"
+    // });
+    // Task 04 Method 03
+    // parameters: sql connection, filters, newValues
+    // const result = await ws_updateCharityAccounts({
+    //     pool,
+    //     poolConnect
+    // }, {
+    //     CharityAccountId: "1"
+    // }, {
+    //     CardNumber: "6037691596008235",
+    //     BranchName: "Molasadra",
+    // });
+    // console.log(result);
 })();
