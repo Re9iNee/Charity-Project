@@ -104,7 +104,9 @@ const ws_createCharityAccounts = async (connection, details) => {
 const ws_updateCharityAccounts = async (connection, filters, newValues) => {
 
     let queryString = `UPDATE [SabkadV01].[dbo].[tblCharityAccounts] SET `
-    const {setToQueryString} = require("../others/commonModules")
+    const {
+        setToQueryString
+    } = require("../others/commonModules")
     // setToQueryString returns: Update ... SET sth = 2, test = 3
     queryString = setToQueryString(queryString, newValues) + " WHERE 1=1 ";
     queryString = normalizeQueryString(queryString, filters);
@@ -112,13 +114,28 @@ const ws_updateCharityAccounts = async (connection, filters, newValues) => {
     // Can we Do this? queryString= ... SET BranchName = "Ahmad Abad",;
     // Or this? queryString = ... SET , BranchName = "Ahmad Abad";
 
+
+    if (filters.CardNumber) {
+        const {
+            validateCreditCard,
+        } = require("../others/bank");
+        // returns true if valid.
+        const valid = validateCreditCard(String(CardNumber));
+        if (!valid)
+            return {
+                status: "Failed",
+                msg: "The Credit Card Number is Incorrect.",
+                CardNumber
+            }
+    }
+
     const {
         pool,
         poolConnect
     } = connection;
     // ensures that the pool has been created
     await poolConnect;
-    
+
     try {
         const request = pool.request();
         const updateResult = await request.query(queryString);
