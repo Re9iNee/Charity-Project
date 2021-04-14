@@ -87,9 +87,8 @@ const ws_createCharityAccounts = async (connection, details) => {
     [SabkadV01].[dbo].[tblCharityAccounts]
     (BankId, BranchName, OwnerName, CardNumber, AccountNumber, AccountName)
     VALUES 
-    ('${BankId}', '${BranchName}', ${OwnerName}, ${CardNumber}, ${AccountNumber}, ${AccountName}); 
-    SELECT SCOPE_IDENTITY() AS CommonBaseDataId;`
-
+    ('${BankId}', '${BranchName}', '${OwnerName}', '${CardNumber}', '${AccountNumber}', '${AccountName}'); 
+    SELECT SCOPE_IDENTITY() AS charityAccountId;`
     try {
         const request = pool.request();
         const result = request.query(queryString);

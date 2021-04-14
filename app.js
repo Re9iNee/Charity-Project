@@ -176,6 +176,7 @@ app.route("/charityAccounts")
             pool,
             poolConnect
         }, req.body);
+        // sending req.body directly cause in that method we will deconstruct the object.
         res.send(result)
     })
     .put(async (req, res) => {
@@ -215,10 +216,11 @@ const {
     //     BankId: 7,
     //     BranchName: "Ahmadabad",
     //     OwnerName: "Ali",
-    //     CardNumber: "5022291045970124",
-    //     AccountNumber: "1",
+    //     CardNumber: "5022291025692979",
+    //     AccountNumber: "3",
     //     AccountName: "Nam-e-Hesab"
     // });
+    // console.log(result);
     // Task 04 Method 03
     // parameters: sql connection, filters, newValues
     // const result = await ws_updateCharityAccounts({
@@ -233,9 +235,9 @@ const {
     // console.log(result);
     // Task 04 Method 04
     // parameters: sql connection, charityAccountId
-    const result = await ws_deleteCharityAccounts({
-        pool,
-        poolConnect
-    }, "1");
-    console.log(result);
+    // const result = await ws_deleteCharityAccounts({
+    //     pool,
+    //     poolConnect
+    // }, "1");
+    // console.log(result);
 })();
