@@ -195,6 +195,7 @@ const {
     ws_loadCharityAccounts,
     ws_createCharityAccounts,
     ws_updateCharityAccounts,
+    ws_deleteCharityAccounts,
 } = require("./T04 - Charity Accounts/charityAccounts");
 (async () => {
     // Task 04 Method 01
@@ -230,4 +231,11 @@ const {
     //     BranchName: "Molasadra",
     // });
     // console.log(result);
+    // Task 04 Method 04
+    // parameters: sql connection, charityAccountId
+    const result = await ws_deleteCharityAccounts({
+        pool,
+        poolConnect
+    }, "1");
+    console.log(result);
 })();
