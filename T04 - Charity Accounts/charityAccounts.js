@@ -110,11 +110,9 @@ const ws_updateCharityAccounts = async (connection, filters, newValues) => {
     queryString = setToQueryString(queryString, newValues) + " WHERE 1=1 ";
     queryString = normalizeQueryString(queryString, filters);
     console.log(queryString)
-    // Can we Do this? queryString= ... SET BranchName = "Ahmad Abad",;
-    // Or this? queryString = ... SET , BranchName = "Ahmad Abad";
 
-
-    if (filters.CardNumber) {
+    if (newValues.CardNumber) {
+        CardNumber = newValues.CardNumber;
         const {
             validateCreditCard,
         } = require("../others/bank");
