@@ -32,7 +32,7 @@
 
 ## Questions
 
-<!--  1. Why Using Connection Pool?
+ 1. Why Using Connection Pool?
   We don't want to overhead database with so many connections. we open one use it for multiple Queries. then close() connection when we don't need it.
 2. Why resultLimit? 
  It is recommended to use SELECT TOP $(int) instead of Selecting and returning Everything from database.
@@ -44,4 +44,4 @@
  As in Issue #15
  > https://github.com/Re9iNee/Sabkad/issues/15#issue-852374633
  
-  this method has one disadvatange that is: it contains bug when a primary key or 2 keys from a table make up to a foreign key. -->
+  this method has one disadvatange that is: it contains bug when a primary key or 2 keys from a table make up to a foreign key.
