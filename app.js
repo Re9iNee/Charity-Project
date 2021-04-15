@@ -176,6 +176,7 @@ app.route("/charityAccounts")
             pool,
             poolConnect
         }, req.body);
+        // sending req.body directly cause in that method we will deconstruct the object.
         res.send(result)
     })
     .put(async (req, res) => {
@@ -188,6 +189,15 @@ app.route("/charityAccounts")
             poolConnect
         }, req.body.filters, req.body.newValues);
         res.send(result);
+    })
+    .delete(async (req, res) => {
+        // T04 - Method 04
+        // parameters: sql connection, charityAccountId
+        const result = await ws_deleteCharityAccounts({
+            pool,
+            poolConnect
+        }, req.body.charityAccountId);
+        res.send(result);
     });
 
 /* Task 04 */
@@ -195,6 +205,7 @@ const {
     ws_loadCharityAccounts,
     ws_createCharityAccounts,
     ws_updateCharityAccounts,
+    ws_deleteCharityAccounts,
 } = require("./T04 - Charity Accounts/charityAccounts");
 (async () => {
     // Task 04 Method 01
@@ -214,10 +225,11 @@ const {
     //     BankId: 7,
     //     BranchName: "Ahmadabad",
     //     OwnerName: "Ali",
-    //     CardNumber: "5022291045970124",
-    //     AccountNumber: "1",
+    //     CardNumber: "5022291025692979",
+    //     AccountNumber: "3",
     //     AccountName: "Nam-e-Hesab"
     // });
+    // console.log(result);
     // Task 04 Method 03
     // parameters: sql connection, filters, newValues
     // const result = await ws_updateCharityAccounts({
@@ -229,5 +241,12 @@ const {
     //     CardNumber: "6037691596008235",
     //     BranchName: "Molasadra",
     // });
+    // console.log(result);
+    // Task 04 Method 04
+    // parameters: sql connection, charityAccountId
+    // const result = await ws_deleteCharityAccounts({
+    //     pool,
+    //     poolConnect
+    // }, "1");
     // console.log(result);
 })();

@@ -87,9 +87,8 @@ const ws_createCharityAccounts = async (connection, details) => {
     [SabkadV01].[dbo].[tblCharityAccounts]
     (BankId, BranchName, OwnerName, CardNumber, AccountNumber, AccountName)
     VALUES 
-    ('${BankId}', '${BranchName}', ${OwnerName}, ${CardNumber}, ${AccountNumber}, ${AccountName}); 
-    SELECT SCOPE_IDENTITY() AS CommonBaseDataId;`
-
+    ('${BankId}', '${BranchName}', '${OwnerName}', '${CardNumber}', '${AccountNumber}', '${AccountName}'); 
+    SELECT SCOPE_IDENTITY() AS charityAccountId;`
     try {
         const request = pool.request();
         const result = request.query(queryString);
@@ -104,13 +103,28 @@ const ws_createCharityAccounts = async (connection, details) => {
 const ws_updateCharityAccounts = async (connection, filters, newValues) => {
 
     let queryString = `UPDATE [SabkadV01].[dbo].[tblCharityAccounts] SET `
-    const {setToQueryString} = require("../others/commonModules")
+    const {
+        setToQueryString
+    } = require("../others/commonModules")
     // setToQueryString returns: Update ... SET sth = 2, test = 3
     queryString = setToQueryString(queryString, newValues) + " WHERE 1=1 ";
     queryString = normalizeQueryString(queryString, filters);
     console.log(queryString)
-    // Can we Do this? queryString= ... SET BranchName = "Ahmad Abad",;
-    // Or this? queryString = ... SET , BranchName = "Ahmad Abad";
+
+    if (newValues.CardNumber) {
+        CardNumber = newValues.CardNumber;
+        const {
+            validateCreditCard,
+        } = require("../others/bank");
+        // returns true if valid.
+        const valid = validateCreditCard(String(CardNumber));
+        if (!valid)
+            return {
+                status: "Failed",
+                msg: "The Credit Card Number is Incorrect.",
+                CardNumber
+            }
+    }
 
     const {
         pool,
@@ -118,7 +132,7 @@ const ws_updateCharityAccounts = async (connection, filters, newValues) => {
     } = connection;
     // ensures that the pool has been created
     await poolConnect;
-    
+
     try {
         const request = pool.request();
         const updateResult = await request.query(queryString);
@@ -130,8 +144,38 @@ const ws_updateCharityAccounts = async (connection, filters, newValues) => {
     }
 }
 
+const ws_deleteCharityAccounts = async (connection, charityAccountId) => {
+    const {
+        checkForeignKey
+    } = require("../others/commonModules");
+    const canRemove = await checkForeignKey(connection, "tblCharityAccounts", charityAccountId);
+    if (!canRemove) return {
+        status: "Failed",
+        msg: "Can not remove this ID",
+        charityAccountId
+    };
+
+    const {
+        pool,
+        poolConnect
+    } = connection;
+    // ensures that the pool has been created
+    await poolConnect;
+
+    let queryString = `DELETE [SabkadV01].[dbo].[tblCharityAccounts] WHERE CharityAccountId = ${charityAccountId};`
+    try {
+        const request = pool.request();
+        const deleteResult = await request.query(queryString);
+        const table = await ws_loadCharityAccounts(connection);
+        return table;
+    } catch (err) {
+        console.log("SQL error: ", err);
+    }
+}
+
 module.exports = {
     ws_loadCharityAccounts,
     ws_createCharityAccounts,
     ws_updateCharityAccounts,
+    ws_deleteCharityAccounts,
 }
