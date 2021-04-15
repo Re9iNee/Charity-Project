@@ -189,6 +189,15 @@ app.route("/charityAccounts")
             poolConnect
         }, req.body.filters, req.body.newValues);
         res.send(result);
+    })
+    .delete(async (req, res) => {
+        // T04 - Method 04
+        // parameters: sql connection, charityAccountId
+        const result = await ws_deleteCharityAccounts({
+            pool,
+            poolConnect
+        }, req.body.charityAccountId);
+        res.send(result);
     });
 
 /* Task 04 */

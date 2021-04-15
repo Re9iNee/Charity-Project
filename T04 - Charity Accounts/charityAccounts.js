@@ -145,10 +145,16 @@ const ws_updateCharityAccounts = async (connection, filters, newValues) => {
 }
 
 const ws_deleteCharityAccounts = async (connection, charityAccountId) => {
-    const {checkForeignKey} = require("../others/commonModules");
-    const canRemove = await checkForeignKey(connection, "tblChariyAccounts", charityAccountId);
-    if (!canRemove) return {status: "Failed", msg: "Can not remove this ID"};
-    
+    const {
+        checkForeignKey
+    } = require("../others/commonModules");
+    const canRemove = await checkForeignKey(connection, "tblCharityAccounts", charityAccountId);
+    if (!canRemove) return {
+        status: "Failed",
+        msg: "Can not remove this ID",
+        charityAccountId
+    };
+
     const {
         pool,
         poolConnect
