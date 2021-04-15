@@ -10,15 +10,14 @@
  - End: 23 Farvardin 21:15
 
 
-<!-- ## Method 3 - Updating into CommonBaseData table
- - Start: 17 Farvardin 13:02
- - End: 17 Farvardin 14:26 -->
+## Method 3 - Updating into CharityAccounts table
+ - Start: 25 Farvardin
+ - End: 25 Farvardin
 
 
-<!-- ## Method 4 - Deleting from CommonBaseData table
- - Start: 17 Farvardin
- - End: 19 Farvardin 17:27
- - Estimate written time: 3Hours -->
+## Method 4 - Deleting from CharityAccounts table
+ - Start: 26 Farvardin 23:30
+ - End: 27 Farvardin 17:00
 
 ## PostMan Documentation
 
@@ -27,9 +26,9 @@
 
   https://documenter.getpostman.com/view/6106774/TzCQa6DK#9de17519-f477-406e-bd66-7cf8461d7d52
 
- <!-- Postman Collection JSON:
+ Postman Collection JSON:
 
- https://github.com/Re9iNee/Sabkad/blob/master/T03%20-%20BaseInfo%20Services%20-%20Constant%20Values%20Task/Docs/SabkadV01.postman_collection.json -->
+ https://github.com/Re9iNee/Sabkad/blob/master/T04%20-%20Charity%20Accounts/Docs/SabkadV01.postman_collection.json
 
 ## Questions
 
