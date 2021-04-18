@@ -1,0 +1,117 @@
+{
+	"info": {
+		"_postman_id": "e0b939eb-f93b-4998-b7ca-4a5f46711e4d",
+		"name": "SabkadV01",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "commonBaseType",
+			"item": [
+				{
+					"name": "commonBaseType POST",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"BaseTypeTitle\": \"I\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:3000/commonBaseType/",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"commonBaseType",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "commonBaseType GET",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:3000/commonBaseType/",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"commonBaseType",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "commonBaseType PUT",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"filters\": {\n        \"BaseTypeCode\": \"6\"\n    },\n    \"BaseTypeTitle\": \"G\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/commonBaseType",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"commonBaseType"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "commonBaseType DELETE",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"commonBaseTypeId\": 9\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/commonBaseType",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"commonBaseType"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

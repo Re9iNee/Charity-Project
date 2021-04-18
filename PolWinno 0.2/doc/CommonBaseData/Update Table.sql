@@ -1,0 +1,1 @@
+UPDATE [SabkadV01].[dbo].[tblCommonBaseData] SET BaseValue = '24', CommonBaseTypeId='4' WHERE CommonBaseDataId=3; 
