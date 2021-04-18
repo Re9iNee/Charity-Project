@@ -1,0 +1,1 @@
+UPDATE [SabkadV01].[dbo].[tblCharityAccounts] SET BranchName = '5Tan' WHERE CharityAccountId = '1';
