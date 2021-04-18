@@ -1,1 +1,0 @@
-SELECT TOP (1) [BaseTypeCode] FROM [SabkadV01].[dbo].[tblCommonBaseType] ORDER BY BaseTypeCode DESC;

@@ -1,1 +1,0 @@
-INSERT INTO [SabkadV01].[dbo].[tblCommonBaseData](BaseCode, BaseValue, CommonBaseTypeId) VALUES  (100, 100, 10)

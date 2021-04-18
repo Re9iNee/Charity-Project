@@ -1,1 +1,0 @@
-DELETE [SabkadV01].[dbo].[tblCharityAccounts] WHERE CharityAccountId = '1';

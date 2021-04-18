@@ -1,1 +1,0 @@
-DELETE [SabkadV01].[dbo].[tblCommonBaseType] WHERE CommonBaseTypeId = 11;
