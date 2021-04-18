@@ -11,8 +11,7 @@
 
 const {
     normalizeQueryString,
-    toHex,
-    toInt
+    addZero,
 } = require("../utils/commonModules");
 
 
@@ -45,9 +44,10 @@ const ws_loadBaseType = async (connection, filters, costumeQuery = null, resultL
 
 // Task 02 Method 02
 const ws_createBaseType = async (connection, baseTypeTitle) => {
-    // read last baseCode from table and create hex index then insert into table
+    // read last baseCode from table and create incremented one to insert
     const lastBaseCode = await getLastBaseCode(connection);
-    let baseTypeCode = toHex(lastBaseCode + 1);
+    let baseTypeCode = addZero(Number(lastBaseCode) + 1, 3);
+    
     if (!baseTypeTitle)
         return {
             status: "Failed",
@@ -90,8 +90,12 @@ async function checkDuplicateTitle(connection, baseTypeTitle) {
 }
 async function getLastBaseCode(connection) {
     let code = await ws_loadBaseType(connection, null, "ORDER BY BaseTypeCode DESC;", 1);
-    code = code.recordset[0].BaseTypeCode;
-    code = toInt(code);
+    try {
+        code = code.recordset[0].BaseTypeCode;
+    }
+    catch {
+        code = "000";
+    }
     return code;
 };
 
