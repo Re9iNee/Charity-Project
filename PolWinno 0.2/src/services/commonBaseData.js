@@ -33,7 +33,6 @@ const ws_loadBaseValue = async (connection, filters, customeQuery = null, result
 
 
 const ws_createBaseValue = async (connection, baseValue, commonBaseTypeId) => {
-
     const {
         pool,
         poolConnect
@@ -52,9 +51,9 @@ const ws_createBaseValue = async (connection, baseValue, commonBaseTypeId) => {
     }
     let baseCode = generateBaseCode(lastCode, commonBaseTypeId);
 
+    if (!baseValue || !baseCode || !commonBaseTypeId)
+        throw new Error("Error Creating Row, Fill Parameters Utterly");
     try {
-        if (!baseValue || !baseCode || !commonBaseTypeId)
-            throw new Error("Error Creating Row, Fill Parameters Utterly");
         // Select Scope Identity is for returning id of affected row(s)
         let queryString = `INSERT INTO 
         [SabkadV01].[dbo].[tblCommonBaseData]
@@ -64,8 +63,8 @@ const ws_createBaseValue = async (connection, baseValue, commonBaseTypeId) => {
         SELECT SCOPE_IDENTITY() AS CommonBaseDataId;`;
         const request = pool.request();
         const result = await request.query(queryString);
-        console.dir(result);
-        return result;
+        const id = result.recordset[0].CommonBaseDataId;
+        return id;
     } catch (err) {
         console.error("ws_createBaseValue error: ", err);
     }
@@ -128,7 +127,7 @@ const ws_updateBaseValue = async (connection, filters, newValues) => {
 const ws_deleteBaseValue = async (connection, commonBaseDataId) => {
     const {checkForeignKey} = require("../utils/commonModules");
     const canRemove = await checkForeignKey(connection, "tblCommonBaseData", commonBaseDataId);
-    if (!canRemove) return {status: "Failed", msg: "Can not remove this ID", commonBaseDataId};
+    if (!canRemove) return {status: "Failed", msg: "Can not remove this ID due to dependency", commonBaseDataId};
     const {
         pool,
         poolConnect
