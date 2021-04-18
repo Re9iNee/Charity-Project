@@ -57,10 +57,10 @@ const ws_createBaseType = async (connection, baseTypeTitle) => {
     await poolConnect;
     try {
         if (!baseTypeTitle || !baseTypeCode)
-            throw new Error("Error Creating Row, Fill Parameters Utterly");
+            return {status: "Failed", msg: "Error Creating Row, Fill Parameters Utterly"};
         /* Select Scope Identity is for returning id of affected row(s) */
         let queryString = `INSERT INTO 
-        [SabkadV01].[dbo].[tblCommonBaseType] (BaseTypeTitle, BaseTypeCode) VALUES ('${baseTypeTitle}', ${baseTypeCode}); SELECT SCOPE_IDENTITY() AS CommonBaseTypeId;`;
+        [SabkadV01].[dbo].[tblCommonBaseType] (BaseTypeTitle, BaseTypeCode) VALUES ('${baseTypeTitle}', '${baseTypeCode}'); SELECT SCOPE_IDENTITY() AS CommonBaseTypeId;`;
         const request = pool.request();
         const result = await request.query(queryString);
         console.dir(result);
