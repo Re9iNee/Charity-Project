@@ -26,7 +26,7 @@ exports.creatCommonBaseType = async (req, res) => {
         poolConnect
     }, req.body.BaseTypeTitle)
     res.send({
-        result
+        commonBaseTypeId: result
     })
 };
 
