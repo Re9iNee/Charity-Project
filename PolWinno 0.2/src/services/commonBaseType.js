@@ -105,6 +105,14 @@ const ws_updateBaseType = async (connection, filters, newBaseTypeTitle) => {
     await poolConnect;
     let queryString = `UPDATE [SabkadV01].[dbo].[tblCommonBaseType] SET BaseTypeTitle = '${newBaseTypeTitle}' WHERE 1=1 `
     queryString = normalizeQueryString(queryString, filters)
+    // check for baseTypeTitle duplicates - returns: true -> duplicate | false -> unique
+    const duplicateBaseTypeTitle = await checkDuplicateTitle(connection, newBaseTypeTitle);
+    if (duplicateBaseTypeTitle)
+        return {
+            status: "Failed",
+            msg: "Error Updating Row, Duplicate BaseTypeTitle",
+            newBaseTypeTitle
+        };
     try {
         const request = pool.request();
         const updateResult = await request.query(queryString);
