@@ -119,12 +119,15 @@ const ws_updateBaseType = async (connection, filters, newBaseTypeTitle) => {
 const ws_deleteBaseType = async (connection, commonBaseTypeId) => {
     const {
         ws_loadBaseValue
-    } = require("../T03 - BaseInfo Services - Constant Values Task/constantValues");
+    } = require("./commonBaseData");
     const result = await ws_loadBaseValue(connection, {
         CommonBaseTypeId: commonBaseTypeId
     });
     const canRemove = !result.recordset.length;
-
+    if (!canRemove) return {
+        status: "Failed",
+        msg: `Can't Drop row with the id of ${commonBaseTypeId}, commonBaseData Table Depends on it.`
+    }
     const {
         pool,
         poolConnect
@@ -134,7 +137,6 @@ const ws_deleteBaseType = async (connection, commonBaseTypeId) => {
 
     let queryString = `DELETE [SabkadV01].[dbo].[tblCommonBaseType] WHERE CommonBaseTypeId = ${commonBaseTypeId};`
     try {
-        if (!canRemove) throw new Error(`Can't Drop row with this:${commonBaseTypeId} id, because commonBaseData Table Depends on it.`);
         const request = pool.request();
         const result = await request.query(queryString);
         return result;
