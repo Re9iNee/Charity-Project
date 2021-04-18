@@ -49,11 +49,18 @@ const ws_createBaseType = async (connection, baseTypeTitle) => {
     const lastBaseCode = await getLastBaseCode(connection);
     let baseTypeCode = toHex(lastBaseCode + 1);
     if (!baseTypeTitle)
-        return {status: "Failed", msg: "Error Creating Row, Fill Parameters Utterly"};
+        return {
+            status: "Failed",
+            msg: "Error Creating Row, Fill Parameters Utterly"
+        };
     // check for baseTypeTitle duplicates - returns: true -> duplicate | false -> unique
     const duplicateBaseTypeTitle = await checkDuplicateTitle(connection, baseTypeTitle);
     if (duplicateBaseTypeTitle)
-        return {status: "Failed", msg: "Error Creating Row, Duplicate BaseTypeTitle", baseTypeTitle};
+        return {
+            status: "Failed",
+            msg: "Error Creating Row, Duplicate BaseTypeTitle",
+            baseTypeTitle
+        };
     const {
         pool,
         poolConnect
@@ -73,7 +80,9 @@ const ws_createBaseType = async (connection, baseTypeTitle) => {
     }
 };
 async function checkDuplicateTitle(connection, baseTypeTitle) {
-    let result = await ws_loadBaseType(connection, {BaseTypeTitle: baseTypeTitle}, null, 1);
+    let result = await ws_loadBaseType(connection, {
+        BaseTypeTitle: baseTypeTitle
+    }, null, 1);
     // 0 -> unique 
     // 1 -> duplicate
     let duplicate = !(!result.recordset.length);
