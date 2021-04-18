@@ -126,9 +126,9 @@ const ws_updateBaseValue = async (connection, filters, newValues) => {
 
 
 const ws_deleteBaseValue = async (connection, commonBaseDataId) => {
-    const {checkForeignKey} = require("../others/commonModules");
+    const {checkForeignKey} = require("../utils/commonModules");
     const canRemove = await checkForeignKey(connection, "tblCommonBaseData", commonBaseDataId);
-    if (!canRemove) return {status: "Failed", msg: "Can not remove this ID"};
+    if (!canRemove) return {status: "Failed", msg: "Can not remove this ID", commonBaseDataId};
     const {
         pool,
         poolConnect
