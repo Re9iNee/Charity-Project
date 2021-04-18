@@ -1,5 +1,13 @@
-const {ws_loadBaseValue,ws_createBaseValue,ws_updateBaseValue,ws_deleteBaseValue} = require("../services/commonBaseData");
-const {poolConnect , pool} = require('../utils/charityDb ');
+const {
+    ws_loadBaseValue,
+    ws_createBaseValue,
+    ws_updateBaseValue,
+    ws_deleteBaseValue
+} = require("../services/commonBaseData");
+const {
+    poolConnect,
+    pool
+} = require('../utils/charityDb ');
 
 
 exports.getCommonBaseData = async (req, res) => {
@@ -29,7 +37,9 @@ exports.createCommonBaseData = async (req, res) => {
         pool,
         poolConnect
     }, baseValue, commonBaseTypeId)
-    res.send(result);
+    res.send({
+        commonBaseTypeId: result
+    })
 };
 
 exports.updateCommonBaseData = async (req, res) => {
