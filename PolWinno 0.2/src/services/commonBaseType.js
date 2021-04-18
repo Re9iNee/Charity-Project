@@ -138,8 +138,9 @@ const ws_deleteBaseType = async (connection, commonBaseTypeId) => {
     let queryString = `DELETE [SabkadV01].[dbo].[tblCommonBaseType] WHERE CommonBaseTypeId = ${commonBaseTypeId};`
     try {
         const request = pool.request();
-        const result = await request.query(queryString);
-        return result;
+        const DeleteResult = await request.query(queryString);
+        const table = ws_loadBaseType(connection);
+        return table;
     } catch (err) {
         console.error("SQL error: ", err)
     }
