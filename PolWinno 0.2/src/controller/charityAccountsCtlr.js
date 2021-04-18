@@ -1,4 +1,4 @@
-const {ws_loadCharityAccounts} = require("../services/charityAccounts");
+const {ws_loadCharityAccounts, ws_createCharityAccounts, ws_updateCharityAccounts, ws_deleteCharityAccounts} = require("../services/charityAccounts");
 const {poolConnect , pool} = require('../utils/charityDb ');
 
 
