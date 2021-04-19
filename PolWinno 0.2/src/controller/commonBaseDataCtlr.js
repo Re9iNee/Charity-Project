@@ -15,7 +15,7 @@ exports.getCommonBaseData = async (req, res) => {
         BaseValue: query.BaseValue,
         CommonBaseTypeId: query.CommonBaseTypeId
     });
-    res.send(result)
+    res.send({result})
 };
 
 exports.createCommonBaseData = async (req, res) => {
@@ -29,7 +29,7 @@ exports.createCommonBaseData = async (req, res) => {
         pool,
         poolConnect
     }, baseValue, commonBaseTypeId)
-    res.send(result);
+    res.send({result});
 };
 
 exports.updateCommonBaseData = async (req, res) => {
@@ -39,7 +39,7 @@ exports.updateCommonBaseData = async (req, res) => {
         pool,
         poolConnect
     }, req.body.filters, req.body.newValues);
-    res.send(result);
+    res.send({result});
 };
 
 exports.deleteCommonBaseData = async (req, res) => {
@@ -49,5 +49,5 @@ exports.deleteCommonBaseData = async (req, res) => {
         pool,
         poolConnect
     }, req.body.commonBaseDataId);
-    res.send(result);
+    res.send({result});
 };
