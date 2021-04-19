@@ -42,9 +42,18 @@ const ws_loadCharityAccounts = async (connection, filters, customQuery = null, r
 }
 
 
+async function checkDuplicateAccountNumber(connection, accountNumber) {
+    let result = await ws_loadCharityAccounts(connection, {
+        AccountNumber: accountNumber
+    }, null, 1);
+    // 0 -> unique 
+    // 1 -> duplicate
+    let duplicate = !(!result.recordset.length);
+    return duplicate;
+}
+
 const ws_createCharityAccounts = async (connection, details) => {
     // details are the parameters sent for creating table
-
 
     const {
         BankId,
@@ -54,6 +63,17 @@ const ws_createCharityAccounts = async (connection, details) => {
         AccountNumber,
         AccountName
     } = details;
+
+
+    // check for baseTypeTitle duplicates - returns: true -> duplicate | false -> unique
+    const duplicateAccountNumber = await checkDuplicateAccountNumber(connection, AccountNumber);
+    if (duplicateAccountNumber)
+        return {
+            status: "Failed",
+            msg: "Error Creating Row, Duplicate AccountNumber",
+            AccountNumber,
+        };
+    
     if (CardNumber) {
         const {
             validateCreditCard
