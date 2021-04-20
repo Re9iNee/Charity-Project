@@ -52,7 +52,10 @@ const ws_createBaseValue = async (connection, baseValue, commonBaseTypeId) => {
     let baseCode = generateBaseCode(lastCode, commonBaseTypeId);
 
     if (!baseValue || !baseCode || !commonBaseTypeId)
-        throw new Error("Error Creating Row, Fill Parameters Utterly");
+        return {
+            status: "Failed",
+            msg: "Error Creating Row, Fill Parameters Utterly"
+        };
     try {
         // Select Scope Identity is for returning id of affected row(s)
         let queryString = `INSERT INTO 
@@ -125,9 +128,15 @@ const ws_updateBaseValue = async (connection, filters, newValues) => {
 
 
 const ws_deleteBaseValue = async (connection, commonBaseDataId) => {
-    const {checkForeignKey} = require("../utils/commonModules");
+    const {
+        checkForeignKey
+    } = require("../utils/commonModules");
     const canRemove = await checkForeignKey(connection, "tblCommonBaseData", commonBaseDataId);
-    if (!canRemove) return {status: "Failed", msg: "Can not remove this ID due to dependency", commonBaseDataId};
+    if (!canRemove) return {
+        status: "Failed",
+        msg: "Can not remove this ID due to dependency",
+        commonBaseDataId
+    };
     const {
         pool,
         poolConnect
