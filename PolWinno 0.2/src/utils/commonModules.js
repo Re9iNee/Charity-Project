@@ -22,6 +22,13 @@ const addZero = (number, length) => {
     return number;
 }
 
+require("dotenv").config({
+    path: "./utils/.env"
+});
+const {
+    DB_DATABASE
+} = process.env
+
 const checkForeignKey = async (connection, parentTable, idValue) => {
     const {
         pool,
@@ -36,7 +43,7 @@ const checkForeignKey = async (connection, parentTable, idValue) => {
         filters[column] = idValue;
 
         let queryString = `SELECT TOP (1) [${column}]
-        FROM [SabkadV01].[dbo].[${table}]
+        FROM [${DB_DATABASE}].[dbo].[${table}]
         WHERE 1=1`
         queryString = normalizeQueryString(queryString, filters);
         try {

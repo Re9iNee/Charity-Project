@@ -1,10 +1,24 @@
-const {normalizeQueryString,setToQueryString,checkForeignKey} = require("../utils/commonModules");
+const {
+    normalizeQueryString,
+    setToQueryString,
+    checkForeignKey
+} = require("../utils/commonModules");
 
+
+require("dotenv").config({
+    path: "./utils/.env"
+});
+const {
+    DB_DATABASE
+} = process.env
 
 const ws_loadPersonal = async (connection, filters, customeQuery = null, resultLimit = 1000) => {
 
     //connection set
-    const {pool , poolConnect} = connection; 
+    const {
+        pool,
+        poolConnect
+    } = connection;
     await poolConnect;
 
     //get all datas from ppersonal table
@@ -18,7 +32,7 @@ const ws_loadPersonal = async (connection, filters, customeQuery = null, resultL
         [BirthPlace], 
         [PersonType], 
         [PersonPhoto], 
-    FROM [SabkadV01].[dbo].[tblPersonal]
+    FROM [${DB_DATABASE}].[dbo].[tblPersonal]
     WHERE 1=1`;
 
     // create our query string
@@ -37,13 +51,26 @@ const ws_loadPersonal = async (connection, filters, customeQuery = null, resultL
 };
 
 
-const ws_createPersonal = async (connection,values) => {
+const ws_createPersonal = async (connection, values) => {
 
-    const {pool,poolConnect} = connection;
+    const {
+        pool,
+        poolConnect
+    } = connection;
     await poolConnect;
 
     // destruct our input values
-    const {Name,Family,NationalCode,IdNumber,Sex,BirthDate,BirthPlace,PersonType,PersonPhoto} = values;
+    const {
+        Name,
+        Family,
+        NationalCode,
+        IdNumber,
+        Sex,
+        BirthDate,
+        BirthPlace,
+        PersonType,
+        PersonPhoto
+    } = values;
 
     // national card validation
     if (NationalCode) {
@@ -67,7 +94,7 @@ const ws_createPersonal = async (connection,values) => {
     };
 
     let queryString = `INSERT INTO 
-        [SabkadV01].[dbo].[tblPersonal]
+        [${DB_DATABASE}].[dbo].[tblPersonal]
         (Name,Family,NationalCode,IdNumber,Sex,BirthDate,BirthPlace,PersonType,PersonPhoto)
         VALUES 
         ('${Name}','${Family}',${NationalCode},${IdNumber},${Sex},${BirthDate},${BirthPlace},${PersonType},${PersonPhoto}); 
@@ -87,12 +114,15 @@ const ws_createPersonal = async (connection,values) => {
 };
 
 
-const ws_updatePersonal = async (connection , filters , newValues) => {
-    
-    const {pool,poolConnect} = connection;
+const ws_updatePersonal = async (connection, filters, newValues) => {
+
+    const {
+        pool,
+        poolConnect
+    } = connection;
     await poolConnect;
 
-    let queryString = `UPDATE [SabkadV01].[dbo].[tblPersonal] SET `;
+    let queryString = `UPDATE [${DB_DATABASE}].[dbo].[tblPersonal] SET `;
 
     // update our query string
     queryString = setToQueryString(queryString, newValues) + "WHERE 1=1";
@@ -104,7 +134,7 @@ const ws_updatePersonal = async (connection , filters , newValues) => {
         const updateResult = await request.query(queryString);
         console.dir(updateResult);
         const table = await ws_loadPersonal(connection);
-            return table;
+        return table;
     } catch (err) {
         console.error("SQL error:", err);
     }
@@ -114,18 +144,21 @@ const ws_updatePersonal = async (connection , filters , newValues) => {
 
 const ws_deletePersonal = async (connection, PersonId) => {
 
-    const {pool,poolConnect} = connection;
+    const {
+        pool,
+        poolConnect
+    } = connection;
     await poolConnect;
 
     const canRemove = await checkForeignKey(connection, "tblPersonal", PersonId);
     if (!canRemove)
-     return {
-        status: "Failed",
-        msg: "Can not remove this ID",
-        PersonId
-    };
- 
-    let queryString = `DELETE [SabkadV01].[dbo].[tblPersonal] WHERE PersonId = ${PersonId};`
+        return {
+            status: "Failed",
+            msg: "Can not remove this ID",
+            PersonId
+        };
+
+    let queryString = `DELETE [${DB_DATABASE}].[dbo].[tblPersonal] WHERE PersonId = ${PersonId};`
 
     try {
         const request = pool.request();
@@ -142,4 +175,9 @@ const ws_deletePersonal = async (connection, PersonId) => {
 
 
 
-module.exports = {ws_loadPersonal , ws_createPersonal , ws_updatePersonal , ws_deletePersonal};
+module.exports = {
+    ws_loadPersonal,
+    ws_createPersonal,
+    ws_updatePersonal,
+    ws_deletePersonal
+};

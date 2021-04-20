@@ -3,7 +3,12 @@ const {
     addZero
 } = require("../utils/commonModules");
 
-
+require("dotenv").config({
+    path: "./utils/.env"
+});
+const {
+    DB_DATABASE
+} = process.env
 
 const ws_loadBaseValue = async (connection, filters, customeQuery = null, resultLimit = 1000) => {
     const {
@@ -16,7 +21,7 @@ const ws_loadBaseValue = async (connection, filters, customeQuery = null, result
     ,[CommonBaseTypeId]
     ,[BaseValue]
     ,[BaseCode]
-    FROM [SabkadV01].[dbo].[tblCommonBaseData]
+    FROM [${DB_DATABASE}].[dbo].[tblCommonBaseData]
     WHERE 1=1`;
     queryString = normalizeQueryString(queryString, filters);
     if (customeQuery)
@@ -52,11 +57,14 @@ const ws_createBaseValue = async (connection, baseValue, commonBaseTypeId) => {
     let baseCode = generateBaseCode(lastCode, commonBaseTypeId);
 
     if (!baseValue || !baseCode || !commonBaseTypeId)
-        throw new Error("Error Creating Row, Fill Parameters Utterly");
+        return {
+            status: "Failed",
+            msg: "Error Creating Row, Fill Parameters Utterly"
+        };
     try {
         // Select Scope Identity is for returning id of affected row(s)
         let queryString = `INSERT INTO 
-        [SabkadV01].[dbo].[tblCommonBaseData]
+        [${DB_DATABASE}].[dbo].[tblCommonBaseData]
         (BaseCode, BaseValue, CommonBaseTypeId)
         VALUES 
         ('${baseCode}', '${baseValue}', ${commonBaseTypeId}); 
@@ -98,7 +106,7 @@ const ws_updateBaseValue = async (connection, filters, newValues) => {
         commonBaseTypeId,
         baseValue
     } = newValues;
-    let queryString = `UPDATE [SabkadV01].[dbo].[tblCommonBaseData] SET `
+    let queryString = `UPDATE [${DB_DATABASE}].[dbo].[tblCommonBaseData] SET `
     if (commonBaseTypeId && baseValue)
         queryString += ` CommonBaseTypeId = ${commonBaseTypeId}, BaseValue = ${baseValue} `;
     else if (baseValue)
@@ -125,9 +133,15 @@ const ws_updateBaseValue = async (connection, filters, newValues) => {
 
 
 const ws_deleteBaseValue = async (connection, commonBaseDataId) => {
-    const {checkForeignKey} = require("../utils/commonModules");
+    const {
+        checkForeignKey
+    } = require("../utils/commonModules");
     const canRemove = await checkForeignKey(connection, "tblCommonBaseData", commonBaseDataId);
-    if (!canRemove) return {status: "Failed", msg: "Can not remove this ID due to dependency", commonBaseDataId};
+    if (!canRemove) return {
+        status: "Failed",
+        msg: "Can not remove this ID due to dependency",
+        commonBaseDataId
+    };
     const {
         pool,
         poolConnect
@@ -135,7 +149,7 @@ const ws_deleteBaseValue = async (connection, commonBaseDataId) => {
     // ensures that the pool has been created
     await poolConnect;
 
-    let queryString = `DELETE [SabkadV01].[dbo].[tblCommonBaseData] WHERE CommonBaseDataId = ${commonBaseDataId};`
+    let queryString = `DELETE [${DB_DATABASE}].[dbo].[tblCommonBaseData] WHERE CommonBaseDataId = ${commonBaseDataId};`
     try {
         const request = pool.request();
         const deleteResult = await request.query(queryString);
