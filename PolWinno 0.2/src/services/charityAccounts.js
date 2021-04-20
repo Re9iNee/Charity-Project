@@ -3,6 +3,13 @@ const {
 } = require("../utils/commonModules");
 
 
+require("dotenv").config({
+    path: "./utils/.env"
+});
+const {
+    DB_DATABASE
+} = process.env
+
 const ws_loadCharityAccounts = async (connection, filters, customQuery = null, resultLimit = 1000) => {
     const {
         pool,
@@ -22,10 +29,10 @@ const ws_loadCharityAccounts = async (connection, filters, customQuery = null, r
     ,[BaseCode]
     ,[BaseValue]
     ,[CommonBaseDataId]
-    FROM [SabkadV01].[dbo].[tblCharityAccounts] as charityAcc 
-        INNER JOIN [SabkadV01].[dbo].[tblCommonBaseData] as cmData
+    FROM [${DB_DATABASE}].[dbo].[tblCharityAccounts] as charityAcc 
+        INNER JOIN [${DB_DATABASE}].[dbo].[tblCommonBaseData] as cmData
             on charityAcc.BankID = cmData.CommonBaseDataId
-        INNER JOIN [SabkadV01].[dbo].[tblCommonBaseType] as cmType
+        INNER JOIN [${DB_DATABASE}].[dbo].[tblCommonBaseType] as cmType
             on cmData.CommonBaseTypeId = cmType.CommonBaseTypeId
     WHERE 1 = 1 `;
     queryString = normalizeQueryString(queryString, filters);
@@ -106,7 +113,7 @@ const ws_createCharityAccounts = async (connection, details) => {
     await poolConnect;
 
     let queryString = `INSERT INTO 
-    [SabkadV01].[dbo].[tblCharityAccounts]
+    [${DB_DATABASE}].[dbo].[tblCharityAccounts]
     (BankId, BranchName, OwnerName, CardNumber, AccountNumber, AccountName)
     VALUES 
     ('${BankId}', '${BranchName}', '${OwnerName}', '${CardNumber}', '${AccountNumber}', '${AccountName}'); 
@@ -124,7 +131,7 @@ const ws_createCharityAccounts = async (connection, details) => {
 
 const ws_updateCharityAccounts = async (connection, filters, newValues) => {
 
-    let queryString = `UPDATE [SabkadV01].[dbo].[tblCharityAccounts] SET `
+    let queryString = `UPDATE [${DB_DATABASE}].[dbo].[tblCharityAccounts] SET `
     const {
         setToQueryString
     } = require("../utils/commonModules")
@@ -184,7 +191,7 @@ const ws_deleteCharityAccounts = async (connection, charityAccountId) => {
     // ensures that the pool has been created
     await poolConnect;
 
-    let queryString = `DELETE [SabkadV01].[dbo].[tblCharityAccounts] WHERE CharityAccountId = ${charityAccountId};`
+    let queryString = `DELETE [${DB_DATABASE}].[dbo].[tblCharityAccounts] WHERE CharityAccountId = ${charityAccountId};`
     try {
         const request = pool.request();
         const deleteResult = await request.query(queryString);
