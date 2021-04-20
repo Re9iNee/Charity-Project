@@ -1,10 +1,12 @@
 const sql = require("mssql");
-
+require("dotenv").config({
+    path: "./utils/.env"
+});
 const config = {
-    user: "sa",
-    password: "Rainbow78951",
-    server: "localhost",
-    database: "SabkadV01", 
+    user: process.env.DB_USER,
+    password: process.env.DB_PWD,
+    server: process.env.DB_SERVER,
+    database: process.env.DB_DATABASE,
     "options": {
         "encrypt": true,
         "enableArithAbort": true
@@ -21,4 +23,7 @@ pool.on("error", err => {
     console.log("Could not Connect to the Database", err);
 });
 
-module.exports = {pool , poolConnect}
+module.exports = {
+    pool,
+    poolConnect
+}

@@ -12,8 +12,9 @@ const needyAccountRoutes = require('./router/needyAccount');
 
 // config
 
-dotEnv.config({path : "./utils/config.env"});
-
+dotEnv.config({
+    path: "./utils/.env"
+});
 const port = process.env.PORT || 3000;
 
 
@@ -24,7 +25,9 @@ const app = express();
 
 //bodyParser
 
-app.use(bodyPaser.urlencoded({ extended: false }));
+app.use(bodyPaser.urlencoded({
+    extended: false
+}));
 
 
 app.use(express.json({
@@ -36,30 +39,30 @@ app.use(express.json({
 
 /*  TASK 1 */
 
-    app.use(commonBaseTypeRoutes);
+app.use(commonBaseTypeRoutes);
 
 
 /*  TASK 2 */
 
-    app.use(commonBaseDataRoutes);
+app.use(commonBaseDataRoutes);
 
 
 /*  TASK 3 */
 
-    app.use(charityAccountsRoutes);
+app.use(charityAccountsRoutes);
 
 
 /*  TASK 4 */
 
-    app.use(personalInfoRoutes);
+app.use(personalInfoRoutes);
 
 
 /*  TASK 5 */
 
-    app.use(needyAccountRoutes);
+app.use(needyAccountRoutes);
 
 
 //-----------------------------------
 
 
-app.listen(port, () => console.log(`Listening on ${port}`) );
+app.listen(port, () => console.log(`Listening on ${port}`));
