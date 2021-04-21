@@ -96,9 +96,9 @@ const setToQueryString = (queryString, newValues) => {
     let objEntries = Object.entries(newValues);
     for (const [i, [property, value]] of objEntries.entries()) {
         if (i == 0) 
-            queryString += ` ${property} = '${value}'`
+            queryString += ` ${property} = ${(typeof value == "string") ? "N" : " "}'${value}'`
         else if (i < objEntries.length)
-            queryString += `, ${property} = '${value}'`
+            queryString += `, ${property} = ${(typeof value == "string") ? "N" : " "}'${value}'`
     }
     return queryString;
 }
