@@ -67,7 +67,7 @@ const ws_createBaseValue = async (connection, baseValue, commonBaseTypeId) => {
         [${DB_DATABASE}].[dbo].[tblCommonBaseData]
         (BaseCode, BaseValue, CommonBaseTypeId)
         VALUES 
-        ('${baseCode}', '${baseValue}', ${commonBaseTypeId}); 
+        ('${baseCode}', N'${baseValue}', ${commonBaseTypeId}); 
         SELECT SCOPE_IDENTITY() AS CommonBaseDataId;`;
         const request = pool.request();
         const result = await request.query(queryString);
@@ -108,9 +108,9 @@ const ws_updateBaseValue = async (connection, filters, newValues) => {
     } = newValues;
     let queryString = `UPDATE [${DB_DATABASE}].[dbo].[tblCommonBaseData] SET `
     if (commonBaseTypeId && baseValue)
-        queryString += ` CommonBaseTypeId = ${commonBaseTypeId}, BaseValue = ${baseValue} `;
+        queryString += ` CommonBaseTypeId = ${commonBaseTypeId}, BaseValue = N'${baseValue}' `;
     else if (baseValue)
-        queryString += ` BaseValue = ${baseValue}`;
+        queryString += ` BaseValue = N'${baseValue}'`;
     else if (commonBaseTypeId)
         queryString += ` CommonBaseTypeId = ${commonBaseTypeId}`;
 
