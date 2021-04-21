@@ -80,7 +80,6 @@ const ws_createCharityAccounts = async (connection, details) => {
             msg: "Error Creating Row, Duplicate AccountNumber",
             AccountNumber,
         };
-    
     if (CardNumber) {
         const {
             validateCreditCard
@@ -130,6 +129,16 @@ const ws_createCharityAccounts = async (connection, details) => {
 }
 
 const ws_updateCharityAccounts = async (connection, filters, newValues) => {
+    if (newValues.AccountNumber) {
+        const duplicateAccountNumber = await checkDuplicateAccountNumber(connection, newValues.AccountNumber);
+        if (duplicateAccountNumber)
+            return {
+                status: "Failed",
+                msg: "Error Creating Row, Duplicate AccountNumber",
+                ...newValues.AccountNumber,
+            };
+
+    }
 
     let queryString = `UPDATE [${DB_DATABASE}].[dbo].[tblCharityAccounts] SET `
     const {
