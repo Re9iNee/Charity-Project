@@ -80,7 +80,6 @@ const ws_createCharityAccounts = async (connection, details) => {
             msg: "Error Creating Row, Duplicate AccountNumber",
             AccountNumber,
         };
-    
     if (CardNumber) {
         const {
             validateCreditCard
@@ -116,7 +115,7 @@ const ws_createCharityAccounts = async (connection, details) => {
     [${DB_DATABASE}].[dbo].[tblCharityAccounts]
     (BankId, BranchName, OwnerName, CardNumber, AccountNumber, AccountName)
     VALUES 
-    ('${BankId}', '${BranchName}', '${OwnerName}', '${CardNumber}', '${AccountNumber}', '${AccountName}'); 
+    ('${BankId}', N'${BranchName}', N'${OwnerName}', '${CardNumber}', '${AccountNumber}', N'${AccountName}'); 
     SELECT SCOPE_IDENTITY() AS charityAccountId;`
     try {
         const request = pool.request();
@@ -130,6 +129,16 @@ const ws_createCharityAccounts = async (connection, details) => {
 }
 
 const ws_updateCharityAccounts = async (connection, filters, newValues) => {
+    if (newValues.AccountNumber) {
+        const duplicateAccountNumber = await checkDuplicateAccountNumber(connection, newValues.AccountNumber);
+        if (duplicateAccountNumber)
+            return {
+                status: "Failed",
+                msg: "Error Creating Row, Duplicate AccountNumber",
+                ...newValues.AccountNumber,
+            };
+
+    }
 
     let queryString = `UPDATE [${DB_DATABASE}].[dbo].[tblCharityAccounts] SET `
     const {

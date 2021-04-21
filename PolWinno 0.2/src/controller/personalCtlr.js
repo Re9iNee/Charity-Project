@@ -1,8 +1,16 @@
-const {pool , poolConnect} = require('../utils/charityDb ');
-const {ws_loadPersonal , ws_createPersonal , ws_updatePersonal , ws_deletePersonal} = require('../services/personal');
+const {
+    pool,
+    poolConnect
+} = require('../utils/charityDb ');
+const {
+    ws_loadPersonal,
+    ws_createPersonal,
+    ws_updatePersonal,
+    ws_deletePersonal
+} = require('../services/personal');
 
 
-exports.getPersonalData = async (res , req) => {
+exports.getPersonalData = async (res, req) => {
 
     let query = req.query;
 
@@ -21,7 +29,9 @@ exports.getPersonalData = async (res , req) => {
         PersonPhoto: query.PersonPhoto,
     });
 
-    res.send(result);
+    res.send({
+        result
+    });
 };
 
 
@@ -29,9 +39,12 @@ exports.createPersonalData = async (req, res) => {
 
     let values = req.body;
 
-    const resault = await ws_createPersonal( {pool , poolConnect} , values );
+    const result = await ws_createPersonal({
+        pool,
+        poolConnect
+    }, values);
 
-    res.send(resault);
+    res.send(result);
 };
 
 
@@ -40,9 +53,14 @@ exports.updatePersonalData = async (req, res) => {
     let newValues = req.body.values;
     let filters = req.body.filters;
 
-    const resault = await ws_updatePersonal( {pool , poolConnect} , filters ,newValues );
+    const result = await ws_updatePersonal({
+        pool,
+        poolConnect
+    }, filters, newValues);
 
-    res.send(resault);
+    res.send({
+        result
+    });
 };
 
 
@@ -50,7 +68,12 @@ exports.deletePersonalData = async (req, res) => {
 
     const accountId = req.body.PersonId;
 
-    const result = await ws_deletePersonal( {pool , poolConnect} , accountId );
+    const result = await ws_deletePersonal({
+        pool,
+        poolConnect
+    }, accountId);
 
-    res.send(result);
+    res.send({
+        result
+    });
 };

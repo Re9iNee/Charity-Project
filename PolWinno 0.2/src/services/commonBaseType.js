@@ -76,7 +76,7 @@ const ws_createBaseType = async (connection, baseTypeTitle) => {
     try {
         /* Select Scope Identity is for returning id of affected row(s) */
         let queryString = `INSERT INTO 
-        [${DB_DATABASE}].[dbo].[tblCommonBaseType] (BaseTypeTitle, BaseTypeCode) VALUES ('${baseTypeTitle}', '${baseTypeCode}'); SELECT SCOPE_IDENTITY() AS CommonBaseTypeId;`;
+        [${DB_DATABASE}].[dbo].[tblCommonBaseType] (BaseTypeTitle, BaseTypeCode) VALUES (N'${baseTypeTitle}', '${baseTypeCode}'); SELECT SCOPE_IDENTITY() AS CommonBaseTypeId;`;
         const request = pool.request();
         const result = await request.query(queryString);
         const id = result.recordset[0].CommonBaseTypeId;
@@ -112,7 +112,7 @@ const ws_updateBaseType = async (connection, filters, newBaseTypeTitle) => {
     } = connection;
     // ensures that the pool has been created
     await poolConnect;
-    let queryString = `UPDATE [${DB_DATABASE}].[dbo].[tblCommonBaseType] SET BaseTypeTitle = '${newBaseTypeTitle}' WHERE 1=1 `
+    let queryString = `UPDATE [${DB_DATABASE}].[dbo].[tblCommonBaseType] SET BaseTypeTitle = N'${newBaseTypeTitle}' WHERE 1=1 `
     queryString = normalizeQueryString(queryString, filters)
     // check for baseTypeTitle duplicates - returns: true -> duplicate | false -> unique
     const duplicateBaseTypeTitle = await checkDuplicateTitle(connection, newBaseTypeTitle);
