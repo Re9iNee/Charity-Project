@@ -52,6 +52,17 @@ const ws_createBaseValue = async (connection, baseValue, commonBaseTypeId) => {
             status: "Failed",
             msg: "Error Creating Row, Fill Parameters Utterly"
         };
+
+
+    // Check if commonBaseTypeId exists on commonBaseType table - returns true -> exist ||| false -> doesn't exist 
+    const canAdd = await availableTypeId(connection, commonBaseTypeId)
+    if (!canAdd)
+        return {
+            status: "Failed",
+            msg: "Can't Add with this commonTypeId, This ID Doesn't Exist"
+        }
+
+
     try {
         // Select Scope Identity is for returning id of affected row(s)
         let queryString = `INSERT INTO 
@@ -68,6 +79,16 @@ const ws_createBaseValue = async (connection, baseValue, commonBaseTypeId) => {
         console.error("ws_createBaseValue error: ", err);
     }
 };
+
+async function availableTypeId(connection, commonBaseTypeId) {
+    const {
+        ws_loadBaseType
+    } = require("./commonBaseType");
+    const availableTypeId = await ws_loadBaseType(connection, {
+        CommonBaseTypeId: commonBaseTypeId
+    }, null, 1);
+    return !(!availableTypeId.recordset.length);
+}
 
 async function getLastBaseCode(connection) {
     let code = await ws_loadBaseValue(connection, null, "ORDER BY BaseCode DESC;", 1);
