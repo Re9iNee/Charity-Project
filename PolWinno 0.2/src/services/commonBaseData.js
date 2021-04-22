@@ -45,22 +45,24 @@ const ws_createBaseValue = async (connection, baseValue, commonBaseTypeId) => {
     // ensures that the pool has been created
     await poolConnect;
 
-
-    let lastCode = 0;
-    // Fetch the last BaseCode
-    try {
-        lastCode = await getLastBaseCode(connection);
-        lastCode = lastCode.slice(3);
-    } catch (e) {
-        lastCode = "000";
-    }
-    let baseCode = generateBaseCode(lastCode, commonBaseTypeId);
+    let baseCode = await generateBaseCode(connection, commonBaseTypeId);
 
     if (!baseValue || !baseCode || !commonBaseTypeId)
         return {
             status: "Failed",
             msg: "Error Creating Row, Fill Parameters Utterly"
         };
+
+
+    // Check if commonBaseTypeId exists on commonBaseType table - returns true -> exist ||| false -> doesn't exist 
+    const canAdd = await availableTypeId(connection, commonBaseTypeId)
+    if (!canAdd)
+        return {
+            status: "Failed",
+            msg: "Can't Add with this commonTypeId, This ID Doesn't Exist"
+        }
+
+
     try {
         // Select Scope Identity is for returning id of affected row(s)
         let queryString = `INSERT INTO 
@@ -78,6 +80,16 @@ const ws_createBaseValue = async (connection, baseValue, commonBaseTypeId) => {
     }
 };
 
+async function availableTypeId(connection, commonBaseTypeId) {
+    const {
+        ws_loadBaseType
+    } = require("./commonBaseType");
+    const availableTypeId = await ws_loadBaseType(connection, {
+        CommonBaseTypeId: commonBaseTypeId
+    }, null, 1);
+    return !(!availableTypeId.recordset.length);
+}
+
 async function getLastBaseCode(connection) {
     let code = await ws_loadBaseValue(connection, null, "ORDER BY BaseCode DESC;", 1);
     code = code.recordset[0].BaseCode;
@@ -85,7 +97,17 @@ async function getLastBaseCode(connection) {
     return code;
 };
 
-function generateBaseCode(lastCode, commonBaseTypeId) {
+async function generateBaseCode(connection, commonBaseTypeId) {
+
+    let lastCode = "000";
+    // Fetch the last BaseCode
+    try {
+        lastCode = await getLastBaseCode(connection);
+        lastCode = lastCode.slice(3);
+    } catch (e) {
+        lastCode = "000";
+    }
+
     commonBaseTypeId = addZero(commonBaseTypeId, 3)
     let baseCode = addZero(Number(lastCode) + 1, 3)
     baseCode = String(commonBaseTypeId) + String(baseCode);
