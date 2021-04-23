@@ -80,6 +80,7 @@ const ws_createCharityAccounts = async (connection, details) => {
             msg: "Error Creating Row, Duplicate AccountNumber",
             AccountNumber,
         };
+    // Credit Card Validation if it exists
     if (CardNumber) {
         const {
             validateCreditCard
@@ -95,6 +96,7 @@ const ws_createCharityAccounts = async (connection, details) => {
             }
         }
     }
+    // Not Null Values
     if (!BankId || !OwnerName || !BranchName || !AccountNumber) {
         return {
             status: "Failed",
@@ -129,6 +131,7 @@ const ws_createCharityAccounts = async (connection, details) => {
 }
 
 const ws_updateCharityAccounts = async (connection, filters, newValues) => {
+    // check wheter Account Number is Unique or not.
     if (newValues.AccountNumber) {
         const duplicateAccountNumber = await checkDuplicateAccountNumber(connection, newValues.AccountNumber);
         if (duplicateAccountNumber)
@@ -147,7 +150,6 @@ const ws_updateCharityAccounts = async (connection, filters, newValues) => {
     // setToQueryString returns: Update ... SET sth = 2, test = 3
     queryString = setToQueryString(queryString, newValues) + " WHERE 1=1 ";
     queryString = normalizeQueryString(queryString, filters);
-    console.log(queryString)
 
     if (newValues.CardNumber) {
         CardNumber = newValues.CardNumber;

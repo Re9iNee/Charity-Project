@@ -103,11 +103,33 @@ const setToQueryString = (queryString, newValues) => {
     return queryString;
 }
 
+
+const validateNationalCode =  str => {
+    // Source: https://ab-bellona.ir/portal/algorithm-detection-accuracy-code-national-iran/
+    let arr = str.split('');
+    arr.reverse()
+    let controlFigure = arr.splice(0, 1)[0];
+    let accumulated = arr.reduce((acc, currentValue, currentIndex) => acc + (currentValue * (currentIndex + 2)), 0);
+
+    // baghi mande 
+    let remainder = accumulated % 11;
+    if (remainder >= 2) {
+        return 11 - remainder == controlFigure;
+    } else {
+        return controlFigure == remainder;
+    }
+}
+
+
+
+console.log(validate("0932947761"))
+
 module.exports = {
     normalizeQueryString,
     toHex,
     toInt,
     addZero,
     checkForeignKey,
-    setToQueryString
+    setToQueryString,
+    validateNationalCode,
 }

@@ -7,7 +7,7 @@ const {
 const {
     poolConnect,
     pool
-} = require('../utils/charityDb ');
+} = require('../utils/charityDb');
 
 
 

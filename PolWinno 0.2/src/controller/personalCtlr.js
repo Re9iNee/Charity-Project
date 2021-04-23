@@ -1,7 +1,7 @@
 const {
     pool,
     poolConnect
-} = require('../utils/charityDb ');
+} = require('../utils/charityDb');
 const {
     ws_loadPersonal,
     ws_createPersonal,

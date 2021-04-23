@@ -46,14 +46,14 @@ const ws_createBaseValue = async (connection, baseValue, commonBaseTypeId) => {
     await poolConnect;
 
     let baseCode = await generateBaseCode(connection, commonBaseTypeId);
-
+    // Not Null values
     if (!baseValue || !baseCode || !commonBaseTypeId)
         return {
             status: "Failed",
             msg: "Error Creating Row, Fill Parameters Utterly"
         };
 
-
+    // Issue #9
     // Check if commonBaseTypeId exists on commonBaseType table - returns true -> exist ||| false -> doesn't exist 
     const canAdd = await availableTypeId(connection, commonBaseTypeId)
     if (!canAdd)

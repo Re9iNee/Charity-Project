@@ -1,7 +1,8 @@
 const {
     normalizeQueryString,
     setToQueryString,
-    checkForeignKey
+    checkForeignKey,
+    validateNationalCode,
 } = require("../utils/commonModules");
 
 
@@ -33,7 +34,7 @@ const ws_loadPersonal = async (connection, filters, customeQuery = null, resultL
         [PersonType], 
         [PersonPhoto], 
     FROM [${DB_DATABASE}].[dbo].[tblPersonal]
-    WHERE 1=1`;
+    WHERE 1=1 `;
 
     // create our query string
     queryString = normalizeQueryString(queryString, filters);
