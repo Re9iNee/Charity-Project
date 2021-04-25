@@ -1,5 +1,6 @@
 const {
     ws_loadPlan,
+    ws_createPlan,
 } = require("../services/plan");
 
 const {
@@ -25,6 +26,21 @@ exports.getPlans = async (req, res) => {
         PlanId: query.PlanId
     });
     // Deconstrucing req.query object helps prevent typo in request url path. therefore keep our program less error prone.
+    res.send({
+        result
+    })
+}
+
+
+exports.postPlans = async (req, res) => {
+    // T07 - Method 02
+    // Attach params to body as an JSON format - Postman Request: 
+    // 
+    const result = await ws_createPlan({
+        pool,
+        poolConnect
+    }, req.body);
+    // sending req.body directly causing program more error prone base on a typo, we will deconstruct object in that method.
     res.send({
         result
     })
