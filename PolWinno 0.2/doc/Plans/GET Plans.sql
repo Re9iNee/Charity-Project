@@ -1,0 +1,10 @@
+SELECT TOP (1000) [PlanId]
+    ,[PlanName]
+    ,[Description]
+    ,[PlanNature]
+    ,[ParentPlanId]
+    ,[Icon]
+    ,[Fdate]
+    ,[Tdate]
+    ,[neededLogin]
+    FROM [SabkadV01].[dbo].[tblPlans] WHERE 1 = 1 
