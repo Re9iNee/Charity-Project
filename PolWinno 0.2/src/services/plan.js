@@ -59,7 +59,7 @@ const ws_createPlan = async (connection, details) => {
         return {
             status: "Failed",
             msg: "Fill Parameters Utterly",
-            notNullColumns: ["PlanName", "PlanNature", "neededLogin"],
+            required: ["PlanName", "PlanNature", "neededLogin"],
             details
         }
     }
@@ -67,7 +67,7 @@ const ws_createPlan = async (connection, details) => {
     const {
         pool,
         poolConnect
-    }
+    } = connection;
     // ensures that the pool has been created
     await poolConnect;
 
@@ -78,6 +78,9 @@ const ws_createPlan = async (connection, details) => {
     VALUES (N'${PlanName}', N'${Description}', '${PlanNature}', '${ParentPlanId}', '${Fdate}', '${Tdate}', '${neededLogin}', CONVERT(varbinary, '${Icon}'));
     SELECT SCOPE_IDENTITY() AS charityAccountId;`
 
+
+
+    details;
     try {
         const request = pool.request();
         const result = request.query(queryString);
