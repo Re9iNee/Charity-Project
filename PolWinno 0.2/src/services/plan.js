@@ -66,6 +66,7 @@ const ws_createPlan = async (connection, details) => {
         }
     }
 
+    // Unique Values
     // check for duplicates - returns: true -> duplicate | false -> unique
     const duplicateUniqueValue = await checkDuplicate(connection, {
         PlanName,
@@ -104,12 +105,11 @@ const ws_createPlan = async (connection, details) => {
     })
     try {
         const request = pool.request();
-        const result = request.query(queryString);
-        // Todo: return id
-        console.dir(result)
-        return result;
+        const result = await request.query(queryString);
+        const id = result.recordset[0].planId;
+        return id;
     } catch (err) {
-        console.error("ws_createPlan errro: ", err)
+        console.error("ws_createPlan error: ", err)
     }
 
 }
