@@ -1,5 +1,6 @@
 const {
     normalizeQueryString,
+    normalizeQueryString_Create,
 } = require("../utils/commonModules");
 
 
@@ -64,6 +65,8 @@ const ws_createPlan = async (connection, details) => {
         }
     }
 
+    
+
     const {
         pool,
         poolConnect
@@ -74,13 +77,16 @@ const ws_createPlan = async (connection, details) => {
 
     let queryString = `INSERT INTO 
     [${DB_DATABASE}].[dbo].[tblPlans] 
-    (PlanName, Description, PlanNature, ParentPlanId, Fdate, Tdate, neededLogin, Icon) 
-    VALUES (N'${PlanName}', N'${Description}', '${PlanNature}', '${ParentPlanId}', '${Fdate}', '${Tdate}', '${neededLogin}', CONVERT(varbinary, '${Icon}'));
-    SELECT SCOPE_IDENTITY() AS charityAccountId;`
-
-
-
-    details;
+    ($COLUMN) 
+    VALUES ($VALUE);
+    SELECT SCOPE_IDENTITY() AS planId;`
+    // normalizeQS_Create => (queryString, {planName: "sth"}, ...configs)
+    // configs are the exceptions that don't have normal values. (need to convert or something to insert into SQL Server)
+    // configs = {onColumn: "EXCEPTION COLUMN", prefix="e.g: CONVERT(INT, $1)"}
+    queryString = normalizeQueryString_Create(queryString, details, {
+        onColumn: "Icon",
+        prefix: "CONVERT(varbinary, '$1')"
+    })
     try {
         const request = pool.request();
         const result = request.query(queryString);
@@ -91,6 +97,8 @@ const ws_createPlan = async (connection, details) => {
     }
 
 }
+
+
 
 module.exports = {
     ws_loadPlan,

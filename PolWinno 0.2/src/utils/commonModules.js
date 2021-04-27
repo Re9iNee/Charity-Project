@@ -121,8 +121,42 @@ const validateNationalCode =  str => {
 }
 
 
+const normalizeQueryString_Create = (queryString, details, ...configs) => {
+    // queryString = INSERT INTO [table]
+    // configs are for the columns that its value needs convert or some other expressions needed for SQLServer.
+    // e.g: configs = [{onColumn: "ICON", prefix="CONVERT(varbinary, '$1')}]
+    // will return: INSERT INTO [table] (column) VALUES (data);
+    let columns = new Array();
+    let values = new Array();
 
-console.log(validate("0932947761"))
+
+    if (configs) {
+        // loop through special columns
+        for (let [index, {
+                onColumn: column,
+                prefix
+            }] of configs.entries()) {
+            let rawValue = details[column];
+            // if value doesn't exist skip this column exception
+            if (!rawValue) continue
+            columns.push(column)
+            values.push(prefix.replace('$1', rawValue))
+            // delete added index from details, avoid duplicates in QString
+            delete details.column;
+        }
+    }
+    for (let column in details) {
+        columns.push(column);
+        let value = details[column];
+        if (typeof value == "string") {
+            values.push(`N'${value}'`);
+        }
+    }
+    queryString = queryString.replace("$COLUMN", columns.join(', '))
+    queryString = queryString.replace("$VALUE", values.join(', '));
+
+    return queryString;
+}
 
 module.exports = {
     normalizeQueryString,
@@ -132,4 +166,5 @@ module.exports = {
     checkForeignKey,
     setToQueryString,
     validateNationalCode,
+    normalizeQueryString_Create
 }
