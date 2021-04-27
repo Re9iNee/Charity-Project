@@ -7,6 +7,7 @@ const commonBaseDataRoutes = require('./router/commonBaseData');
 const charityAccountsRoutes = require('./router/charityAccounts');
 const personalInfoRoutes = require('./router/personalInfo');
 const needyAccountRoutes = require('./router/needyAccount');
+const plansRoutes = require('./router/plan')
 
 
 
@@ -64,7 +65,7 @@ app.use(needyAccountRoutes);
 
 /*  TASK 7 */
 
-
+app.use(plansRoutes)
 
 //-----------------------------------
 

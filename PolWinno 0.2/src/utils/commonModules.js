@@ -15,7 +15,7 @@ const toInt = hex => parseInt(hex, 16);
 
 const addZero = (number, length) => {
     number = String(number).split('');
-    while(number.length < length){
+    while (number.length < length) {
         number.unshift(0);
     }
     number = number.join('');
@@ -37,7 +37,10 @@ const checkForeignKey = async (connection, parentTable, idValue) => {
     // ensures that the pool has been created
     await poolConnect;
     const dependencies = await outputDependencies(connection, parentTable);
-    for (let {TableName: table, ColName: column} of dependencies){
+    for (let {
+            TableName: table,
+            ColName: column
+        } of dependencies) {
         // for query filtering
         let filters = {};
         filters[column] = idValue;
@@ -95,7 +98,7 @@ const setToQueryString = (queryString, newValues) => {
     // returns: Update ... SET sth = 2, test = 3
     let objEntries = Object.entries(newValues);
     for (const [i, [property, value]] of objEntries.entries()) {
-        if (i == 0) 
+        if (i == 0)
             queryString += ` ${property} = ${(typeof value == "string") ? "N" : " "}'${value}'`
         else if (i < objEntries.length)
             queryString += `, ${property} = ${(typeof value == "string") ? "N" : " "}'${value}'`
@@ -104,7 +107,7 @@ const setToQueryString = (queryString, newValues) => {
 }
 
 
-const validateNationalCode =  str => {
+const validateNationalCode = str => {
     // Source: https://ab-bellona.ir/portal/algorithm-detection-accuracy-code-national-iran/
     let arr = str.split('');
     arr.reverse()
@@ -121,9 +124,51 @@ const validateNationalCode =  str => {
 }
 
 
+const normalizeQueryString_Create = (queryString, details, ...configs) => {
+    // queryString = INSERT INTO [table]
+    // configs are for the columns that its value needs convert or some other expressions needed for SQLServer.
+    // e.g: configs = [{onColumn: "ICON", prefix="CONVERT(varbinary, '$1')}]
+    // will return: INSERT INTO [table] (column) VALUES (data);
+    let columns = new Array();
+    let values = new Array();
 
-console.log(validate("0932947761"))
 
+    if (configs) {
+        // loop through special columns
+        for (let [index, {
+                onColumn: column,
+                prefix
+            }] of configs.entries()) {
+            let rawValue = details[column];
+            // if value doesn't exist skip this column exception
+            if (!rawValue) continue
+            columns.push(column)
+            values.push(prefix.replace('$1', rawValue))
+            // delete added index from details, avoid duplicates in QString
+            delete details.column;
+        }
+    }
+    for (let column in details) {
+        columns.push(column);
+        let value = details[column];
+        if (typeof value == "string") {
+            values.push(`N'${value}'`);
+        }
+    }
+    queryString = queryString.replace("$COLUMN", columns.join(', '))
+    queryString = queryString.replace("$VALUE", values.join(', '));
+
+    return queryString;
+}
+
+
+const checkDuplicate = async (connection, column, loadingMethod) => {
+    let result = await loadingMethod(connection, column, null, 1);
+    // 0 -> unique 
+    // 1 -> duplicate
+    let duplicate = !(!result.recordset.length);
+    return duplicate;
+}
 module.exports = {
     normalizeQueryString,
     toHex,
@@ -132,4 +177,6 @@ module.exports = {
     checkForeignKey,
     setToQueryString,
     validateNationalCode,
+    normalizeQueryString_Create,
+    checkDuplicate,
 }
