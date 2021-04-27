@@ -1,6 +1,7 @@
 const {
     normalizeQueryString,
     normalizeQueryString_Create,
+    checkDuplicate,
 } = require("../utils/commonModules");
 
 
@@ -65,16 +66,19 @@ const ws_createPlan = async (connection, details) => {
         }
     }
 
-    if (PlanName) {
-        // check for planName duplicates - returns: true -> duplicate | false -> unique
-        const duplicatePlanName = await checkDuplicate(connection, {PlanName});
-        if (duplicatePlanName) 
-            return {
-                status: "Failed", 
-                msg: "Eror Creating Row, Duplicate PlanName",
-                PlanName
-            }
-    }
+    // check for duplicates - returns: true -> duplicate | false -> unique
+    const duplicateUniqueValue = await checkDuplicate(connection, {
+        PlanName,
+        PlanNature,
+        ParentPlanId
+    }, ws_loadPlan);
+    if (duplicateUniqueValue)
+        return {
+            status: "Failed",
+            msg: "Error Creating Row, Violation of unique values",
+            uniqueColumn: "ParentPlanId, PlanNature, PlanName",
+            details
+        }
 
 
 
@@ -101,6 +105,7 @@ const ws_createPlan = async (connection, details) => {
     try {
         const request = pool.request();
         const result = request.query(queryString);
+        // Todo: return id
         console.dir(result)
         return result;
     } catch (err) {
@@ -110,13 +115,6 @@ const ws_createPlan = async (connection, details) => {
 }
 
 
-async function checkDuplicate(connection, column) {
-    let result = await ws_loadPlan(connection, column, null, 1);
-    // 0 -> unique 
-    // 1 -> duplicate
-    let duplicate = !(!result.recordset.length);
-    return duplicate;
-}
 
 
 module.exports = {

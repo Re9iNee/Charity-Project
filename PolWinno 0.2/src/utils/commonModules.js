@@ -15,7 +15,7 @@ const toInt = hex => parseInt(hex, 16);
 
 const addZero = (number, length) => {
     number = String(number).split('');
-    while(number.length < length){
+    while (number.length < length) {
         number.unshift(0);
     }
     number = number.join('');
@@ -37,7 +37,10 @@ const checkForeignKey = async (connection, parentTable, idValue) => {
     // ensures that the pool has been created
     await poolConnect;
     const dependencies = await outputDependencies(connection, parentTable);
-    for (let {TableName: table, ColName: column} of dependencies){
+    for (let {
+            TableName: table,
+            ColName: column
+        } of dependencies) {
         // for query filtering
         let filters = {};
         filters[column] = idValue;
@@ -95,7 +98,7 @@ const setToQueryString = (queryString, newValues) => {
     // returns: Update ... SET sth = 2, test = 3
     let objEntries = Object.entries(newValues);
     for (const [i, [property, value]] of objEntries.entries()) {
-        if (i == 0) 
+        if (i == 0)
             queryString += ` ${property} = ${(typeof value == "string") ? "N" : " "}'${value}'`
         else if (i < objEntries.length)
             queryString += `, ${property} = ${(typeof value == "string") ? "N" : " "}'${value}'`
@@ -104,7 +107,7 @@ const setToQueryString = (queryString, newValues) => {
 }
 
 
-const validateNationalCode =  str => {
+const validateNationalCode = str => {
     // Source: https://ab-bellona.ir/portal/algorithm-detection-accuracy-code-national-iran/
     let arr = str.split('');
     arr.reverse()
@@ -158,6 +161,14 @@ const normalizeQueryString_Create = (queryString, details, ...configs) => {
     return queryString;
 }
 
+
+const checkDuplicate = async (connection, column, loadingMethod) => {
+    let result = await loadingMethod(connection, column, null, 1);
+    // 0 -> unique 
+    // 1 -> duplicate
+    let duplicate = !(!result.recordset.length);
+    return duplicate;
+}
 module.exports = {
     normalizeQueryString,
     toHex,
@@ -166,5 +177,6 @@ module.exports = {
     checkForeignKey,
     setToQueryString,
     validateNationalCode,
-    normalizeQueryString_Create
+    normalizeQueryString_Create,
+    checkDuplicate,
 }
