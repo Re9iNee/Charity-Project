@@ -65,7 +65,18 @@ const ws_createPlan = async (connection, details) => {
         }
     }
 
-    
+    if (PlanName) {
+        // check for planName duplicates - returns: true -> duplicate | false -> unique
+        const duplicatePlanName = await checkDuplicate(connection, {PlanName});
+        if (duplicatePlanName) 
+            return {
+                status: "Failed", 
+                msg: "Eror Creating Row, Duplicate PlanName",
+                PlanName
+            }
+    }
+
+
 
     const {
         pool,
@@ -98,6 +109,14 @@ const ws_createPlan = async (connection, details) => {
 
 }
 
+
+async function checkDuplicate(connection, column) {
+    let result = await ws_loadPlan(connection, column, null, 1);
+    // 0 -> unique 
+    // 1 -> duplicate
+    let duplicate = !(!result.recordset.length);
+    return duplicate;
+}
 
 
 module.exports = {
