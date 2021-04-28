@@ -1,4 +1,20 @@
-const {normalizeQueryString,setToQueryString,checkForeignKey} = require("../utils/commonModules");
+const crypto = require('crypto');
+const {normalizeQueryString,setToQueryString} = require("../utils/commonModules");
+const validateNationalCode = require('../utils/nationalCard');
+
+
+
+const checkDuplicateId = async(connection, IdNumber) => {
+
+    let result = await ws_loadPersonal(connection, {
+        IdNumber
+    }, null, 1);
+    
+    let duplicate = !(!result.recordset.length);
+    return duplicate;
+};
+
+
 
 
 const ws_loadPersonal = async (connection, filters, customeQuery = null, resultLimit = 1000) => {
@@ -8,7 +24,7 @@ const ws_loadPersonal = async (connection, filters, customeQuery = null, resultL
     await poolConnect;
 
     //get all datas from ppersonal table
-    let queryString = `SELECT TOP (${resultLimit}) [PersonId]
+    let queryString = `SELECT TOP (${resultLimit}) [PersonId],
         [Name], 
         [Family], 
         [NationalCode], 
@@ -17,8 +33,8 @@ const ws_loadPersonal = async (connection, filters, customeQuery = null, resultL
         [BirthDate], 
         [BirthPlace], 
         [PersonType], 
-        [PersonPhoto], 
-    FROM [SabkadV01].[dbo].[tblPersonal]
+        [PersonPhoto] 
+    FROM [${DB_DATABASE}].[dbo].[tblPersonal]
     WHERE 1=1`;
 
     // create our query string
@@ -92,12 +108,22 @@ const ws_updatePersonal = async (connection , filters , newValues) => {
     const {pool,poolConnect} = connection;
     await poolConnect;
 
-    let queryString = `UPDATE [SabkadV01].[dbo].[tblPersonal] SET `;
+    if (newValues.IdNumber) {
+        const DuplicateId = await checkDuplicateId(connection, newValues.IdNumber);
+        if (DuplicateId)
+            return {
+                status: "Failed",
+                msg: "Error Creating Row, Duplicate IdNumber",
+                ...newValues.IdNumber,
+            };
+    }
+
+    
+    let queryString = `UPDATE [${DB_DATABASE}].[dbo].[tblPersonal] SET `;
 
     // update our query string
     queryString = setToQueryString(queryString, newValues) + "WHERE 1=1";
     queryString = normalizeQueryString(queryString, filters);
-    console.log(queryString);
 
     try {
         const request = pool.request();
@@ -117,13 +143,11 @@ const ws_deletePersonal = async (connection, PersonId) => {
     const {pool,poolConnect} = connection;
     await poolConnect;
 
-    const canRemove = await checkForeignKey(connection, "tblPersonal", PersonId);
-    if (!canRemove)
-     return {
-        status: "Failed",
-        msg: "Can not remove this ID",
+   
+    await ws_loadPersonal(connection, {
         PersonId
-    };
+    });
+
  
     let queryString = `DELETE [SabkadV01].[dbo].[tblPersonal] WHERE PersonId = ${PersonId};`
 
