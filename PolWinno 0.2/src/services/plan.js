@@ -2,6 +2,7 @@ const {
     normalizeQueryString,
     normalizeQueryString_Create,
     checkDuplicate,
+    sqlDate,
 } = require("../utils/commonModules");
 
 
@@ -82,6 +83,24 @@ const ws_createPlan = async (connection, details) => {
         }
 
 
+    // Todo: Modat Payan Az modat shuru bayad bozorgtar bashad.
+    // Date format: YYYY-MM-DD
+    // Tdate = Shuru
+    // Fdate = Payan
+    let start = new sqlDate(Tdate.split('-'));
+    let end = new sqlDate(Fdate.split('-'));
+    if (end.year < start.year) {
+        if (end.month < start.month){
+            if (end.day < start.day){
+                return {
+                    status: "Failed",
+                    msg: "ending date must be bigger than initial date",
+                    start,
+                    end
+                }
+            }
+        }
+    }
 
     const {
         pool,
