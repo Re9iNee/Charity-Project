@@ -6,6 +6,7 @@ const router = express.Router();
 
 router.get("/plans", planCtlr.getPlans);
 router.post("/plans", planCtlr.postPlans);
+router.put("/plans", planCtlr.updatePlans);
 
 
 

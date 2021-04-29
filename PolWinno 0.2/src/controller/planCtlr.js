@@ -1,6 +1,7 @@
 const {
     ws_loadPlan,
     ws_createPlan,
+    ws_updatePlan,
 } = require("../services/plan");
 
 const {
@@ -44,4 +45,9 @@ exports.postPlans = async (req, res) => {
     res.send({
         result
     })
+}
+
+
+exports.updatePlans = async (req, res) => {
+    // T07 - Method 03
 }

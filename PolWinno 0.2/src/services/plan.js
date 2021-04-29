@@ -130,9 +130,19 @@ const ws_createPlan = async (connection, details) => {
 }
 
 
+const ws_updatePlan = async (connection, filters, newValues) => {
+    // note: inputs && parameters -> PlanName, Description, PlanNature, ParentPlanId, icon, Fdate, Tdate, neededLogin, PlanId
+    // todo: check for unique Values
+    // Unique Values => (PlanName, PlanNature, ParentPlanId)
+    // todo: if PlanId exists in these table => (tblCashAssistanceDetail, tblNonCashAssistanceDetails) we can not update/change PlanNature Column.
+    // todo: if Planid exists in this table => (tblAssignNeedyToPlans) we can not update/change Fdate && Tdate column.
+    // todo: ending time must be lenghty er than start time
+    // todo: return the table
+}
 
 
 module.exports = {
     ws_loadPlan,
     ws_createPlan,
+    ws_updatePlan,
 }
