@@ -170,7 +170,7 @@ const checkDuplicate = async (connection, column, loadingMethod) => {
     return duplicate;
 }
 
-const sqlDate = ([year, month, day]) {
+const sqlDate = function ([year, month, day]) {
     this.year = year;
     this.month = month;
     this.day = day;

@@ -89,8 +89,8 @@ const ws_createPlan = async (connection, details) => {
     // Tdate = Payan
     let start = new sqlDate(Fdate.split('-'));
     let end = new sqlDate(Tdate.split('-'));
-    // compare end date and start date - returns: true -> end is bigger or at the same date || false -> end is bigger.
-    if (endIsLenghty(start, end))
+    // compare end date and start date - returns: true -> end is bigger or at the same date || false -> start is bigger.
+    if (!endIsLenghty(start, end))
         return {
             status: "Failed",
             msg: "ending date must be bigger than initial date",
