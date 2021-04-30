@@ -1,5 +1,13 @@
-const {ws_loadBaseType,ws_createBaseType,ws_updateBaseType,ws_deleteBaseType} = require("../services/commonBaseType");
-const {poolConnect , pool} = require('../utils/charityDb ');
+const {
+    ws_loadBaseType,
+    ws_createBaseType,
+    ws_updateBaseType,
+    ws_deleteBaseType
+} = require("../services/commonBaseType");
+const {
+    poolConnect,
+    pool
+} = require('../utils/charityDb');
 
 
 
@@ -15,7 +23,9 @@ exports.getCommonBaseType = async (req, res) => {
         BaseTypeTitle: query.BaseTypeTitle,
         CommonBaseTypeId: query.CommonBaseTypeId
     });
-    res.send(result)
+    res.send({
+        result
+    })
 };
 
 exports.creatCommonBaseType = async (req, res) => {
@@ -39,7 +49,9 @@ exports.updateCommonBaseType = async (req, res) => {
         pool,
         poolConnect
     }, filters, newTitle);
-    res.send(result);
+    res.send({
+        result
+    });
 };
 
 exports.deleteCommonBaseType = async (req, res) => {

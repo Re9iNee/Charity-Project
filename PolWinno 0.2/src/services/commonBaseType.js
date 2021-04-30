@@ -15,6 +15,12 @@ const {
 } = require("../utils/commonModules");
 
 
+require("dotenv").config({
+    path: "./utils/.env"
+});
+const {
+    DB_DATABASE
+} = process.env
 
 // Task 02 Method 01
 const ws_loadBaseType = async (connection, filters, costumeQuery = null, resultLimit = 1000) => {
@@ -27,7 +33,7 @@ const ws_loadBaseType = async (connection, filters, costumeQuery = null, resultL
     let queryString = `SELECT TOP (${resultLimit}) [CommonBaseTypeId]
     ,[BaseTypeTitle]
     ,[BaseTypeCode] 
-    FROM [SabkadV01].[dbo].[tblCommonBaseType]
+    FROM [${DB_DATABASE}].[dbo].[tblCommonBaseType]
     WHERE 1=1`
     queryString = normalizeQueryString(queryString, filters)
     if (costumeQuery)
@@ -47,7 +53,7 @@ const ws_createBaseType = async (connection, baseTypeTitle) => {
     // read last baseCode from table and create incremented one to insert
     const lastBaseCode = await getLastBaseCode(connection);
     let baseTypeCode = addZero(Number(lastBaseCode) + 1, 3);
-    
+
     if (!baseTypeTitle)
         return {
             status: "Failed",
@@ -70,7 +76,7 @@ const ws_createBaseType = async (connection, baseTypeTitle) => {
     try {
         /* Select Scope Identity is for returning id of affected row(s) */
         let queryString = `INSERT INTO 
-        [SabkadV01].[dbo].[tblCommonBaseType] (BaseTypeTitle, BaseTypeCode) VALUES ('${baseTypeTitle}', '${baseTypeCode}'); SELECT SCOPE_IDENTITY() AS CommonBaseTypeId;`;
+        [${DB_DATABASE}].[dbo].[tblCommonBaseType] (BaseTypeTitle, BaseTypeCode) VALUES (N'${baseTypeTitle}', '${baseTypeCode}'); SELECT SCOPE_IDENTITY() AS CommonBaseTypeId;`;
         const request = pool.request();
         const result = await request.query(queryString);
         const id = result.recordset[0].CommonBaseTypeId;
@@ -92,8 +98,7 @@ async function getLastBaseCode(connection) {
     let code = await ws_loadBaseType(connection, null, "ORDER BY BaseTypeCode DESC;", 1);
     try {
         code = code.recordset[0].BaseTypeCode;
-    }
-    catch {
+    } catch {
         code = "000";
     }
     return code;
@@ -107,7 +112,7 @@ const ws_updateBaseType = async (connection, filters, newBaseTypeTitle) => {
     } = connection;
     // ensures that the pool has been created
     await poolConnect;
-    let queryString = `UPDATE [SabkadV01].[dbo].[tblCommonBaseType] SET BaseTypeTitle = '${newBaseTypeTitle}' WHERE 1=1 `
+    let queryString = `UPDATE [${DB_DATABASE}].[dbo].[tblCommonBaseType] SET BaseTypeTitle = N'${newBaseTypeTitle}' WHERE 1=1 `
     queryString = normalizeQueryString(queryString, filters)
     // check for baseTypeTitle duplicates - returns: true -> duplicate | false -> unique
     const duplicateBaseTypeTitle = await checkDuplicateTitle(connection, newBaseTypeTitle);
@@ -147,7 +152,7 @@ const ws_deleteBaseType = async (connection, commonBaseTypeId) => {
     // ensures that the pool has been created
     await poolConnect;
 
-    let queryString = `DELETE [SabkadV01].[dbo].[tblCommonBaseType] WHERE CommonBaseTypeId = ${commonBaseTypeId};`
+    let queryString = `DELETE [${DB_DATABASE}].[dbo].[tblCommonBaseType] WHERE CommonBaseTypeId = ${commonBaseTypeId};`
     try {
         const request = pool.request();
         const DeleteResult = await request.query(queryString);

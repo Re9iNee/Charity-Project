@@ -7,13 +7,15 @@ const commonBaseDataRoutes = require('./router/commonBaseData');
 const charityAccountsRoutes = require('./router/charityAccounts');
 const personalInfoRoutes = require('./router/personalInfo');
 const needyAccountRoutes = require('./router/needyAccount');
+const plansRoutes = require('./router/plan')
 
 
 
 // config
 
-dotEnv.config({path : "./utils/config.env"});
-
+dotEnv.config({
+    path: "./utils/.env"
+});
 const port = process.env.PORT || 3000;
 
 
@@ -24,7 +26,9 @@ const app = express();
 
 //bodyParser
 
-app.use(bodyPaser.urlencoded({ extended: false }));
+app.use(bodyPaser.urlencoded({
+    extended: false
+}));
 
 
 app.use(express.json({
@@ -34,32 +38,36 @@ app.use(express.json({
 
 // ---Routes---
 
-/*  TASK 1 */
-
-    app.use(commonBaseTypeRoutes);
-
-
 /*  TASK 2 */
 
-    app.use(commonBaseDataRoutes);
+app.use(commonBaseTypeRoutes);
 
 
 /*  TASK 3 */
 
-    app.use(charityAccountsRoutes);
+app.use(commonBaseDataRoutes);
 
 
 /*  TASK 4 */
 
-    app.use(personalInfoRoutes);
+app.use(charityAccountsRoutes);
 
 
 /*  TASK 5 */
 
-    app.use(needyAccountRoutes);
+app.use(personalInfoRoutes);
 
+
+/*  TASK 6 */
+
+app.use(needyAccountRoutes);
+
+
+/*  TASK 7 */
+
+app.use(plansRoutes)
 
 //-----------------------------------
 
 
-app.listen(port, () => console.log(`Listening on ${port}`) );
+app.listen(port, () => console.log(`Listening on ${port}`));
