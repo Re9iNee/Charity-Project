@@ -132,8 +132,23 @@ const ws_createPlan = async (connection, details) => {
 
 const ws_updatePlan = async (connection, filters, newValues) => {
     // note: inputs && parameters -> PlanName, Description, PlanNature, ParentPlanId, icon, Fdate, Tdate, neededLogin, PlanId
-    // todo: check for unique Values
     // Unique Values => (PlanName, PlanNature, ParentPlanId)
+    if (PlanName || PlanNature || ParentPlanId) {
+        // check for unique values if they've entered.
+        const duplicateUniqueValue = await checkDuplicate(connection, {
+            PlanName,
+            PlanNature,
+            ParentPlanId
+        }, ws_loadPlan);
+        console.log(duplicateUniqueValue)
+        if (duplicateUniqueValue)
+            return {
+                status: "Failed",
+                msg: "Error Updating Row, Violation of unique values",
+                uniqueColumn: "ParentPlanId, PlanNature, PlanName",
+                newValues
+            }
+    }
     // todo: if PlanId exists in these table => (tblCashAssistanceDetail, tblNonCashAssistanceDetails) we can not update/change PlanNature Column.
     // todo: if Planid exists in this table => (tblAssignNeedyToPlans) we can not update/change Fdate && Tdate column.
     // todo: ending time must be lenghty er than start time
