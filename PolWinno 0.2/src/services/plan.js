@@ -132,6 +132,13 @@ const ws_createPlan = async (connection, details) => {
 
 const ws_updatePlan = async (connection, filters, newValues) => {
     // note: inputs && parameters -> PlanName, Description, PlanNature, ParentPlanId, icon, Fdate, Tdate, neededLogin, PlanId
+    const {
+        PlanName,
+        PlanNature,
+        ParentPlanId,
+    } = newValues;
+    // Unique Values
+    // check for duplicates - returns: true -> duplicate | false -> unique
     // Unique Values => (PlanName, PlanNature, ParentPlanId)
     if (PlanName || PlanNature || ParentPlanId) {
         // check for unique values if they've entered.
@@ -149,10 +156,102 @@ const ws_updatePlan = async (connection, filters, newValues) => {
                 newValues
             }
     }
-    // todo: if PlanId exists in these table => (tblCashAssistanceDetail, tblNonCashAssistanceDetails) we can not update/change PlanNature Column.
+    // if PlanId exists in these table => (tblCashAssistanceDetail, tblNonCashAssistanceDetails) we can not update/change PlanNature Column.
+    if ("PlanNature" in newValues) {
+        let planIdExist = null;
+        if ("PlanId" in filters) {
+            let PlanId = filters.PlanId;
+            console.log("HI")
+            // checkPlanId in cashAssistanceDetails table - returns true -> if planId exists || false -> planId doesn't Exist.
+            planIdExist = await checkPlanId_cashAssistanceDetails(connection, PlanId);
+            // todo: also check PlanId in nonCashAssistanceDetails table (This table doesn't exists at this point)
+        } else {
+            // get the PlanId base on the filters object. (load table based on filters object and get their planIds)
+            const result = await ws_loadPlan(connection, filters, "ORDER BY PlanId ");
+            for (let record of result.recordset){
+                // check for duplicates on dependent tables. if it doesn't have any conflicts UPDATE!
+                let PlanId = record.PlanId;
+                planIdExist = planIdExist || await checkPlanId_cashAssistanceDetails(connection, PlanId);
+            }
+        }
+        if (planIdExist) {
+            return {
+                status: "Failed",
+                msg: "Error Updating Row, Can not change PlanNature due to PlanId depends on cashAssistanceDetail and nonCashAssistanceDetails tables",
+                dependencies: ["cashAssistanceDetails", "nonCashAssistanceDetails"],
+                PlanNature,
+                "PlanId": filters.PlanId
+            }
+        }
+    }
+
     // todo: if Planid exists in this table => (tblAssignNeedyToPlans) we can not update/change Fdate && Tdate column.
+
+
     // todo: ending time must be lenghty er than start time
-    // todo: return the table
+    // Date format: YYYY-MM-DD
+    // Fdate = Shuru
+    // Tdate = Payan
+    if (newValues.Fdate && newValues.Tdate) {
+        // if Fdate and Tdate has been inserted.
+        let start = new sqlDate(newValues.Fdate.split('-'));
+        let end = new sqlDate(newValues.Tdate.split('-'));
+        // compare end date and start date - returns: true -> end is bigger or at the same date || false -> start is bigger.
+        if (!endIsLenghty(start, end))
+            return {
+                status: "Failed",
+                msg: "ending date must be bigger than initial date",
+                start,
+                end
+            }
+    } else if (newValues.Fdate || newValues.Tdate) {
+        return {
+            status: "Failed",
+            msg: "Send Both Parameters Fdate And Tdate",
+            newValues,
+            Fdate: newValues.Fdate,
+            Tdate: newValues.Tdate,
+        }
+    }
+
+
+
+    let queryString = `UPDATE [${DB_DATABASE}].[dbo].[tblPlans] SET `
+    const {
+        setToQueryString
+    } = require("../utils/commonModules")
+    // setToQueryString returns: Update ... SET sth = 2, test = 3
+    queryString = setToQueryString(queryString, newValues) + " WHERE 1=1 ";
+    queryString = normalizeQueryString(queryString, filters);
+
+    const {
+        pool,
+        poolConnect
+    } = connection;
+    // ensures that the pool has been created
+    await poolConnect;
+
+    try {
+        const request = pool.request();
+        const updateResult = await request.query(queryString);
+        // return table records
+        const table = await ws_loadPlan(connection);
+        return table;
+    } catch (err) {
+        console.error("ws_updatePlan - SQL  error: ", err);
+    }
+}
+
+
+const {
+    ws_loadCashAssistanceDetail
+} = require("./cashAssistanceDetail");
+async function checkPlanId_cashAssistanceDetails (connection, PlanId) {
+    // check for duplicates - returns: true -> duplicate | false -> unique
+    const planIdExist = await checkDuplicate(connection, {
+        PlanId
+    }, ws_loadCashAssistanceDetail);
+    return planIdExist;
 }
 
 
