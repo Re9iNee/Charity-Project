@@ -9,7 +9,7 @@ const personalInfoRoutes = require('./router/personalInfo');
 const needyAccountRoutes = require('./router/needyAccount');
 const plansRoutes = require('./router/plan');
 const cashAssistanceDetailRouter = require("./router/cashAssistanceDetail");
-const assignNeedyToPlansRouter = require("./router/assignNeedyToPlansRouter")
+const assignNeedyToPlansRouter = require("./router/assignNeedyToPlans")
 
 
 
@@ -85,5 +85,42 @@ app.use(cashAssistanceDetailRouter)
 
 
 
+/* ----  Testing Area: ----- */
+const {
+    pool,
+    poolConnect
+} = require("./utils/charityDb");
+const {
+    ws_updatePlan
+} = require("./services/plan");
+const {
+    ws_loadNeedyForPlan
+} = require("./services/assignNeedyToPlans");
+(async () => {
+    // T07 - Method 03
+    // const result = await ws_updatePlan({
+    //     pool,
+    //     poolConnect
+    // }, {
+    //     ParentPlanId: 1,
+    // }, {
+    //     Description: "Some Of them Worthy",
+    //     PlanNature: 0,
+    // });
+    // console.log(result)
+    // T08 - Method 01 
+    // const result = await ws_loadNeedyForPlan({
+    //     pool,
+    //     poolConnect
+    // }, {
+        
+    // });
+    // console.log(result)
+})();
+
+
+
+
+/* -----  End of Testing Area ---- */
 
 app.listen(port, () => console.log(`Listening on ${port}`));
