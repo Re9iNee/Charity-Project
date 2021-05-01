@@ -43,6 +43,16 @@ const ws_loadNeedyForPlan = async (connection, filters, customQuery = null, resu
     INNER JOIN [SabkadV01].[dbo].[tblPlans] as plans 
     on assNeedy.PlanId = plans.PlanId
     WHERE 1 = 1 `;
+    // abmbiguous column names
+    if ("NeedyId" in filters) {
+        filters["assNeedy.NeedyId"] = filters.NeedyId;
+        delete filters.NeedyId;
+    }
+    if ("PlanId" in filters) {
+        filters["plans.PlanId"] = filters.PlanId;
+        delete filters.PlanId;
+    }
+    
     queryString = normalizeQueryString(queryString, filters);
     if (customQuery)
         queryString += ` ${customQuery}`;
