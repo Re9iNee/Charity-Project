@@ -43,6 +43,16 @@ const ws_loadCashAssistanceDetail = async (connection, filters, customQuery = nu
     INNER JOIN [${DB_DATABASE}].[dbo].[tblPersonal] as personal
     on assignNeedy.NeedyId = personal.PersonId 
     WHERE 1 = 1 `;
+    // Ambiguous column names problem
+    if ("PlanId" in filters) {
+        filters["plans.PlanId"] = filters.PlanId;
+        delete filters.PlanId;
+    }
+    if ("AssignNeedyPlanId" in filters) {
+        filters["cashAssist.AssignNeedyPlanId"] = filters.AssignNeedyPlanId;
+        delete filters.AssignNeedyPlanId;
+    }
+    
     queryString = normalizeQueryString(queryString, filters);
     if (customQuery)
         queryString += ` ${customQuery}`;
@@ -62,5 +72,5 @@ const ws_loadCashAssistanceDetail = async (connection, filters, customQuery = nu
 
 module.exports = {
     ws_loadCashAssistanceDetail,
-    
+
 }

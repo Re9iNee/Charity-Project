@@ -16,8 +16,8 @@ exports.getCashAssistanceDetail = async (req, res) => {
         pool,
         poolConnect
     }, {
-        "cashAssist.AssignNeedyPlanId": query.AssignNeedyPlanId,
-        "plans.PlanId": query.PlanId,
+        AssignNeedyPlanId: query.AssignNeedyPlanId,
+        PlanId: query.PlanId,
         CashAssistanceDetailId: query.CashAssistanceDetailId
     });
     // Easier way to send request is to send query object itself, but when it comes to typo it throws an error
