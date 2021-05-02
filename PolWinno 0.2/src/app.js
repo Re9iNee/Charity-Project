@@ -90,24 +90,7 @@ const {
     pool,
     poolConnect
 } = require("./utils/charityDb");
-const {
-    ws_updatePlan
-} = require("./services/plan");
-const {
-    ws_loadNeedyForPlan
-} = require("./services/assignNeedyToPlans");
 (async () => {
-    // T07 - Method 03
-    // const result = await ws_updatePlan({
-    //     pool,
-    //     poolConnect
-    // }, {
-    //     ParentPlanId: 1,
-    // }, {
-    //     Description: "Some Of them Worthy",
-    //     PlanNature: 0,
-    // });
-    // console.log(result)
     // T08 - Method 01 
     // const result = await ws_loadNeedyForPlan({
     //     pool,

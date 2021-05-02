@@ -50,4 +50,14 @@ exports.postPlans = async (req, res) => {
 
 exports.updatePlans = async (req, res) => {
     // T07 - Method 03
-}
+    // Attach filters object and newValues to request body
+    // parameters sql connection, filters, newValues
+    // returns plans table
+    const result = await ws_updatePlan({
+        pool,
+        poolConnect
+    }, req.body.filters, req.body.newValues);
+    res.send({
+        result
+    });
+};

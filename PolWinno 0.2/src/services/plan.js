@@ -159,22 +159,17 @@ const ws_updatePlan = async (connection, filters, newValues) => {
     // if PlanId exists in these table => (tblCashAssistanceDetail, tblNonCashAssistanceDetails) we can not update/change PlanNature Column.
     if ("PlanNature" in newValues) {
         let planIdExist = null;
-        if ("PlanId" in filters) {
-            let PlanId = filters.PlanId;
-            console.log("HI")
+        // get the PlanId base on the filters object. (load table based on filters object and get their planIds)
+        const result = await ws_loadPlan(connection, filters, "ORDER BY PlanId ");
+        for (let record of result.recordset) {
+            // check for duplicates on dependent tables. if it doesn't have any conflicts UPDATE!
+            let PlanId = record.PlanId;
             // checkPlanId in cashAssistanceDetails table - returns true -> if planId exists || false -> planId doesn't Exist.
-            planIdExist = await checkPlanId_cashAssistanceDetails(connection, PlanId);
+            planIdExist = planIdExist || await checkPlanId_cashAssistanceDetails(connection, PlanId);
             // todo: also check PlanId in nonCashAssistanceDetails table (This table doesn't exists at this point)
-        } else {
-            // get the PlanId base on the filters object. (load table based on filters object and get their planIds)
-            const result = await ws_loadPlan(connection, filters, "ORDER BY PlanId ");
-            for (let record of result.recordset) {
-                // check for duplicates on dependent tables. if it doesn't have any conflicts UPDATE!
-                let PlanId = record.PlanId;
-                planIdExist = planIdExist || await checkPlanId_cashAssistanceDetails(connection, PlanId);
-                // todo: also check PlanId in nonCashAssistanceDetails table (This table doesn't exists at this point)
-            }
+            if (planIdExist) break;
         }
+
         if (planIdExist) {
             return {
                 status: "Failed",
@@ -186,7 +181,7 @@ const ws_updatePlan = async (connection, filters, newValues) => {
         }
     }
 
-    
+
     if ("Fdate" in newValues && "Tdate" in newValues) {
         // ending time must be lenghty er than start time
         // Date format: YYYY-MM-DD
