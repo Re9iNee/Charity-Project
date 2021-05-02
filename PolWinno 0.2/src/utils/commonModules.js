@@ -169,6 +169,15 @@ const checkDuplicate = async (connection, column, loadingMethod) => {
     let duplicate = !(!result.recordset.length);
     return duplicate;
 }
+
+const sqlDate = function ([year, month, day]) {
+    this.year = year;
+    this.month = month;
+    this.day = day;
+}
+
+const endIsLenghty = (start, end) => (end.year > start.year) ? true : (end.year == start.year) ? (end.month > start.month) ? true : (end.month == start.month) ? (end.day >= start.day) ? true : false : false : false;
+
 module.exports = {
     normalizeQueryString,
     toHex,
@@ -179,4 +188,6 @@ module.exports = {
     validateNationalCode,
     normalizeQueryString_Create,
     checkDuplicate,
+    sqlDate,
+    endIsLenghty,
 }
