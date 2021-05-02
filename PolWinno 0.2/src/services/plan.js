@@ -168,10 +168,11 @@ const ws_updatePlan = async (connection, filters, newValues) => {
         } else {
             // get the PlanId base on the filters object. (load table based on filters object and get their planIds)
             const result = await ws_loadPlan(connection, filters, "ORDER BY PlanId ");
-            for (let record of result.recordset){
+            for (let record of result.recordset) {
                 // check for duplicates on dependent tables. if it doesn't have any conflicts UPDATE!
                 let PlanId = record.PlanId;
                 planIdExist = planIdExist || await checkPlanId_cashAssistanceDetails(connection, PlanId);
+                // todo: also check PlanId in nonCashAssistanceDetails table (This table doesn't exists at this point)
             }
         }
         if (planIdExist) {
@@ -185,14 +186,12 @@ const ws_updatePlan = async (connection, filters, newValues) => {
         }
     }
 
-    // todo: if Planid exists in this table => (tblAssignNeedyToPlans) we can not update/change Fdate && Tdate column.
-
-
-    // todo: ending time must be lenghty er than start time
-    // Date format: YYYY-MM-DD
-    // Fdate = Shuru
-    // Tdate = Payan
-    if (newValues.Fdate && newValues.Tdate) {
+    
+    if ("Fdate" in newValues && "Tdate" in newValues) {
+        // ending time must be lenghty er than start time
+        // Date format: YYYY-MM-DD
+        // Fdate = Shuru
+        // Tdate = Payan
         // if Fdate and Tdate has been inserted.
         let start = new sqlDate(newValues.Fdate.split('-'));
         let end = new sqlDate(newValues.Tdate.split('-'));
@@ -203,6 +202,32 @@ const ws_updatePlan = async (connection, filters, newValues) => {
                 msg: "ending date must be bigger than initial date",
                 start,
                 end
+            }
+
+
+        // if Planid exists in this table => (tblAssignNeedyToPlans) we can not update/change Fdate && Tdate column.
+        const {
+            ws_loadNeedyForPlan
+        } = require("./assignNeedyToPlans");
+        let planIdExist;
+        // get the PlanId base on the filters object. (load table based on filters object and get their PlanId s)
+        const result = await ws_loadPlan(connection, filters, "ORDER BY PlanId ");
+        for (let record of result.recordset) {
+            // check for duplicates on dependent tables. if it doesn't have any conflicts UPDATE!
+            let PlanId = record.PlanId;
+            // check for duplicates - returns: true -> duplicate | false -> unique
+            planIdExist = planIdExist || await checkDuplicate(connection, {
+                PlanId
+            }, ws_loadNeedyForPlan);
+            if (planIdExist) break;
+        }
+        if (planIdExist)
+            return {
+                status: "Failed",
+                msg: "Error Updating Row, Can not change Fdate nor Tdate due to PlanId column on assignNeedyToPlans table depends on it.",
+                dependencies: ["assignNeedyToPlans"],
+                filters,
+                newValues
             }
     } else if (newValues.Fdate || newValues.Tdate) {
         return {
@@ -246,7 +271,7 @@ const ws_updatePlan = async (connection, filters, newValues) => {
 const {
     ws_loadCashAssistanceDetail
 } = require("./cashAssistanceDetail");
-async function checkPlanId_cashAssistanceDetails (connection, PlanId) {
+async function checkPlanId_cashAssistanceDetails(connection, PlanId) {
     // check for duplicates - returns: true -> duplicate | false -> unique
     const planIdExist = await checkDuplicate(connection, {
         PlanId
