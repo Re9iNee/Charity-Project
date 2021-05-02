@@ -1,4 +1,7 @@
 const {
+    connect
+} = require("../router/plan");
+const {
     normalizeQueryString,
     normalizeQueryString_Create,
     checkDuplicate,
@@ -268,8 +271,41 @@ const ws_updatePlan = async (connection, filters, newValues) => {
     }
 }
 
+const ws_deletePlan = async (connection, planId) => {
+    // if PlanId exists on => tblAssignNeedyToPlans & tblCashAssistanceDetail & tblNonCashAssistanceDetail we can not delete a row with the id of PlanId
+    
+    // todo: nonCashAssistanceTable doesn't exist at this point. create and check planId for this table
+    const {
+        checkForeignKey
+    } = require("../utils/commonModules");
+    const canRemove = await checkForeignKey(connection, "tblPlans", planId);
+    if (!canRemove) return {
+        status: "Failed",
+        msg: "Can not remove this ID",
+        PlanId: planId,
+        dependencies: ["tblCashAssistanceDetail", "tblNonCashAssistanceDetail", "tblAssignNeedyToPlans"]
+    };
+
+    const {
+        pool,
+        poolConnect
+    } = connection;
+    // ensures that the pool has been created
+    await poolConnect;
+
+    let queryString = `DELETE [${DB_DATABASE}].[dbo].[tblPlans] WHERE PlanId = ${planId};`
+    try {
+        const request = pool.request();
+        const deleteResult = await request.query(queryString);
+        const table = await ws_loadPlan(connection);
+        return table;
+    } catch (err) {
+        console.log("ws_deletePlan - SQL error: ", err);
+    }
+}
 module.exports = {
     ws_loadPlan,
     ws_createPlan,
     ws_updatePlan,
+    ws_deletePlan
 }
