@@ -158,6 +158,9 @@ const ws_updatePlan = async (connection, filters, newValues) => {
     }
     // if PlanId exists in these table => (tblCashAssistanceDetail, tblNonCashAssistanceDetails) we can not update/change PlanNature Column.
     if ("PlanNature" in newValues) {
+        const {
+            ws_loadCashAssistanceDetail
+        } = require("./cashAssistanceDetail")
         let planIdExist = null;
         // get the PlanId base on the filters object. (load table based on filters object and get their planIds)
         const result = await ws_loadPlan(connection, filters, "ORDER BY PlanId ");
@@ -165,7 +168,10 @@ const ws_updatePlan = async (connection, filters, newValues) => {
             // check for duplicates on dependent tables. if it doesn't have any conflicts UPDATE!
             let PlanId = record.PlanId;
             // checkPlanId in cashAssistanceDetails table - returns true -> if planId exists || false -> planId doesn't Exist.
-            planIdExist = planIdExist || await checkPlanId_cashAssistanceDetails(connection, PlanId);
+            // check for duplicates - returns: true -> duplicate | false -> unique
+            planIdExist = planIdExist || await checkDuplicate(connection, {
+                PlanId
+            }, ws_loadCashAssistanceDetail);
             // todo: also check PlanId in nonCashAssistanceDetails table (This table doesn't exists at this point)
             if (planIdExist) break;
         }
@@ -261,19 +267,6 @@ const ws_updatePlan = async (connection, filters, newValues) => {
         console.error("ws_updatePlan - SQL  error: ", err);
     }
 }
-
-
-const {
-    ws_loadCashAssistanceDetail
-} = require("./cashAssistanceDetail");
-async function checkPlanId_cashAssistanceDetails(connection, PlanId) {
-    // check for duplicates - returns: true -> duplicate | false -> unique
-    const planIdExist = await checkDuplicate(connection, {
-        PlanId
-    }, ws_loadCashAssistanceDetail);
-    return planIdExist;
-}
-
 
 module.exports = {
     ws_loadPlan,
