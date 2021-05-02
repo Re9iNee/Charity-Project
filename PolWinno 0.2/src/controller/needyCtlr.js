@@ -50,7 +50,7 @@ exports.createNeedyAccount = async (req, res) => {
 
 exports.updateNeedyAccount = async (req, res) => {
 
-    let newValues = req.body.values;
+    let newValues = req.body.newValues;
     let filters = req.body.filters;
 
     const result = await ws_updateNeedyAccount({

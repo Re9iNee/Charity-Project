@@ -1,7 +1,8 @@
 const {
     normalizeQueryString,
     setToQueryString,
-    checkForeignKey
+    checkForeignKey,
+    checkDuplicate
 } = require("../utils/commonModules");
 const {
     validateCreditCard
@@ -119,6 +120,23 @@ const ws_createNeedyAccount = async (connection, values) => {
             values
         }
     };
+
+    const canAdd = await availableId(connection, BankId, NeedyId)
+    if (!canAdd) {
+        return {
+            status: "Failed",
+            msg: "Can't Add with this ID, This ID Doesn't Exist"
+        }
+    };
+
+    const duplicateId = await checkDuplicate(connection, AccountNumber , ws_loadPersonal);
+        if (duplicateId){
+            return {
+                status: "Failed",
+                msg: "Error Creating Row, Duplicate Record",
+                AccountNumber
+            };
+        }
 
     let queryString = `INSERT INTO 
         [${DB_DATABASE}].[dbo].[tblNeedyAccounts]

@@ -1,18 +1,5 @@
 const crypto = require('crypto');
-const {normalizeQueryString,setToQueryString} = require("../utils/commonModules");
-const validateNationalCode = require('../utils/nationalCard');
-
-
-
-const checkDuplicateId = async(connection, IdNumber) => {
-
-    let result = await ws_loadPersonal(connection, {
-        IdNumber
-    }, null, 1);
-    
-    let duplicate = !(!result.recordset.length);
-    return duplicate;
-};
+const {normalizeQueryString,setToQueryString,validateNationalCode,checkDuplicate} = require("../utils/commonModules");
 
 
 
@@ -53,13 +40,13 @@ const ws_loadPersonal = async (connection, filters, customeQuery = null, resultL
 };
 
 
-const ws_createPersonal = async (connection,values) => {
+const ws_createPersonal = async (connection,values,PersonPhoto) => {
 
     const {pool,poolConnect} = connection;
     await poolConnect;
 
     // destruct our input values
-    const {Name,Family,NationalCode,IdNumber,Sex,BirthDate,BirthPlace,PersonType,PersonPhoto} = values;
+    const {Name,Family,NationalCode,IdNumber,Sex,BirthDate,BirthPlace,PersonType} = values;
 
     // national card validation
     if (NationalCode) {
@@ -82,22 +69,75 @@ const ws_createPersonal = async (connection,values) => {
         }
     };
 
-    let queryString = `INSERT INTO 
+    
+    // if the personType is needy we should encrypt it.
+
+    if( PersonType === "3" ){
+        
+        const person = {
+            Name ,
+            Family,
+            NationalCode
+        };
+        
+        const hashPerson = crypto.createHash( 'sha1' , person).digest('hex');
+
+        let queryString = `INSERT INTO 
         [SabkadV01].[dbo].[tblPersonal]
         (Name,Family,NationalCode,IdNumber,Sex,BirthDate,BirthPlace,PersonType,PersonPhoto)
         VALUES 
-        ('${Name}','${Family}',${NationalCode},${IdNumber},${Sex},${BirthDate},${BirthPlace},${PersonType},${PersonPhoto}); 
+        ('${hashPerson}','${hashPerson}',${NationalCode},${IdNumber},${Sex},${BirthDate},${BirthPlace},${PersonType},CONVERT(varbinary ,'${PersonPhoto}')); 
         SELECT SCOPE_IDENTITY() AS PersonId;`
 
-    try {
-        const request = pool.request();
-        const result = request.query(queryString);
 
-        console.dir(result);
-        return result;
+        const duplicateId = await checkDuplicate(connection, IdNumber , ws_loadPersonal);
+        if (duplicateId)
+            return {
+                status: "Failed",
+                msg: "Error Creating Row, Duplicate Record",
+                IdNumber
+            };
 
-    } catch (err) {
-        console.error("ws_createPersonal error:", err)
+        try {
+            const request = pool.request();
+            const result = request.query(queryString);
+    
+            console.dir(result);
+            return result;
+    
+        } catch (err) {
+            console.error("SQL error:", err)
+        }
+
+    } else{
+
+        
+        let queryString = `INSERT INTO 
+            [SabkadV01].[dbo].[tblPersonal]
+            (Name,Family,NationalCode,IdNumber,Sex,BirthDate,BirthPlace,PersonType,PersonPhoto)
+            VALUES 
+            ('${Name}','${Family}','${NationalCode}','${IdNumber}','${Sex}','${BirthDate}','${BirthPlace}','${PersonType}',CONVERT(varbinary ,'${PersonPhoto}'));
+            SELECT SCOPE_IDENTITY() AS PersonId;`
+
+            const duplicateId = await checkDuplicate(connection, IdNumber , ws_loadPersonal);
+            if (duplicateId)
+                return {
+                    status: "Failed",
+                    msg: "Error Creating Row, Duplicate Record",
+                    IdNumber
+                };
+    
+
+            try {
+                const request = pool.request();
+                const result = request.query(queryString);
+        
+                console.dir(result);
+                return result;
+        
+            } catch (err) {
+                console.error("SQL error:", err)
+            }
     }
 
 };
@@ -119,6 +159,19 @@ const ws_updatePersonal = async (connection , filters , newValues) => {
     }
 
     
+    if (newValues.NationalCode) {
+        const valid = await validateNationalCode(String(NationalCode));
+        console.log('NationalCode run');
+        if (!valid) {
+            return {
+                status: "Failed",
+                msg: "Your National Code is Incorrect.",
+                NationalCode
+            }
+        }
+    }
+
+
     let queryString = `UPDATE [${DB_DATABASE}].[dbo].[tblPersonal] SET `;
 
     // update our query string
