@@ -38,11 +38,16 @@ exports.getPersonalData = async (res, req) => {
 exports.createPersonalData = async (req, res) => {
 
     let values = req.body;
-
+    let image = req.files;
+      
+    const imagePath = fs.readFileSync(image[0].path);
+    const encode_image = imagePath.toString('base64');
+    let PersonPhoto = {contentType: image[0].mimetype , image: new Buffer.from(encode_image , 'base64')};
+ 
     const result = await ws_createPersonal({
         pool,
         poolConnect
-    }, values);
+    }, values , PersonPhoto);
 
     res.send(result);
 };
@@ -50,7 +55,7 @@ exports.createPersonalData = async (req, res) => {
 
 exports.updatePersonalData = async (req, res) => {
 
-    let newValues = req.body.values;
+    let newValues = req.body.newValues;
     let filters = req.body.filters;
 
     const result = await ws_updatePersonal({

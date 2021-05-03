@@ -1,19 +1,43 @@
 const {
     normalizeQueryString,
     setToQueryString,
-    checkForeignKey
+    checkForeignKey,
+    checkDuplicate
 } = require("../utils/commonModules");
 const {
     validateCreditCard
 } = require("../utils/bankCardNumber");
 
-
 require("dotenv").config({
-    path: "./utils/.env"
+    path: "./utils/config.env"
 });
+
+const {ws_loadBaseValue} = require("./commonBaseData");
+const {ws_loadPersonal} = require("./personal");
+
 const {
     DB_DATABASE
 } = process.env
+
+
+
+const availableId = async(connection, BankId , NeedyId) => {
+   
+
+    if(BankId){
+        const availableDataId = await ws_loadBaseValue(connection, {
+            CommonBaseDataId: BankId
+        }, null, 1);
+        return !(!availableDataId.recordset.length);
+
+    } else if(NeedyId){
+        const availablePersonId = await ws_loadPersonal(connection, {
+            PersonId: NeedyId
+        }, null, 1);
+        return !(!availablePersonId.recordset.length);
+    }
+};
+
 
 const ws_loadNeedyAccount = async (connection, filters, customeQuery = null, resultLimit = 1000) => {
 
@@ -25,17 +49,18 @@ const ws_loadNeedyAccount = async (connection, filters, customeQuery = null, res
     await poolConnect;
 
     //get all datas from needy table
-    let queryString = `SELECT TOP (${resultLimit}) [NeedyAccountId]
+    let queryString = `SELECT TOP (${resultLimit}) [NeedyAccountId],
         [BankId], 
         [NeedyId], 
         [OwnerName], 
         [CardNumber], 
         [AccountNumber], 
         [AccountName], 
-        [ShebaNumber], 
+        [ShebaNumber],
     FROM [${DB_DATABASE}].[dbo].[tblNeedyAccounts] as needyAcc
         INNER JOIN [${DB_DATABASE}].[dbo].[tblPersonal] as personalData
             on needyAcc.NeedyId = personalData.PersonId
+
         INNER JOIN [${DB_DATABASE}].[dbo].[tblCommonBaseData] as commonBaseData
             on needyAcc.BankId = commonBaseData.CommonBaseDataId
     WHERE 1=1`;
@@ -95,6 +120,23 @@ const ws_createNeedyAccount = async (connection, values) => {
             values
         }
     };
+
+    const canAdd = await availableId(connection, BankId, NeedyId)
+    if (!canAdd) {
+        return {
+            status: "Failed",
+            msg: "Can't Add with this ID, This ID Doesn't Exist"
+        }
+    };
+
+    const duplicateId = await checkDuplicate(connection, AccountNumber , ws_loadPersonal);
+        if (duplicateId){
+            return {
+                status: "Failed",
+                msg: "Error Creating Row, Duplicate Record",
+                AccountNumber
+            };
+        }
 
     let queryString = `INSERT INTO 
         [${DB_DATABASE}].[dbo].[tblNeedyAccounts]
@@ -179,8 +221,8 @@ const ws_deleteNeedyAccount = async (connection, NeedyAccountId) => {
         const deleteResult = await request.query(queryString);
         console.dir(deleteResult);
 
-        const table = await ws_loadCharityAccounts(connection);
-        return table;
+        const tables = await ws_loadNeedyAccount(connection);
+        return tables;
     } catch (err) {
         console.log("SQL error: ", err);
     }

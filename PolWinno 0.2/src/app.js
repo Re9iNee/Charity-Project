@@ -1,6 +1,8 @@
 const express = require("express");
 const dotEnv = require("dotenv");
 const bodyPaser = require('body-parser');
+const path = require('path');
+const upload = require("./utils/uploadImage");
 
 const commonBaseTypeRoutes = require('./router/commonBaseType');
 const commonBaseDataRoutes = require('./router/commonBaseData');
@@ -10,6 +12,9 @@ const needyAccountRoutes = require('./router/needyAccount');
 const plansRoutes = require('./router/plan');
 const cashAssistanceDetailRouter = require("./router/cashAssistanceDetail");
 const assignNeedyToPlansRouter = require("./router/assignNeedyToPlans")
+
+
+
 
 
 
@@ -26,11 +31,19 @@ const port = process.env.PORT || 3000;
 const app = express();
 
 
+// static folder
+app.use(express.static(path.join(__dirname, "public")));
+
+
 //bodyParser
 
+app.use(bodyPaser.json());
 app.use(bodyPaser.urlencoded({
     extended: false
 }));
+
+//multer
+app.use(upload.any()); 
 
 
 app.use(express.json({
