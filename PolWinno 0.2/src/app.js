@@ -2,6 +2,7 @@ const express = require("express");
 const dotEnv = require("dotenv");
 const bodyPaser = require('body-parser');
 const path = require('path');
+const upload = require("./utils/uploadImage");
 
 const commonBaseTypeRoutes = require('./router/commonBaseType');
 const commonBaseDataRoutes = require('./router/commonBaseData');
@@ -9,7 +10,11 @@ const charityAccountsRoutes = require('./router/charityAccounts');
 const personalInfoRoutes = require('./router/personalInfo');
 const needyAccountRoutes = require('./router/needyAccount');
 const plansRoutes = require('./router/plan');
-const upload = require("./utils/uploadImage");
+const cashAssistanceDetailRouter = require("./router/cashAssistanceDetail");
+const assignNeedyToPlansRouter = require("./router/assignNeedyToPlans")
+
+
+
 
 
 
@@ -77,7 +82,41 @@ app.use(needyAccountRoutes);
 
 app.use(plansRoutes)
 
+
+
+/*  TASK 8 */
+
+app.use(assignNeedyToPlansRouter);
+
+
+/*  TASK 9 */
+
+app.use(cashAssistanceDetailRouter)
+
+
 //-----------------------------------
 
+
+
+/* ----  Testing Area: ----- */
+const {
+    pool,
+    poolConnect
+} = require("./utils/charityDb");
+(async () => {
+    // T08 - Method 01 
+    // const result = await ws_loadNeedyForPlan({
+    //     pool,
+    //     poolConnect
+    // }, {
+        
+    // });
+    // console.log(result)
+})();
+
+
+
+
+/* -----  End of Testing Area ---- */
 
 app.listen(port, () => console.log(`Listening on ${port}`));

@@ -1,7 +1,12 @@
 const {
+    connect
+} = require("../router/plan");
+const {
     normalizeQueryString,
     normalizeQueryString_Create,
     checkDuplicate,
+    sqlDate,
+    endIsLenghty,
 } = require("../utils/commonModules");
 
 
@@ -82,6 +87,19 @@ const ws_createPlan = async (connection, details) => {
         }
 
 
+    // Date format: YYYY-MM-DD
+    // Fdate = Shuru
+    // Tdate = Payan
+    let start = new sqlDate(Fdate.split('-'));
+    let end = new sqlDate(Tdate.split('-'));
+    // compare end date and start date - returns: true -> end is bigger or at the same date || false -> start is bigger.
+    if (!endIsLenghty(start, end))
+        return {
+            status: "Failed",
+            msg: "ending date must be bigger than initial date",
+            start,
+            end
+        }
 
     const {
         pool,
@@ -115,9 +133,179 @@ const ws_createPlan = async (connection, details) => {
 }
 
 
+const ws_updatePlan = async (connection, filters, newValues) => {
+    // note: inputs && parameters -> PlanName, Description, PlanNature, ParentPlanId, icon, Fdate, Tdate, neededLogin, PlanId
+    const {
+        PlanName,
+        PlanNature,
+        ParentPlanId,
+    } = newValues;
+    // Unique Values
+    // check for duplicates - returns: true -> duplicate | false -> unique
+    // Unique Values => (PlanName, PlanNature, ParentPlanId)
+    if (PlanName || PlanNature || ParentPlanId) {
+        // check for unique values if they've entered.
+        const duplicateUniqueValue = await checkDuplicate(connection, {
+            PlanName,
+            PlanNature,
+            ParentPlanId
+        }, ws_loadPlan);
+        console.log(duplicateUniqueValue)
+        if (duplicateUniqueValue)
+            return {
+                status: "Failed",
+                msg: "Error Updating Row, Violation of unique values",
+                uniqueColumn: "ParentPlanId, PlanNature, PlanName",
+                newValues
+            }
+    }
+    // if PlanId exists in these table => (tblCashAssistanceDetail, tblNonCashAssistanceDetails) we can not update/change PlanNature Column.
+    if ("PlanNature" in newValues) {
+        const {
+            ws_loadCashAssistanceDetail
+        } = require("./cashAssistanceDetail")
+        let planIdExist = null;
+        // get the PlanId base on the filters object. (load table based on filters object and get their planIds)
+        const result = await ws_loadPlan(connection, filters, "ORDER BY PlanId ");
+        for (let record of result.recordset) {
+            // check for duplicates on dependent tables. if it doesn't have any conflicts UPDATE!
+            let PlanId = record.PlanId;
+            // checkPlanId in cashAssistanceDetails table - returns true -> if planId exists || false -> planId doesn't Exist.
+            // check for duplicates - returns: true -> duplicate | false -> unique
+            planIdExist = planIdExist || await checkDuplicate(connection, {
+                PlanId
+            }, ws_loadCashAssistanceDetail);
+            // todo: also check PlanId in nonCashAssistanceDetails table (This table doesn't exists at this point)
+            if (planIdExist) break;
+        }
+
+        if (planIdExist) {
+            return {
+                status: "Failed",
+                msg: "Error Updating Row, Can not change PlanNature due to PlanId depends on cashAssistanceDetail and nonCashAssistanceDetails tables",
+                dependencies: ["cashAssistanceDetails", "nonCashAssistanceDetails"],
+                PlanNature,
+                "PlanId": filters.PlanId
+            }
+        }
+    }
 
 
+    if ("Fdate" in newValues && "Tdate" in newValues) {
+        // ending time must be lenghty er than start time
+        // Date format: YYYY-MM-DD
+        // Fdate = Shuru
+        // Tdate = Payan
+        // if Fdate and Tdate has been inserted.
+        let start = new sqlDate(newValues.Fdate.split('-'));
+        let end = new sqlDate(newValues.Tdate.split('-'));
+        // compare end date and start date - returns: true -> end is bigger or at the same date || false -> start is bigger.
+        if (!endIsLenghty(start, end))
+            return {
+                status: "Failed",
+                msg: "ending date must be bigger than initial date",
+                start,
+                end
+            }
+
+
+        // if Planid exists in this table => (tblAssignNeedyToPlans) we can not update/change Fdate && Tdate column.
+        const {
+            ws_loadNeedyForPlan
+        } = require("./assignNeedyToPlans");
+        let planIdExist;
+        // get the PlanId base on the filters object. (load table based on filters object and get their PlanId s)
+        const result = await ws_loadPlan(connection, filters, "ORDER BY PlanId ");
+        for (let record of result.recordset) {
+            // check for duplicates on dependent tables. if it doesn't have any conflicts UPDATE!
+            let PlanId = record.PlanId;
+            // check for duplicates - returns: true -> duplicate | false -> unique
+            planIdExist = planIdExist || await checkDuplicate(connection, {
+                PlanId
+            }, ws_loadNeedyForPlan);
+            if (planIdExist) break;
+        }
+        if (planIdExist)
+            return {
+                status: "Failed",
+                msg: "Error Updating Row, Can not change Fdate nor Tdate due to PlanId column on assignNeedyToPlans table depends on it.",
+                dependencies: ["assignNeedyToPlans"],
+                filters,
+                newValues
+            }
+    } else if (newValues.Fdate || newValues.Tdate) {
+        return {
+            status: "Failed",
+            msg: "Send Both Parameters Fdate And Tdate",
+            newValues,
+            Fdate: newValues.Fdate,
+            Tdate: newValues.Tdate,
+        }
+    }
+
+
+
+    let queryString = `UPDATE [${DB_DATABASE}].[dbo].[tblPlans] SET `
+    const {
+        setToQueryString
+    } = require("../utils/commonModules")
+    // setToQueryString returns: Update ... SET sth = 2, test = 3
+    queryString = setToQueryString(queryString, newValues) + " WHERE 1=1 ";
+    queryString = normalizeQueryString(queryString, filters);
+
+    const {
+        pool,
+        poolConnect
+    } = connection;
+    // ensures that the pool has been created
+    await poolConnect;
+
+    try {
+        const request = pool.request();
+        const updateResult = await request.query(queryString);
+        // return table records
+        const table = await ws_loadPlan(connection);
+        return table;
+    } catch (err) {
+        console.error("ws_updatePlan - SQL  error: ", err);
+    }
+}
+
+const ws_deletePlan = async (connection, planId) => {
+    // if PlanId exists on => tblAssignNeedyToPlans & tblCashAssistanceDetail & tblNonCashAssistanceDetail we can not delete a row with the id of PlanId
+    
+    // todo: nonCashAssistanceTable doesn't exist at this point. create and check planId for this table
+    const {
+        checkForeignKey
+    } = require("../utils/commonModules");
+    const canRemove = await checkForeignKey(connection, "tblPlans", planId);
+    if (!canRemove) return {
+        status: "Failed",
+        msg: "Can not remove this ID",
+        PlanId: planId,
+        dependencies: ["tblCashAssistanceDetail", "tblNonCashAssistanceDetail", "tblAssignNeedyToPlans"]
+    };
+
+    const {
+        pool,
+        poolConnect
+    } = connection;
+    // ensures that the pool has been created
+    await poolConnect;
+
+    let queryString = `DELETE [${DB_DATABASE}].[dbo].[tblPlans] WHERE PlanId = ${planId};`
+    try {
+        const request = pool.request();
+        const deleteResult = await request.query(queryString);
+        const table = await ws_loadPlan(connection);
+        return table;
+    } catch (err) {
+        console.log("ws_deletePlan - SQL error: ", err);
+    }
+}
 module.exports = {
     ws_loadPlan,
     ws_createPlan,
+    ws_updatePlan,
+    ws_deletePlan
 }

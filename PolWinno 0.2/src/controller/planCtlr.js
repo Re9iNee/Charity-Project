@@ -1,6 +1,8 @@
 const {
     ws_loadPlan,
     ws_createPlan,
+    ws_updatePlan,
+    ws_deletePlan,
 } = require("../services/plan");
 
 const {
@@ -44,4 +46,32 @@ exports.postPlans = async (req, res) => {
     res.send({
         result
     })
+}
+
+
+exports.updatePlans = async (req, res) => {
+    // T07 - Method 03
+    // Attach filters object and newValues to request body
+    // parameters sql connection, filters, newValues
+    // returns plans table
+    const result = await ws_updatePlan({
+        pool,
+        poolConnect
+    }, req.body.filters, req.body.newValues);
+    res.send({
+        result
+    });
+};
+
+
+exports.deletePlans = async (req, res) => {
+    // T07 - Method 04
+    // parameters: sql connection, planId
+    const result = await ws_deletePlan({
+        pool,
+        poolConnect
+    }, req.body.planId);
+    res.send({
+        result
+    });
 }
