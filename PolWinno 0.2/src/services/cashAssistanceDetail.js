@@ -149,7 +149,37 @@ const ws_createCashAssistanceDetail = async (connection, details) => {
 }
 
 
+const ws_updateCashAssistanceDetail = async (connection, filters, newValues) => {
+    // if MinPrice was empty default will be "0"
+    if (!("MinPrice" in newValues)) {
+        newValues.MinPrice = 0;
+    }
+    // inputs and params
+    const {
+        AssignNeedyPlanId,
+        PlanId,
+        NeededPrice,
+        MinPrice,
+        Description
+    } = newValues;
+    // MinPrice should be less or equal than NeededPrice
+    if (MinPrice > NeededPrice)
+        return {
+            status: "Failed",
+            msg: "Error Updating Row, NeededPrice should be greater than MinPrice",
+            details
+        }
+
+    // todo: if CashAssistanceDetailId is available on tblPayment we can not change MinPrice AND NeededPrice
+
+    // todo: check for duplicates (check for unique columns)
+    // todo: AssignNeedyPlanId and PlanId are unqiue values - make sure if you enter one of them it will work
+
+
+}
+
 module.exports = {
     ws_loadCashAssistanceDetail,
     ws_createCashAssistanceDetail,
+    ws_updateCashAssistanceDetail,
 }
