@@ -1,5 +1,7 @@
 const {
     normalizeQueryString,
+    checkDuplicate,
+    normalizeQueryString_Create,
 } = require("../utils/commonModules");
 
 
@@ -52,7 +54,7 @@ const ws_loadCashAssistanceDetail = async (connection, filters, customQuery = nu
         filters["cashAssist.AssignNeedyPlanId"] = filters.AssignNeedyPlanId;
         delete filters.AssignNeedyPlanId;
     }
-    
+
     queryString = normalizeQueryString(queryString, filters);
     if (customQuery)
         queryString += ` ${customQuery}`;
@@ -71,6 +73,10 @@ const ws_loadCashAssistanceDetail = async (connection, filters, customQuery = nu
 
 
 const ws_createCashAssistanceDetail = async (connection, details) => {
+    // if MinPrice was empty default will be "0"
+    if (!("MinPrice" in details)) {
+        details.MinPrice = 0;
+    }
     // details are the parameters sent for creating table
     const {
         AssignNeedyPlanId,
@@ -80,25 +86,70 @@ const ws_createCashAssistanceDetail = async (connection, details) => {
         Description
     } = details;
 
-    // check inserted for not null values (check not null values)
-    // todo: if MinPrice was empty default will be "0"
+    // Not Null Values
+    if (!("PlanId" in details) || !("NeededPrice" in details))
+        return {
+            status: "FAILED",
+            msg: "Fill Parameters Utterly.",
+            details,
+            notNullValues: ["PlanId", "NeededPrice"]
+        }
+
+
 
 
 
     // check for duplicates (check for unique columns)
-    // todo: assignNeedyPlanId and PlanId are unqiue values
-
-
+    // AssignNeedyPlanId and PlanId are unqiue values
+    const duplicateUniqueValue = await checkDuplicate(connection, {
+        AssignNeedyPlanId,
+        PlanId
+    }, ws_loadCashAssistanceDetail);
+    if (duplicateUniqueValue)
+        return {
+            status: "Failed",
+            msg: "Error Creating Row, Violation of unique values",
+            uniqueColumn: "AssignNeedyPlanId, PlanId",
+            details
+        }
 
     // check for any column custome validations
-    // todo: MinPrice should be less or equal than NeededPrice
+    // MinPrice should be less or equal than NeededPrice
+    if (MinPrice > NeededPrice)
+        return {
+            status: "Failed",
+            msg: "Error Creating Row, NeededPrice should be greater than MinPrice",
+            details
+        }
 
 
-    // put 'N' before any given string.
+    const {
+        pool,
+        poolConnect
+    } = connection;
+    // ensures that the pool has been created
+    await poolConnect;
+
+    let queryString = `INSERT INTO 
+        [${DB_DATABASE}].[dbo].[tblCashAssistanceDetail] 
+        ($COLUMN)
+        VALUES ($VALUE);
+        SELECT SCOPE_IDENTITY() AS cashAssistanceDetailId;`
+    // normalizeQS_Cretate => (queryString, {PlanId: "sth"}, ...configs)
+    queryString = normalizeQueryString_Create(queryString, details);
+
+    try {
+        const request = pool.request();
+        const result = await request.query(queryString);
+        const id = result.recordset[0].cashAssistanceDetailId;
+        return id;
+    } catch (err) {
+        console.error("ws_createCashAssistanceDetail error: ", err);
+    }
 }
 
 
 module.exports = {
     ws_loadCashAssistanceDetail,
-
+    ws_createCashAssistanceDetail,
 }

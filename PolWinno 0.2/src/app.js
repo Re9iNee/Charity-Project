@@ -43,7 +43,7 @@ app.use(bodyPaser.urlencoded({
 }));
 
 //multer
-app.use(upload.any()); 
+app.use(upload.any());
 
 
 app.use(express.json({
@@ -103,15 +103,22 @@ const {
     pool,
     poolConnect
 } = require("./utils/charityDb");
+const {
+    ws_createCashAssistanceDetail
+} = require("./services/cashAssistanceDetail");
 (async () => {
-    // T08 - Method 01 
-    // const result = await ws_loadNeedyForPlan({
-    //     pool,
-    //     poolConnect
-    // }, {
-        
-    // });
-    // console.log(result)
+    // T09 - Method 02
+    const result = await ws_createCashAssistanceDetail({
+        pool,
+        poolConnect
+    }, {
+        PlanId: 5,
+        MinPrice: 2000,
+        NeededPrice: 2000
+    });
+    console.log({
+        result
+    })
 })();
 
 

@@ -123,7 +123,9 @@ const validateNationalCode = str => {
     }
 }
 
-
+// normalizeQS_Create => (queryString, {planName: "sth"}, ...configs)
+// configs are the exceptions that don't have normal values. (need to convert or something to insert into SQL Server)
+// configs = {onColumn: "EXCEPTION COLUMN", prefix="e.g: CONVERT(INT, $1)"}
 const normalizeQueryString_Create = (queryString, details, ...configs) => {
     // queryString = INSERT INTO [table]
     // configs are for the columns that its value needs convert or some other expressions needed for SQLServer.
@@ -153,6 +155,8 @@ const normalizeQueryString_Create = (queryString, details, ...configs) => {
         let value = details[column];
         if (typeof value == "string") {
             values.push(`N'${value}'`);
+        } else {
+            values.push(value);
         }
     }
     queryString = queryString.replace("$COLUMN", columns.join(', '))
