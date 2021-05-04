@@ -104,21 +104,30 @@ const {
     poolConnect
 } = require("./utils/charityDb");
 const {
-    ws_createCashAssistanceDetail
-} = require("./services/cashAssistanceDetail");
+    ws_loadPayment
+} = require("./services/payment");
 (async () => {
-    // T09 - Method 02
-    const result = await ws_createCashAssistanceDetail({
+    // // T09 - Method 02
+    // const result = await ws_createCashAssistanceDetail({
+    //     pool,
+    //     poolConnect
+    // }, {
+    //     PlanId: 5,
+    //     MinPrice: 2000,
+    //     NeededPrice: 2000
+    // });
+    // console.log({
+    //     result
+    // })
+    // T10 - Method 02 - Load
+    const result = await ws_loadPayment({
         pool,
         poolConnect
-    }, {
-        PlanId: 5,
-        MinPrice: 2000,
-        NeededPrice: 2000
     });
     console.log({
         result
     })
+
 })();
 
 
