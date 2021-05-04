@@ -11,8 +11,6 @@ const {
 
 const ws_loadPayment = async (connection, filters, customQuery = null, resultLimit = 1000) => {
 
-    // inputs = CashAssistanceDetailId, PaymentGatewayId, PaymentDate, PaymentStatus, CharityAccountId, FollowCode, NeedyId, PaymentId
-
     const {
         pool,
         poolConnect
@@ -42,7 +40,7 @@ const ws_loadPayment = async (connection, filters, customQuery = null, resultLim
     ,plans.[PlanId]
     ,[NeededPrice]
     ,[MinPrice]
-    ,cashAssist.[Description]
+    ,cashAssist.[Description] as "Cash Assistance Description"
     ,[Name]
     ,[Family]
     ,[NationalCode]
@@ -53,10 +51,9 @@ const ws_loadPayment = async (connection, filters, customQuery = null, resultLim
     ,[PersonType]
     ,[SecretCode]
     ,[PlanName]
-    ,plans.[Description]
+    ,plans.[Description] as "Plans Description"
     ,[PlanNature]
     ,[ParentPlanId]
-    ,[Icon]
     ,[Fdate]
     ,[Tdate]
     ,[neededLogin]
@@ -69,6 +66,19 @@ const ws_loadPayment = async (connection, filters, customQuery = null, resultLim
     on plans.PlanId = cashAssist.PlanId
     INNER JOIN [${DB_DATABASE}].[dbo].[tblPersonal] as personal
     on payment.NeedyId = personal.PersonId WHERE 1 = 1 `
+
+    // inputs: CashAssistanceDetailId, PaymentGatewayId, PaymentDate, PaymentStatus, CharityAccountId, FollowCode, NeedyId, PaymentId
+
+    // Ambiguous columns: CashAssistanceDetailId, CharityAccountId
+    // Ambiguous column names problem
+    if ("CashAssistanceDetailId" in filters) {
+        filters["payment.CashAssistanceDetailId"] = filters.CashAssistanceDetailId;
+        delete filters.CashAssistanceDetailId;
+    }
+    if ("CharityAccountId" in filters) {
+        filters["filters.CharityAccountId"] = filters.CharityAccountId;
+        delete filters.CharityAccountId;
+    }
 
     queryString = normalizeQueryString(queryString, filters);
     if (customQuery)

@@ -12,6 +12,7 @@ const needyAccountRoutes = require('./router/needyAccount');
 const plansRoutes = require('./router/plan');
 const cashAssistanceDetailRouter = require("./router/cashAssistanceDetail");
 const assignNeedyToPlansRouter = require("./router/assignNeedyToPlans")
+const paymentRouter = require("./router/payment")
 
 
 
@@ -93,6 +94,9 @@ app.use(assignNeedyToPlansRouter);
 
 app.use(cashAssistanceDetailRouter)
 
+/*  TASK 10 */
+
+app.use(paymentRouter);
 
 //-----------------------------------
 
@@ -120,13 +124,13 @@ const {
     //     result
     // })
     // T10 - Method 02 - Load
-    const result = await ws_loadPayment({
-        pool,
-        poolConnect
-    });
-    console.log({
-        result
-    })
+    // const result = await ws_loadPayment({
+    //     pool,
+    //     poolConnect
+    // });
+    // console.log({
+    //     result
+    // })
 
 })();
 
