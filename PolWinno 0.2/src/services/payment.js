@@ -10,7 +10,7 @@ const {
 } = process.env;
 
 const ws_loadPayment = async (connection, filters = new Object(null), customQuery = null, resultLimit = 1000) => {
-    // in older version of this code. filters object hadn't any default value - Issue #42
+    // in older version of this code. filters object hadn't any default value - Issue #42 - filters object should not be empty
     const {
         pool,
         poolConnect

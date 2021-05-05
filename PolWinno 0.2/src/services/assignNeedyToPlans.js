@@ -9,7 +9,7 @@ const {
     DB_DATABASE
 } = process.env
 const ws_loadNeedyForPlan = async (connection, filters = new Object(null), customQuery = null, resultLimit = 1000) => {
-    // filters object should not be empty - Issue #42
+    // in older version of this code. filters object hadn't any default value - Issue #42 - filters object should not be empty
     const {
         pool,
         poolConnect
