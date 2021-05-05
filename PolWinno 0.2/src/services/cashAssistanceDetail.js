@@ -12,7 +12,8 @@ const {
     DB_DATABASE
 } = process.env
 
-const ws_loadCashAssistanceDetail = async (connection, filters, customQuery = null, resultLimit = 1000) => {
+const ws_loadCashAssistanceDetail = async (connection, filters = new Object(null), customQuery = null, resultLimit = 1000) => {
+    // in older version of this code. filters object hadn't any default value - Issue #42
     const {
         pool,
         poolConnect
