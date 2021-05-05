@@ -1,5 +1,6 @@
 const {
     ws_loadCashAssistanceDetail,
+    ws_createCashAssistanceDetail,
 } = require("../services/cashAssistanceDetail");
 const {
     poolConnect,
@@ -24,4 +25,17 @@ exports.getCashAssistanceDetail = async (req, res) => {
     res.send({
         result
     })
+}
+
+exports.postCashAssistanceDetail = async (req, res) => {
+    // T09 - Method 02 
+    // Attach params to body as an JSON Format
+    const result = await ws_createCashAssistanceDetail({
+        pool,
+        poolConnect
+    }, req.body);
+    // sending req.body directly causing program more error prone base on a typo, we will deconstruct object in that method.
+    res.send({
+        result
+    });
 }

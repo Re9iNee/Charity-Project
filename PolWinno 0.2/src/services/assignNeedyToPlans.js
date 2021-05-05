@@ -8,7 +8,8 @@ require("dotenv").config({
 const {
     DB_DATABASE
 } = process.env
-const ws_loadNeedyForPlan = async (connection, filters, customQuery = null, resultLimit = 1000) => {
+const ws_loadNeedyForPlan = async (connection, filters = new Object(null), customQuery = null, resultLimit = 1000) => {
+    // filters object should not be empty - Issue #42
     const {
         pool,
         poolConnect
@@ -43,7 +44,7 @@ const ws_loadNeedyForPlan = async (connection, filters, customQuery = null, resu
     INNER JOIN [SabkadV01].[dbo].[tblPlans] as plans 
     on assNeedy.PlanId = plans.PlanId
     WHERE 1 = 1 `;
-    // abmbiguous column names
+    // Ambiguous column names
     if ("NeedyId" in filters) {
         filters["assNeedy.NeedyId"] = filters.NeedyId;
         delete filters.NeedyId;

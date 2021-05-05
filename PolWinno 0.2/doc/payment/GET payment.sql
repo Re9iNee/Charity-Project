@@ -1,0 +1,50 @@
+SELECT TOP (1000) [PaymentId]
+      ,[DonatorId]
+      ,payment.[CashAssistanceDetailId]
+      ,[PaymentPrice]
+      ,[PaymentGatewayId]
+      ,[PaymentDate]
+      ,[PaymentTime]
+      ,[PaymentStatus]
+      ,[SourceAccountNumber]
+      ,[TargetAccountNumber]
+      ,payment.[CharityAccountId]
+      ,[FollowCode]
+      ,[NeedyId]
+      ,[BankID]
+      ,[BranchName]
+      ,[OwnerName]
+      ,[CardNumber]
+      ,[AccountNumber]
+      ,[AccountName]
+      ,[AssignNeedyPlanId]
+      ,plans.[PlanId]
+      ,[NeededPrice]
+      ,[MinPrice]
+      ,cashAssist.[Description]
+      ,[Name]
+      ,[Family]
+      ,[NationalCode]
+      ,[IdNumber]
+      ,[Sex]
+      ,[BirthDate]
+      ,[BirthPlace]
+      ,[PersonType]
+      ,[SecretCode]
+      ,[PlanName]
+      ,plans.[Description]
+      ,[PlanNature]
+      ,[ParentPlanId]
+      ,[Icon]
+      ,[Fdate]
+      ,[Tdate]
+      ,[neededLogin]
+  FROM [SabkadV01].[dbo].[tblPayment] as payment INNER JOIN
+  [SabkadV01].[dbo].[tblCharityAccounts] as charityAccounts
+  on payment.CharityAccountId = charityAccounts.CharityAccountId
+  INNER JOIN [SabkadV01].[dbo].[tblCashAssistanceDetail] as cashAssist
+  on payment.CashAssistanceDetailId = cashAssist.CashAssistanceDetailId
+  INNER JOIN [SabkadV01].[dbo].[tblPlans] as plans
+  on plans.PlanId = cashAssist.PlanId
+  INNER JOIN [SabkadV01].[dbo].[tblPersonal] as personal
+  on payment.NeedyId = personal.PersonId;
