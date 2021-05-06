@@ -112,8 +112,10 @@ const {
 } = require("./services/payment");
 const {
     ws_updateCashAssistanceDetail,
-    ws_loadCashAssistanceDetail
+    ws_loadCashAssistanceDetail,
+    ws_deleteCashAssistanceDetail
 } = require("./services/cashAssistanceDetail");
+const { ws_deleteCharityAccounts } = require("./services/charityAccounts");
 (async () => {
     // // T09 - Method 02
     // const result = await ws_createCashAssistanceDetail({
@@ -146,6 +148,12 @@ const {
     //     NeededPrice: "3500"
     // });
     // console.log(result);
+    // T10 - Method 04
+    const result = await ws_deleteCashAssistanceDetail({
+        pool,
+        poolConnect
+    }, "17");
+    console.log(result)
 })();
 
 

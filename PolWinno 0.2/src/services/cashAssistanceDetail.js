@@ -113,8 +113,8 @@ const ws_createCashAssistanceDetail = async (connection, details) => {
             uniqueColumn: "AssignNeedyPlanId, PlanId",
             details
         }
-        // BUG: Issue #41
-        
+    // BUG: Issue #41
+
     // check for any column custome validations
     // MinPrice should be less or equal than NeededPrice
     if (MinPrice > NeededPrice)
@@ -234,8 +234,40 @@ const ws_updateCashAssistanceDetail = async (connection, filters, newValues) => 
     }
 }
 
+const ws_deleteCashAssistanceDetail = async (connection, cashAssistanceDetailId) => {
+    // if cashAssistancedDetailId exists on => tblPayment we can not delete that row.
+    const {
+        checkForeignKey
+    } = require("../utils/commonModules");
+    const canRemove = await checkForeignKey(connection, "tblCashAssistanceDetail", cashAssistanceDetailId);
+    if (!canRemove)
+        return {
+            status: "Failed",
+            msg: "Can not remove this ID",
+            cashAssistanceDetailId,
+            dependency: "tblPayment"
+        }
+
+    const {
+        pool,
+        poolConnect
+    } = connection;
+    // ensures that the pool has been created
+    await poolConnect;
+    let queryString = `DELETE [${DB_DATABASE}].[dbo].[tblCashAssistanceDetail] WHERE CashAssistanceDetailId = ${cashAssistanceDetailId};`;
+    try {
+        const request = pool.request();
+        const deleteResult = await request.query(queryString);
+        const table = await ws_loadCashAssistanceDetail(connection);
+        return table;
+    } catch (err) {
+        console.error("ws_deleteCashAssistanceDetail - SQL Error: ", err);
+    }
+}
+
 module.exports = {
     ws_loadCashAssistanceDetail,
     ws_createCashAssistanceDetail,
     ws_updateCashAssistanceDetail,
+    ws_deleteCashAssistanceDetail
 }
