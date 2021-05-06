@@ -1,6 +1,7 @@
 const {
     ws_loadCashAssistanceDetail,
     ws_createCashAssistanceDetail,
+    ws_updateCashAssistanceDetail,
 } = require("../services/cashAssistanceDetail");
 const {
     poolConnect,
@@ -35,6 +36,20 @@ exports.postCashAssistanceDetail = async (req, res) => {
         poolConnect
     }, req.body);
     // sending req.body directly causing program more error prone base on a typo, we will deconstruct object in that method.
+    res.send({
+        result
+    });
+}
+
+exports.updateCashAssistanceDetail = async (req, res) => {
+    // T09 - Method 03
+    // Attach filters object and newValues to request body
+    // parameters sql connection, filters, newValues
+    // returns cashAssistanceDetail table
+    const result = await ws_updateCashAssistanceDetail({
+        pool,
+        poolConnect
+    }, req.body.filters, req.body.newValues);
     res.send({
         result
     });
