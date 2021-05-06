@@ -9,7 +9,7 @@ const {
 } = require("../utils/bankCardNumber");
 
 require("dotenv").config({
-    path: "./utils/config.env"
+    path: "./utils/.env"
 });
 
 const {ws_loadBaseValue} = require("./commonBaseData");
@@ -57,6 +57,17 @@ const ws_loadNeedyAccount = async (connection, filters, customeQuery = null, res
         [AccountNumber], 
         [AccountName], 
         [ShebaNumber],
+        [Name], 
+        [Family], 
+        [NationalCode], 
+        [IdNumber], 
+        [Sex], 
+        [BirthDate], 
+        [BirthPlace], 
+        [PersonType], 
+        [PersonPhoto],
+        [BaseValue],
+        [BaseCode]
     FROM [${DB_DATABASE}].[dbo].[tblNeedyAccounts] as needyAcc
         INNER JOIN [${DB_DATABASE}].[dbo].[tblPersonal] as personalData
             on needyAcc.NeedyId = personalData.PersonId
@@ -129,7 +140,7 @@ const ws_createNeedyAccount = async (connection, values) => {
         }
     };
 
-    const duplicateId = await checkDuplicate(connection, AccountNumber , ws_loadPersonal);
+    const duplicateId = await checkDuplicate(connection, AccountNumber , ws_loadNeedyAccount);
         if (duplicateId){
             return {
                 status: "Failed",
