@@ -25,7 +25,7 @@ const ws_loadCashAssistanceDetail = async (connection, filters = new Object(null
     ,cashAssist.[PlanId]
     ,[NeededPrice]
     ,[MinPrice]
-    ,cashAssist.[Description]
+    ,cashAssist.[Description] as "Cash Assist Description"
     ,[NeedyId]
     ,assignNeedy.[Fdate]
     ,assignNeedy.[Tdate]
@@ -35,16 +35,16 @@ const ws_loadCashAssistanceDetail = async (connection, filters = new Object(null
     ,[NationalCode]
     ,[SecretCode]
     ,[PlanName]
-    ,plans.[Description]
+    ,plans.[Description] as "Plans Description"
     ,[PlanNature]
     ,[ParentPlanId]
-    FROM [${DB_DATABASE}].[dbo].[tblCashAssistanceDetail] as cashAssist INNER JOIN
-    [${DB_DATABASE}].[dbo].[tblAssignNeedyToPlans] as assignNeedy 
-    on cashAssist.AssignNeedyPlanId = assignNeedy.AssignNeedyPlanId
-    INNER JOIN [${DB_DATABASE}].[dbo].[tblPlans] as plans 
+    FROM [${DB_DATABASE}].[dbo].[tblCashAssistanceDetail] as cashAssist 
+    INNER JOIN [${DB_DATABASE}].[dbo].[tblPlans] as plans
     on cashAssist.PlanId = plans.PlanId
-    INNER JOIN [${DB_DATABASE}].[dbo].[tblPersonal] as personal
-    on assignNeedy.NeedyId = personal.PersonId 
+    LEFT JOIN [${DB_DATABASE}].[dbo].[tblAssignNeedyToPlans] as assignNeedy
+    on cashAssist.AssignNeedyPlanId = assignNeedy.AssignNeedyPlanId
+    LEFT JOIN [${DB_DATABASE}].[dbo].[tblPersonal] as personal
+    on assignNeedy.NeedyId = personal.PersonId
     WHERE 1 = 1 `;
     // Ambiguous column names problem
     if ("PlanId" in filters) {
