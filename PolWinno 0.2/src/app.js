@@ -110,6 +110,10 @@ const {
 const {
     ws_loadPayment
 } = require("./services/payment");
+const {
+    ws_updateCashAssistanceDetail,
+    ws_loadCashAssistanceDetail
+} = require("./services/cashAssistanceDetail");
 (async () => {
     // // T09 - Method 02
     // const result = await ws_createCashAssistanceDetail({
@@ -131,7 +135,17 @@ const {
     // console.log({
     //     result
     // })
-
+    // T09 - Method 03
+    // const result = await ws_updateCashAssistanceDetail({
+    //     pool,
+    //     poolConnect
+    // }, {
+    //     cashAssistanceDetailId: "12"
+    // }, {
+    //     MinPrice: "3000",
+    //     NeededPrice: "3500"
+    // });
+    // console.log(result);
 })();
 
 
