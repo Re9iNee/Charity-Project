@@ -9,7 +9,7 @@ const {
 } = require("../utils/bankCardNumber");
 
 require("dotenv").config({
-    path: "./utils/config.env"
+    path: "./utils/.env"
 });
 
 const {ws_loadBaseValue} = require("./commonBaseData");
@@ -68,11 +68,11 @@ const ws_loadNeedyAccount = async (connection, filters, customeQuery = null, res
         [PersonPhoto],
         [BaseValue],
         [BaseCode]
-    FROM [SabkadV01].[dbo].[tblNeedyAccounts] as needyAcc
-        INNER JOIN [SabkadV01].[dbo].[tblPersonal] as personalData
+    FROM [${DB_DATABASE}].[dbo].[tblNeedyAccounts] as needyAcc
+        INNER JOIN [${DB_DATABASE}].[dbo].[tblPersonal] as personalData
             on needyAcc.NeedyId = personalData.PersonId
 
-        INNER JOIN [SabkadV01].[dbo].[tblCommonBaseData] as commonBaseData
+        INNER JOIN [${DB_DATABASE}].[dbo].[tblCommonBaseData] as commonBaseData
             on needyAcc.BankId = commonBaseData.CommonBaseDataId
     WHERE 1=1`;
 
