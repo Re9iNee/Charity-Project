@@ -149,11 +149,11 @@ const { ws_deleteCharityAccounts } = require("./services/charityAccounts");
     // });
     // console.log(result);
     // T10 - Method 04
-    const result = await ws_deleteCashAssistanceDetail({
-        pool,
-        poolConnect
-    }, "17");
-    console.log(result)
+    // const result = await ws_deleteCashAssistanceDetail({
+    //     pool,
+    //     poolConnect
+    // }, "17");
+    // console.log(result)
 })();
 
 

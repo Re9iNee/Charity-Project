@@ -2,6 +2,7 @@ const {
     ws_loadCashAssistanceDetail,
     ws_createCashAssistanceDetail,
     ws_updateCashAssistanceDetail,
+    ws_deleteCashAssistanceDetail
 } = require("../services/cashAssistanceDetail");
 const {
     poolConnect,
@@ -53,4 +54,16 @@ exports.updateCashAssistanceDetail = async (req, res) => {
     res.send({
         result
     });
+}
+
+exports.deleteCashAssistanceDetail = async (req, res) => {
+    // T09 - Method 04
+    // parameters: sql conneciton, cashAssistanceDetailId
+    const result = await ws_deleteCashAssistanceDetail({
+        pool,
+        poolConnect
+    }, req.body.cashAssistanceDetailId);
+    res.send({
+        result
+    })
 }
