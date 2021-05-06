@@ -1,0 +1,1 @@
+DELETE [SabkadV01].[dbo].[tblCashAssistanceDetail] WHERE CashAssistanceDetailId = 15;

@@ -25,7 +25,7 @@ const ws_loadCashAssistanceDetail = async (connection, filters = new Object(null
     ,cashAssist.[PlanId]
     ,[NeededPrice]
     ,[MinPrice]
-    ,cashAssist.[Description]
+    ,cashAssist.[Description] as "Cash Assist Description"
     ,[NeedyId]
     ,assignNeedy.[Fdate]
     ,assignNeedy.[Tdate]
@@ -35,16 +35,16 @@ const ws_loadCashAssistanceDetail = async (connection, filters = new Object(null
     ,[NationalCode]
     ,[SecretCode]
     ,[PlanName]
-    ,plans.[Description]
+    ,plans.[Description] as "Plans Description"
     ,[PlanNature]
     ,[ParentPlanId]
-    FROM [${DB_DATABASE}].[dbo].[tblCashAssistanceDetail] as cashAssist INNER JOIN
-    [${DB_DATABASE}].[dbo].[tblAssignNeedyToPlans] as assignNeedy 
-    on cashAssist.AssignNeedyPlanId = assignNeedy.AssignNeedyPlanId
-    INNER JOIN [${DB_DATABASE}].[dbo].[tblPlans] as plans 
+    FROM [${DB_DATABASE}].[dbo].[tblCashAssistanceDetail] as cashAssist 
+    INNER JOIN [${DB_DATABASE}].[dbo].[tblPlans] as plans
     on cashAssist.PlanId = plans.PlanId
-    INNER JOIN [${DB_DATABASE}].[dbo].[tblPersonal] as personal
-    on assignNeedy.NeedyId = personal.PersonId 
+    LEFT JOIN [${DB_DATABASE}].[dbo].[tblAssignNeedyToPlans] as assignNeedy
+    on cashAssist.AssignNeedyPlanId = assignNeedy.AssignNeedyPlanId
+    LEFT JOIN [${DB_DATABASE}].[dbo].[tblPersonal] as personal
+    on assignNeedy.NeedyId = personal.PersonId
     WHERE 1 = 1 `;
     // Ambiguous column names problem
     if ("PlanId" in filters) {
@@ -113,6 +113,7 @@ const ws_createCashAssistanceDetail = async (connection, details) => {
             uniqueColumn: "AssignNeedyPlanId, PlanId",
             details
         }
+    // BUG: Issue #41
 
     // check for any column custome validations
     // MinPrice should be less or equal than NeededPrice
@@ -151,10 +152,6 @@ const ws_createCashAssistanceDetail = async (connection, details) => {
 
 
 const ws_updateCashAssistanceDetail = async (connection, filters, newValues) => {
-    // if MinPrice was empty default will be "0"
-    if (!("MinPrice" in newValues)) {
-        newValues.MinPrice = 0;
-    }
     // inputs and params
     const {
         AssignNeedyPlanId,
@@ -167,20 +164,110 @@ const ws_updateCashAssistanceDetail = async (connection, filters, newValues) => 
     if (MinPrice > NeededPrice)
         return {
             status: "Failed",
-            msg: "Error Updating Row, NeededPrice should be greater than MinPrice",
-            details
+            msg: "Error Updating Row, NeededPrice should be either bigger or equal, than MinPrice",
+            newValues
         }
 
-    // todo: if CashAssistanceDetailId is available on tblPayment we can not change MinPrice AND NeededPrice
+    if ("AssignNeedyPlanId" in newValues || "PlanId" in newValues) {
+        // AssignNeedyPlanId and PlanId are unqiue values
+        //check for unqiue values if they've entered.
+        const duplicateUniqueValue = await checkDuplicate(connection, {
+            AssignNeedyPlanId,
+            PlanId
+        }, ws_loadCashAssistanceDetail);
+        if (duplicateUniqueValue)
+            return {
+                status: "Failed",
+                msg: "Error Updating Row, Violation of unique values",
+                uniqueColumn: "AssignNeedyPlanId, PlanId",
+                newValues
+            }
+    }
 
-    // todo: check for duplicates (check for unique columns)
-    // todo: AssignNeedyPlanId and PlanId are unqiue values - make sure if you enter one of them it will work
 
+    // if CashAssistanceDetailId is available on tblPayment we can not change MinPrice AND NeededPrice
+    if ("MinPrice" in newValues || "NeededPrice" in newValues) {
+        const {
+            ws_loadPayment
+        } = require("./payment");
+        // get the cashAssistanceDetailId base on the entered filters object.
+        const result = await ws_loadCashAssistanceDetail(connection, filters, "ORDER BY CashAssistanceDetailId ");
+        for (let record of result.recordset) {
+            // check for duplicate on dependent tables. if it doesn't conflict with payment table -> UPDATE
+            let CashAssistanceDetailId = record.CashAssistanceDetailId;
+            let cashAssistIdExist = await checkDuplicate(connection, {
+                CashAssistanceDetailId
+            }, ws_loadPayment);
+            if (cashAssistIdExist)
+                return {
+                    status: "Failed",
+                    msg: "Error Updating Row, Can not change MinPrice NOR NeededPrice columns if cashAssistanceDetailId Exists on tblPayment",
+                    dependencies: ["tblPayment"],
+                    CashAssistanceDetailId
+                }
+        }
+    }
 
+    queryString = `UPDATE [${DB_DATABASE}].[dbo].[tblCashAssistanceDetail] 
+    SET `;
+    const {
+        setToQueryString
+    } = require("../utils/commonModules");
+    // setToQueryString returns: Update ... SET sth = 2, test = 3
+    queryString = setToQueryString(queryString, newValues) + " WHERE 1=1 ";
+    queryString = normalizeQueryString(queryString, filters);
+
+    const {
+        pool,
+        poolConnect
+    } = connection;
+    // ensures that the pool has been created
+    await poolConnect;
+    try {
+        const request = pool.request();
+        const updateResult = await request.query(queryString);
+        // return table records
+        const table = await ws_loadCashAssistanceDetail(connection);
+        return table;
+    } catch (err) {
+        console.error("ws_updateCashAssistanceDetail SQL erorr: ", err);
+    }
+}
+
+const ws_deleteCashAssistanceDetail = async (connection, cashAssistanceDetailId) => {
+    // if cashAssistancedDetailId exists on => tblPayment we can not delete that row.
+    const {
+        checkForeignKey
+    } = require("../utils/commonModules");
+    const canRemove = await checkForeignKey(connection, "tblCashAssistanceDetail", cashAssistanceDetailId);
+    if (!canRemove)
+        return {
+            status: "Failed",
+            msg: "Can not remove this ID",
+            cashAssistanceDetailId,
+            dependency: "tblPayment"
+        }
+
+    const {
+        pool,
+        poolConnect
+    } = connection;
+    // ensures that the pool has been created
+    await poolConnect;
+    let queryString = `DELETE [${DB_DATABASE}].[dbo].[tblCashAssistanceDetail] WHERE CashAssistanceDetailId = ${cashAssistanceDetailId};`;
+    try {
+        const request = pool.request();
+        const deleteResult = await request.query(queryString);
+        const table = await ws_loadCashAssistanceDetail(connection);
+        return table;
+    } catch (err) {
+        console.error("ws_deleteCashAssistanceDetail - SQL Error: ", err);
+    }
 }
 
 module.exports = {
     ws_loadCashAssistanceDetail,
     ws_createCashAssistanceDetail,
     ws_updateCashAssistanceDetail,
+    ws_deleteCashAssistanceDetail
 }
