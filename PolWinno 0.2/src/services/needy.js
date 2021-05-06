@@ -57,11 +57,22 @@ const ws_loadNeedyAccount = async (connection, filters, customeQuery = null, res
         [AccountNumber], 
         [AccountName], 
         [ShebaNumber],
-    FROM [${DB_DATABASE}].[dbo].[tblNeedyAccounts] as needyAcc
-        INNER JOIN [${DB_DATABASE}].[dbo].[tblPersonal] as personalData
+        [Name], 
+        [Family], 
+        [NationalCode], 
+        [IdNumber], 
+        [Sex], 
+        [BirthDate], 
+        [BirthPlace], 
+        [PersonType], 
+        [PersonPhoto],
+        [BaseValue],
+        [BaseCode]
+    FROM [SabkadV01].[dbo].[tblNeedyAccounts] as needyAcc
+        INNER JOIN [SabkadV01].[dbo].[tblPersonal] as personalData
             on needyAcc.NeedyId = personalData.PersonId
 
-        INNER JOIN [${DB_DATABASE}].[dbo].[tblCommonBaseData] as commonBaseData
+        INNER JOIN [SabkadV01].[dbo].[tblCommonBaseData] as commonBaseData
             on needyAcc.BankId = commonBaseData.CommonBaseDataId
     WHERE 1=1`;
 
@@ -129,7 +140,7 @@ const ws_createNeedyAccount = async (connection, values) => {
         }
     };
 
-    const duplicateId = await checkDuplicate(connection, AccountNumber , ws_loadPersonal);
+    const duplicateId = await checkDuplicate(connection, AccountNumber , ws_loadNeedyAccount);
         if (duplicateId){
             return {
                 status: "Failed",
