@@ -156,6 +156,7 @@ const ws_updatePlan = async (connection, filters, newValues) => {
                 newValues
             }
     }
+    // BUG: Issue #41
     // if PlanId exists in these table => (tblCashAssistanceDetail, tblNonCashAssistanceDetails) we can not update/change PlanNature Column.
     if ("PlanNature" in newValues) {
         const {
@@ -270,7 +271,7 @@ const ws_updatePlan = async (connection, filters, newValues) => {
 
 const ws_deletePlan = async (connection, planId) => {
     // if PlanId exists on => tblAssignNeedyToPlans & tblCashAssistanceDetail & tblNonCashAssistanceDetail we can not delete a row with the id of PlanId
-    
+
     // todo: nonCashAssistanceTable doesn't exist at this point. create and check planId for this table
     const {
         checkForeignKey
@@ -297,7 +298,7 @@ const ws_deletePlan = async (connection, planId) => {
         const table = await ws_loadPlan(connection);
         return table;
     } catch (err) {
-        console.log("ws_deletePlan - SQL error: ", err);
+        console.error("ws_deletePlan - SQL error: ", err);
     }
 }
 module.exports = {
