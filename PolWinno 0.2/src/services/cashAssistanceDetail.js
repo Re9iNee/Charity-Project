@@ -75,9 +75,9 @@ const ws_loadCashAssistanceDetail = async (connection, filters = new Object(null
 
 const ws_createCashAssistanceDetail = async (connection, details) => {
     // if MinPrice was empty default will be "0"
-    if (!("MinPrice" in details)) {
-        details.MinPrice = 0;
-    }
+    // if (!("MinPrice" in details)) {
+    //     details.MinPrice = 0;
+    // }
     // details are the parameters sent for creating table
     const {
         AssignNeedyPlanId,
