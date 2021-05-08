@@ -74,10 +74,6 @@ const ws_loadCashAssistanceDetail = async (connection, filters = new Object(null
 
 
 const ws_createCashAssistanceDetail = async (connection, details) => {
-    // if MinPrice was empty default will be "0"
-    // if (!("MinPrice" in details)) {
-    //     details.MinPrice = 0;
-    // }
     // details are the parameters sent for creating table
     const {
         AssignNeedyPlanId,
@@ -150,7 +146,7 @@ const ws_createCashAssistanceDetail = async (connection, details) => {
     }
 }
 
-
+// NOTE Bulk Updating is disbaled on this table
 const ws_updateCashAssistanceDetail = async (connection, filters, newValues) => {
     // inputs and params
     const {
@@ -168,21 +164,37 @@ const ws_updateCashAssistanceDetail = async (connection, filters, newValues) => 
             newValues
         }
 
-    if ("AssignNeedyPlanId" in newValues || "PlanId" in newValues) {
-        // AssignNeedyPlanId and PlanId are unqiue values
-        //check for unqiue values if they've entered.
+    // NOTE Fix #41
+    async function checkForCashAssistDuplicate(PlanId, AssignNeedyPlanId) {
         const duplicateUniqueValue = await checkDuplicate(connection, {
             AssignNeedyPlanId,
             PlanId
         }, ws_loadCashAssistanceDetail);
-        if (duplicateUniqueValue)
-            return {
-                status: "Failed",
-                msg: "Error Updating Row, Violation of unique values",
-                uniqueColumn: "AssignNeedyPlanId, PlanId",
-                newValues
-            }
+        return duplicateUniqueValue;
     }
+    let uniqueViolation = null;
+    if ("AssignNeedyPlanId" in newValues && "PlanId" in newValues) {
+        // AssignNeedyPlanId and PlanId are unqiue values
+        //check for unqiue values if both have entered.
+        uniqueViolation = await checkForCashAssistDuplicate(PlanId, AssignNeedyPlanId)
+    } else if ("AssignNeedyPlanId" in newValues || "PlanId" in newValues) {
+        //check for unqiue values if either have entered.
+        let filteredRow = await ws_loadCashAssistanceDetail(connection, filters);
+        if ("AssignNeedyPlanId" in newValues) {
+            const PlanId = filteredRow.recordset[0].PlanId;
+            uniqueViolation = await checkForCashAssistDuplicate(PlanId, AssignNeedyPlanId)
+        } else if ("PlanId" in newValues) {
+            const AssignNeedyPlanId = filteredRow.recordset[0].AssignNeedyPlanId;
+            uniqueViolation = await checkForCashAssistDuplicate(PlanId, AssignNeedyPlanId)
+        }
+    }
+    if (uniqueViolation)
+        return {
+            status: "Failed",
+            msg: "Error Updating Row, Violation of unique values",
+            uniqueColumn: "AssignNeedyPlanId, PlanId",
+            newValues
+        }
 
 
     // if CashAssistanceDetailId is available on tblPayment we can not change MinPrice AND NeededPrice
