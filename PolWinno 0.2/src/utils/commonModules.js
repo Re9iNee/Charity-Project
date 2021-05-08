@@ -1,7 +1,7 @@
 const normalizeQueryString = (queryString, filters) => {
     for (let property in filters) {
         const filterValue = filters[property];
-        if (filterValue) {
+        if (filterValue != undefined || filterValue != null ) {
             if (typeof filterValue !== "string")
                 queryString += ` AND ${property}=${filterValue}`;
             else
@@ -143,7 +143,7 @@ const normalizeQueryString_Create = (queryString, details, ...configs) => {
             }] of configs.entries()) {
             let rawValue = details[column];
             // if value doesn't exist skip this column exception
-            if (!rawValue) continue
+            if (rawValue == undefined || rawValue == null) continue
             columns.push(column)
             values.push(prefix.replace('$1', rawValue))
             // delete added index from details, avoid duplicates in QString

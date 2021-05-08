@@ -13,7 +13,8 @@ const {
     DB_DATABASE
 } = process.env;
 
-const ws_loadPlan = async (connection, filters, customQuery = null, resultLimit = 1000) => {
+const ws_loadPlan = async (connection, filters = new Object(null), customQuery = null, resultLimit = 1000) => {
+    // NOTE because we use "in" keyword to search in filters object, it can not be empty
     const {
         pool,
         poolConnect
@@ -88,7 +89,7 @@ const ws_createPlan = async (connection, details) => {
         }
 
 
-    if ("Fdate" in details && "Tdate" in details){
+    if ("Fdate" in details && "Tdate" in details) {
         // Date format: YYYY-MM-DD
         // Fdate = Shuru
         // Tdate = Payan
@@ -135,31 +136,35 @@ const ws_createPlan = async (connection, details) => {
 
 }
 
-
-const ws_updatePlan = async (connection, filters, newValues) => {
+// NOTE Bulk update is disabled on this table - due to issue #41
+const ws_updatePlan = async (connection, filters = new Object(null), newValues = new Object(null)) => {
+    // NOTE Because we are searching using "in" keyword filters & newValues object should not be null
     // note: inputs && parameters -> PlanName, Description, PlanNature, ParentPlanId, icon, Fdate, Tdate, neededLogin, PlanId
-    const {
-        PlanName,
-        PlanNature,
-        ParentPlanId,
-    } = newValues;
-    // Unique Values
+
     // check for duplicates - returns: true -> duplicate | false -> unique
     // Unique Values => (PlanName, PlanNature, ParentPlanId)
-    if (PlanName || PlanNature || ParentPlanId) {
+    // NOTE Fix Issue #41
+    if ("PlanName" in newValues || "PlanNature" in newValues || "ParentPlanId" in newValues) {
         // check for unique values if they've entered.
-        const duplicateUniqueValue = await checkDuplicate(connection, {
-            PlanName,
-            PlanNature,
-            ParentPlanId
-        }, ws_loadPlan);
-        console.log(duplicateUniqueValue)
+        let filteredRow = await ws_loadPlan(connection, filters);
+        let filteredVals = {
+            ParentPlanId: filteredRow.recordset[0].ParentPlanId,
+            PlanNature: filteredRow.recordset[0].PlanNature,
+            PlanName: filteredRow.recordset[0].PlanName
+        }
+        let config = {
+            PlanName: ("PlanName" in newValues) ? newValues.PlanName : filteredVals.PlanName,
+            ParentPlanId: ("ParentPlanId" in newValues) ? newValues.ParentPlanId : filteredVals.ParentPlanId,
+            PlanNature: ("PlanNature" in newValues) ? newValues.PlanNature : filteredVals.PlanNature
+        }
+        const duplicateUniqueValue = await checkDuplicate(connection, config, ws_loadPlan);
         if (duplicateUniqueValue)
             return {
                 status: "Failed",
                 msg: "Error Updating Row, Violation of unique values",
                 uniqueColumn: "ParentPlanId, PlanNature, PlanName",
-                newValues
+                newValues,
+                "original values of this row": filteredVals
             }
     }
     // BUG: Issue #41
