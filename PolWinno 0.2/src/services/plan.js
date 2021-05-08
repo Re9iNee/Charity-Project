@@ -6,7 +6,6 @@ const {
     endIsLenghty,
 } = require("../utils/commonModules");
 
-
 require("dotenv").config({
     path: "./utils/.env"
 });
@@ -31,6 +30,11 @@ const ws_loadPlan = async (connection, filters, customQuery = null, resultLimit 
     ,[Tdate]
     ,[neededLogin]
     FROM [${DB_DATABASE}].[dbo].[tblPlans] WHERE 1 = 1 `;
+    // NOTE fixed Issue #38 - converting text to varchar
+    if ("Description" in filters) {
+        filters["CONVERT(VARCHAR(MAX), Description)"] = filters.Description;
+        delete filters.Description;
+    }
     queryString = normalizeQueryString(queryString, filters);
     if (customQuery)
         queryString += ` ${customQuery}`
@@ -84,19 +88,21 @@ const ws_createPlan = async (connection, details) => {
         }
 
 
-    // Date format: YYYY-MM-DD
-    // Fdate = Shuru
-    // Tdate = Payan
-    let start = new sqlDate(Fdate.split('-'));
-    let end = new sqlDate(Tdate.split('-'));
-    // compare end date and start date - returns: true -> end is bigger or at the same date || false -> start is bigger.
-    if (!endIsLenghty(start, end))
-        return {
-            status: "Failed",
-            msg: "ending date must be bigger than initial date",
-            start,
-            end
-        }
+    if ("Fdate" in details && "Tdate" in details){
+        // Date format: YYYY-MM-DD
+        // Fdate = Shuru
+        // Tdate = Payan
+        let start = new sqlDate(Fdate.split('-'));
+        let end = new sqlDate(Tdate.split('-'));
+        // compare end date and start date - returns: true -> end is bigger or at the same date || false -> start is bigger.
+        if (!endIsLenghty(start, end))
+            return {
+                status: "Failed",
+                msg: "ending date must be bigger than initial date",
+                start,
+                end
+            }
+    }
 
     const {
         pool,

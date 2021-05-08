@@ -59,9 +59,9 @@ async function checkDuplicateAccountNumber(connection, accountNumber) {
     return duplicate;
 }
 
-const ws_createCharityAccounts = async (connection, details) => {
+const ws_createCharityAccounts = async (connection, details = new Object(null)) => {
+    // default parameter for details will be null object. (to avoid throwing error - we search in this object later)
     // details are the parameters sent for creating table
-
     const {
         BankId,
         BranchName,
@@ -72,6 +72,15 @@ const ws_createCharityAccounts = async (connection, details) => {
     } = details;
 
 
+    // Not Null Values
+    if (!("BankId" in details) || !("OwnerName" in details) || !("BranchName" in details) || !("AccountNumber") in details) {
+        return {
+            status: "Failed",
+            msg: "Fill Parameters Utterly",
+            details
+        }
+    }
+
     // check for baseTypeTitle duplicates - returns: true -> duplicate | false -> unique
     const duplicateAccountNumber = await checkDuplicateAccountNumber(connection, AccountNumber);
     if (duplicateAccountNumber)
@@ -81,7 +90,7 @@ const ws_createCharityAccounts = async (connection, details) => {
             AccountNumber,
         };
     // Credit Card Validation if it exists
-    if (CardNumber) {
+    if ("CardNumber" in details) {
         const {
             validateCreditCard
         } = require("../utils/bankCardNumber");
@@ -94,14 +103,6 @@ const ws_createCharityAccounts = async (connection, details) => {
                 msg: "The Credit Card Number is Incorrect.",
                 CardNumber
             }
-        }
-    }
-    // Not Null Values
-    if (!BankId || !OwnerName || !BranchName || !AccountNumber) {
-        return {
-            status: "Failed",
-            msg: "Fill Parameters Utterly",
-            details
         }
     }
 
