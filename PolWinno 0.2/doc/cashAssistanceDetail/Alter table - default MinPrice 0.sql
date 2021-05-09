@@ -1,0 +1,1 @@
+ALTER TABLE tblCashAssistanceDetail ADD DEFAULT 0 FOR MinPrice;

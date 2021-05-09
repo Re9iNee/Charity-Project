@@ -25,7 +25,8 @@ exports.getPlans = async (req, res) => {
         Fdate: query.Fdate,
         Tdate: query.Tdate,
         neededLogin: query.neededLogin,
-        PlanId: query.PlanId
+        PlanId: query.PlanId,
+        Description: query.Description,
     });
     // Deconstrucing req.query object helps prevent typo in request url path. therefore keep our program less error prone.
     res.send({

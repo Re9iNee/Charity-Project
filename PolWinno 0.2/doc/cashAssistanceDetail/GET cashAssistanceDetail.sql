@@ -16,10 +16,10 @@ SELECT TOP (1000) [CashAssistanceDetailId]
       ,plans.[Description]
       ,[PlanNature]
       ,[ParentPlanId]
-  FROM [SabkadV01].[dbo].[tblCashAssistanceDetail] as cashAssist INNER JOIN
-  [SabkadV01].[dbo].[tblAssignNeedyToPlans] as assignNeedy 
-  on cashAssist.AssignNeedyPlanId = assignNeedy.AssignNeedyPlanId
-  INNER JOIN [SabkadV01].[dbo].[tblPlans] as plans 
+  FROM [SabkadV01].[dbo].[tblCashAssistanceDetail] as cashAssist 
+  INNER JOIN [SabkadV01].[dbo].[tblPlans] as plans
   on cashAssist.PlanId = plans.PlanId
-  INNER JOIN [SabkadV01].[dbo].[tblPersonal] as personal
+  LEFT JOIN [SabkadV01].[dbo].[tblAssignNeedyToPlans] as assignNeedy
+  on cashAssist.AssignNeedyPlanId = assignNeedy.AssignNeedyPlanId
+  LEFT JOIN [SabkadV01].[dbo].[tblPersonal] as personal
   on assignNeedy.NeedyId = personal.PersonId

@@ -1,7 +1,7 @@
 const normalizeQueryString = (queryString, filters) => {
     for (let property in filters) {
         const filterValue = filters[property];
-        if (filterValue) {
+        if (filterValue != undefined || filterValue != null ) {
             if (typeof filterValue !== "string")
                 queryString += ` AND ${property}=${filterValue}`;
             else
@@ -123,7 +123,9 @@ const validateNationalCode = str => {
     }
 }
 
-
+// normalizeQS_Create => (queryString, {planName: "sth"}, ...configs)
+// configs are the exceptions that don't have normal values. (need to convert or something to insert into SQL Server)
+// configs = {onColumn: "EXCEPTION COLUMN", prefix="e.g: CONVERT(INT, $1)"}
 const normalizeQueryString_Create = (queryString, details, ...configs) => {
     // queryString = INSERT INTO [table]
     // configs are for the columns that its value needs convert or some other expressions needed for SQLServer.
@@ -141,7 +143,7 @@ const normalizeQueryString_Create = (queryString, details, ...configs) => {
             }] of configs.entries()) {
             let rawValue = details[column];
             // if value doesn't exist skip this column exception
-            if (!rawValue) continue
+            if (rawValue == undefined || rawValue == null) continue
             columns.push(column)
             values.push(prefix.replace('$1', rawValue))
             // delete added index from details, avoid duplicates in QString
@@ -153,6 +155,8 @@ const normalizeQueryString_Create = (queryString, details, ...configs) => {
         let value = details[column];
         if (typeof value == "string") {
             values.push(`N'${value}'`);
+        } else {
+            values.push(value);
         }
     }
     queryString = queryString.replace("$COLUMN", columns.join(', '))

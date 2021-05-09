@@ -12,6 +12,7 @@ const needyAccountRoutes = require('./router/needyAccount');
 const plansRoutes = require('./router/plan');
 const cashAssistanceDetailRouter = require("./router/cashAssistanceDetail");
 const assignNeedyToPlansRouter = require("./router/assignNeedyToPlans")
+const paymentRouter = require("./router/payment")
 
 
 
@@ -43,7 +44,7 @@ app.use(bodyPaser.urlencoded({
 }));
 
 //multer
-app.use(upload.any()); 
+app.use(upload.any());
 
 
 app.use(express.json({
@@ -93,6 +94,9 @@ app.use(assignNeedyToPlansRouter);
 
 app.use(cashAssistanceDetailRouter)
 
+/*  TASK 10 */
+
+app.use(paymentRouter);
 
 //-----------------------------------
 
@@ -103,14 +107,52 @@ const {
     pool,
     poolConnect
 } = require("./utils/charityDb");
+const {
+    ws_loadPayment
+} = require("./services/payment");
+const {
+    ws_updateCashAssistanceDetail,
+    ws_loadCashAssistanceDetail,
+    ws_deleteCashAssistanceDetail
+} = require("./services/cashAssistanceDetail");
+const { ws_deleteCharityAccounts } = require("./services/charityAccounts");
 (async () => {
-    // T08 - Method 01 
-    // const result = await ws_loadNeedyForPlan({
+    // // T09 - Method 02
+    // const result = await ws_createCashAssistanceDetail({
     //     pool,
     //     poolConnect
     // }, {
-        
+    //     PlanId: 5,
+    //     MinPrice: 2000,
+    //     NeededPrice: 2000
     // });
+    // console.log({
+    //     result
+    // })
+    // T10 - Method 02 - Load
+    // const result = await ws_loadPayment({
+    //     pool,
+    //     poolConnect
+    // });
+    // console.log({
+    //     result
+    // })
+    // T09 - Method 03
+    // const result = await ws_updateCashAssistanceDetail({
+    //     pool,
+    //     poolConnect
+    // }, {
+    //     cashAssistanceDetailId: "12"
+    // }, {
+    //     MinPrice: "3000",
+    //     NeededPrice: "3500"
+    // });
+    // console.log(result);
+    // T10 - Method 04
+    // const result = await ws_deleteCashAssistanceDetail({
+    //     pool,
+    //     poolConnect
+    // }, "17");
     // console.log(result)
 })();
 

@@ -11,6 +11,7 @@ const {
     DB_DATABASE
 } = process.env
 
+
 const {ws_loadPlan} = require("./plan");
 const {ws_loadPersonal} = require("./personal");
 
@@ -33,10 +34,8 @@ const availableId = async(connection, PlanId , NeedyId) => {
     }
 };
 
-
-
-
-const ws_loadNeedyForPlan = async (connection, filters, customQuery = null, resultLimit = 1000) => {
+const ws_loadNeedyForPlan = async (connection, filters = new Object(null), customQuery = null, resultLimit = 1000) => {
+    // in older version of this code. filters object hadn't any default value - Issue #42 - filters object should not be empty
     const {
         pool,
         poolConnect
@@ -74,17 +73,16 @@ const ws_loadNeedyForPlan = async (connection, filters, customQuery = null, resu
             on assNeedy.PlanId = plans.PlanId
 
     WHERE 1 = 1 `;
-    // abmbiguous column names
-    if(filters){
-        if ("NeedyId" in filters) {
-            filters["assNeedy.NeedyId"] = filters.NeedyId;
-            delete filters.NeedyId;
-        }
-        if ("PlanId" in filters) {
-            filters["plans.PlanId"] = filters.PlanId;
-            delete filters.PlanId;
-        }
-    };
+
+    // Ambiguous column names
+    if ("NeedyId" in filters) {
+        filters["assNeedy.NeedyId"] = filters.NeedyId;
+        delete filters.NeedyId;
+    }
+    if ("PlanId" in filters) {
+        filters["plans.PlanId"] = filters.PlanId;
+        delete filters.PlanId;
+    }
     
     queryString = normalizeQueryString(queryString, filters);
     if (customQuery)

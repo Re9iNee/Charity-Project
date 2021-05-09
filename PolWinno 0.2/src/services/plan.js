@@ -1,14 +1,10 @@
 const {
-    connect
-} = require("../router/plan");
-const {
     normalizeQueryString,
     normalizeQueryString_Create,
     checkDuplicate,
     sqlDate,
     endIsLenghty,
 } = require("../utils/commonModules");
-
 
 require("dotenv").config({
     path: "./utils/.env"
@@ -17,7 +13,8 @@ const {
     DB_DATABASE
 } = process.env;
 
-const ws_loadPlan = async (connection, filters, customQuery = null, resultLimit = 1000) => {
+const ws_loadPlan = async (connection, filters = new Object(null), customQuery = null, resultLimit = 1000) => {
+    // NOTE because we use "in" keyword to search in filters object, it can not be empty
     const {
         pool,
         poolConnect
@@ -34,6 +31,11 @@ const ws_loadPlan = async (connection, filters, customQuery = null, resultLimit 
     ,[Tdate]
     ,[neededLogin]
     FROM [${DB_DATABASE}].[dbo].[tblPlans] WHERE 1 = 1 `;
+    // NOTE fixed Issue #38 - converting text to varchar
+    if ("Description" in filters) {
+        filters["CONVERT(VARCHAR(MAX), Description)"] = filters.Description;
+        delete filters.Description;
+    }
     queryString = normalizeQueryString(queryString, filters);
     if (customQuery)
         queryString += ` ${customQuery}`
@@ -87,19 +89,21 @@ const ws_createPlan = async (connection, details) => {
         }
 
 
-    // Date format: YYYY-MM-DD
-    // Fdate = Shuru
-    // Tdate = Payan
-    let start = new sqlDate(Fdate.split('-'));
-    let end = new sqlDate(Tdate.split('-'));
-    // compare end date and start date - returns: true -> end is bigger or at the same date || false -> start is bigger.
-    if (!endIsLenghty(start, end))
-        return {
-            status: "Failed",
-            msg: "ending date must be bigger than initial date",
-            start,
-            end
-        }
+    if ("Fdate" in details && "Tdate" in details) {
+        // Date format: YYYY-MM-DD
+        // Fdate = Shuru
+        // Tdate = Payan
+        let start = new sqlDate(Fdate.split('-'));
+        let end = new sqlDate(Tdate.split('-'));
+        // compare end date and start date - returns: true -> end is bigger or at the same date || false -> start is bigger.
+        if (!endIsLenghty(start, end))
+            return {
+                status: "Failed",
+                msg: "ending date must be bigger than initial date",
+                start,
+                end
+            }
+    }
 
     const {
         pool,
@@ -132,33 +136,38 @@ const ws_createPlan = async (connection, details) => {
 
 }
 
-
-const ws_updatePlan = async (connection, filters, newValues) => {
+// NOTE Bulk update is disabled on this table - due to issue #41
+const ws_updatePlan = async (connection, filters = new Object(null), newValues = new Object(null)) => {
+    // NOTE Because we are searching using "in" keyword filters & newValues object should not be null
     // note: inputs && parameters -> PlanName, Description, PlanNature, ParentPlanId, icon, Fdate, Tdate, neededLogin, PlanId
-    const {
-        PlanName,
-        PlanNature,
-        ParentPlanId,
-    } = newValues;
-    // Unique Values
+
     // check for duplicates - returns: true -> duplicate | false -> unique
     // Unique Values => (PlanName, PlanNature, ParentPlanId)
-    if (PlanName || PlanNature || ParentPlanId) {
+    // NOTE Fix Issue #41
+    if ("PlanName" in newValues || "PlanNature" in newValues || "ParentPlanId" in newValues) {
         // check for unique values if they've entered.
-        const duplicateUniqueValue = await checkDuplicate(connection, {
-            PlanName,
-            PlanNature,
-            ParentPlanId
-        }, ws_loadPlan);
-        console.log(duplicateUniqueValue)
+        let filteredRow = await ws_loadPlan(connection, filters);
+        let filteredVals = {
+            ParentPlanId: filteredRow.recordset[0].ParentPlanId,
+            PlanNature: filteredRow.recordset[0].PlanNature,
+            PlanName: filteredRow.recordset[0].PlanName
+        }
+        let config = {
+            PlanName: ("PlanName" in newValues) ? newValues.PlanName : filteredVals.PlanName,
+            ParentPlanId: ("ParentPlanId" in newValues) ? newValues.ParentPlanId : filteredVals.ParentPlanId,
+            PlanNature: ("PlanNature" in newValues) ? newValues.PlanNature : filteredVals.PlanNature
+        }
+        const duplicateUniqueValue = await checkDuplicate(connection, config, ws_loadPlan);
         if (duplicateUniqueValue)
             return {
                 status: "Failed",
                 msg: "Error Updating Row, Violation of unique values",
                 uniqueColumn: "ParentPlanId, PlanNature, PlanName",
-                newValues
+                newValues,
+                "original values of this row": filteredVals
             }
     }
+    // BUG: Issue #41
     // if PlanId exists in these table => (tblCashAssistanceDetail, tblNonCashAssistanceDetails) we can not update/change PlanNature Column.
     if ("PlanNature" in newValues) {
         const {
@@ -273,7 +282,7 @@ const ws_updatePlan = async (connection, filters, newValues) => {
 
 const ws_deletePlan = async (connection, planId) => {
     // if PlanId exists on => tblAssignNeedyToPlans & tblCashAssistanceDetail & tblNonCashAssistanceDetail we can not delete a row with the id of PlanId
-    
+
     // todo: nonCashAssistanceTable doesn't exist at this point. create and check planId for this table
     const {
         checkForeignKey
@@ -300,7 +309,7 @@ const ws_deletePlan = async (connection, planId) => {
         const table = await ws_loadPlan(connection);
         return table;
     } catch (err) {
-        console.log("ws_deletePlan - SQL error: ", err);
+        console.error("ws_deletePlan - SQL error: ", err);
     }
 }
 module.exports = {
