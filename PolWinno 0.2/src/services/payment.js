@@ -93,6 +93,26 @@ const ws_loadPayment = async (connection, filters = new Object(null), customQuer
     }
 }
 
+
+const ws_payment = async (connection, details) => {
+    // details are the parameters sent for creating table
+    // TODO: this method written based on Mrs.Vahidi messages not Documents. This method will be completed via Settlement file.
+
+    // parameters and inputs: DonatorId, CashAssistanceDetailId, PaymentPrice, PaymentGatewayId, PaymentDate, PaymentStatus, SourceAccountNumber, TargetAccountNumber, CharityAccountId, FollowCode, NeedyId, PaymentTime
+
+    /* NOTE 
+    check inserted for not null values (check not null values)
+    check for duplicates (check for unique columns)
+    check for any column custome validations
+    put 'N' before any given string.
+    */
+
+    // NOTE Not null Columns: CashAssistanceDetailId, PaymentPrice, PaymentDate, PaymentTime, PaymentStatus, TargetAccountNumber, CharityAccountId, FollowCode.
+
+
+}
+
 module.exports = {
     ws_loadPayment,
+    ws_payment
 }
