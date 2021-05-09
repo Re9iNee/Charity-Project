@@ -107,30 +107,7 @@ const {
     pool,
     poolConnect
 } = require("./utils/charityDb");
-const {
-    ws_loadPayment, ws_payment
-} = require("./services/payment");
-(async () => {
-    // T10 - Method 01 - payment
-    const result = await ws_payment({
-        pool,
-        poolConnect
-    }, {
-        CashAssistanceDetailId: 8,
-        PaymentPrice: 1,
-        PaymentDate: "2020-02-10",
-        PaymentTime: "13:43",
-        PaymentStatus: "Success",
-        TargetAccountNumber: "5022-2910",
-        CharityAccountId: 1,
-        FollowCode: 20001
-    });
-    console.log(result)
-})();
-
-
-
-
+(async () => {})();
 /* -----  End of Testing Area ---- */
 
 app.listen(port, () => console.log(`Listening on ${port}`));

@@ -1,5 +1,6 @@
 const {
     ws_loadPayment,
+    ws_payment
 } = require("../services/payment");
 const {
     poolConnect,
@@ -29,4 +30,18 @@ exports.getPayment = async (req, res) => {
     res.send({
         result
     })
+}
+
+
+exports.makePayment = async (req, res) => {
+    // T10 - Method 01
+    // Attach params to body as an JSON
+    const result = await ws_payment({
+        pool,
+        poolConnect
+    }, req.body);
+    // sending req.body directly causing program more error prone since there might be a typo, we will deconstruct object in that method.
+    res.send({
+        result
+    });
 }
