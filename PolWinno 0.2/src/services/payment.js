@@ -1,5 +1,6 @@
 const {
-    normalizeQueryString
+    normalizeQueryString,
+    normalizeQueryString_Create
 } = require("../utils/commonModules");
 
 require("dotenv").config({
@@ -93,6 +94,113 @@ const ws_loadPayment = async (connection, filters = new Object(null), customQuer
     }
 }
 
+
+const ws_payment = async (connection, details = new Object(null)) => {
+    const paymentStaus = {
+        success: "Successful",
+        fail: "Failed"
+    }
+    // details are the parameters sent for creating table
+    // TODO: this method written based on Mrs.Vahidi messages not Documents. This method will be completed via Settlement file.
+
+    // parameters and inputs: DonatorId, CashAssistanceDetailId, PaymentPrice, PaymentGatewayId, PaymentDate, PaymentStatus, SourceAccountNumber, TargetAccountNumber, CharityAccountId, FollowCode, NeedyId, PaymentTime
+
+    const {
+        CashAssistanceDetailId,
+        PaymentPrice,
+        PaymentGatewayId,
+        PaymentDate,
+        PaymentStatus,
+        SourceAccountNumber,
+        TargetAccountNumber,
+        CharityAccountId,
+        FollowCode,
+        NeedyId,
+        PaymentTime,
+        DonatorId,
+    } = details;
+
+
+
+    if (!(("CashAssistanceDetailId" && "PaymentPrice" && "PaymentDate" && "PaymentTime" && "PaymentStatus" && "TargetAccountNumber" && "CharityAccountId" && "FollowCode") in details))
+        return {
+            status: "Failed",
+            msg: "Fill Parameters Utterly",
+            // Not null Columns
+            required: ["CashAssistanceDetailId", "PaymentPrice", "PaymentDate", "PaymentTime", "PaymentStatus", "TargetAccountNumber", "CharityAccountId", "FollowCode"],
+            details
+        }
+
+    // Read NeededPrice from cashAssist table
+    const {
+        ws_loadCashAssistanceDetail
+    } = require("./cashAssistanceDetail");
+    const cashAssist = await ws_loadCashAssistanceDetail(connection, {
+        CashAssistanceDetailId
+    }, null, 1);
+    // store NeededPrice value in variable called "C"
+    const C = cashAssist.recordset[0].NeededPrice;
+
+    // SUM up all successfull payments and store it in a variable called "A"‌
+    const A = await sumSuccessfulPayments(connection, paymentStaus.success);
+
+    // A + newPaymentPrice should not be greater than needed price 
+    if (A + Number(PaymentPrice) > C)
+        return {
+            status: "Failed",
+            msg: "total Successfull payments + new payments should not be greater than needed price",
+            "total successfull payments": A,
+            "needed price": C,
+            "new payment": PaymentPrice
+        }
+
+
+
+    const {
+        pool,
+        poolConnect
+    } = connection;
+    // ensures that the pool has been created
+    await poolConnect;
+
+    let queryString = `INSERT INTO 
+    [${DB_DATABASE}].[dbo].[tblPayment] 
+    ($COLUMN) 
+    VALUES 
+    ($VALUE);
+    SELECT SCOPE_IDENTITY() as paymentId;`
+    // normalizeQS_Create => (queryString, {planName: "sth"}, ...configs)
+    queryString = normalizeQueryString_Create(queryString, details);
+    try {
+        const request = pool.request();
+        const result = await request.query(queryString);
+        const id = result.recordset[0].paymentId;
+        return id;
+    } catch (err) {
+        console.error("ws_payment error: ", err);
+    }
+}
+
+
+async function sumSuccessfulPayments(connection, successMessage) {
+    const {
+        pool,
+        poolConnect
+    } = connection;
+    // ensures that the pool has been created
+    await poolConnect;
+
+    let SUM_QueryString = `SELECT SUM(PaymentPrice) as TotalAmount FROM [${DB_DATABASE}].[dbo].[tblPayment] WHERE PaymentStatus = '${successMessage}'`;
+    try {
+        const request = pool.request();
+        const result = await request.query(SUM_QueryString)
+        return result.recordset[0].TotalAmount;
+    } catch (err) {
+        console.error("SQL Error on sumSuccessfulPayments method ", err);
+    }
+}
+
 module.exports = {
     ws_loadPayment,
+    ws_payment
 }

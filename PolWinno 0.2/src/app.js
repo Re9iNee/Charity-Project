@@ -107,58 +107,7 @@ const {
     pool,
     poolConnect
 } = require("./utils/charityDb");
-const {
-    ws_loadPayment
-} = require("./services/payment");
-const {
-    ws_updateCashAssistanceDetail,
-    ws_loadCashAssistanceDetail,
-    ws_deleteCashAssistanceDetail
-} = require("./services/cashAssistanceDetail");
-const { ws_deleteCharityAccounts } = require("./services/charityAccounts");
-(async () => {
-    // // T09 - Method 02
-    // const result = await ws_createCashAssistanceDetail({
-    //     pool,
-    //     poolConnect
-    // }, {
-    //     PlanId: 5,
-    //     MinPrice: 2000,
-    //     NeededPrice: 2000
-    // });
-    // console.log({
-    //     result
-    // })
-    // T10 - Method 02 - Load
-    // const result = await ws_loadPayment({
-    //     pool,
-    //     poolConnect
-    // });
-    // console.log({
-    //     result
-    // })
-    // T09 - Method 03
-    // const result = await ws_updateCashAssistanceDetail({
-    //     pool,
-    //     poolConnect
-    // }, {
-    //     cashAssistanceDetailId: "12"
-    // }, {
-    //     MinPrice: "3000",
-    //     NeededPrice: "3500"
-    // });
-    // console.log(result);
-    // T10 - Method 04
-    // const result = await ws_deleteCashAssistanceDetail({
-    //     pool,
-    //     poolConnect
-    // }, "17");
-    // console.log(result)
-})();
-
-
-
-
+(async () => {})();
 /* -----  End of Testing Area ---- */
 
 app.listen(port, () => console.log(`Listening on ${port}`));
