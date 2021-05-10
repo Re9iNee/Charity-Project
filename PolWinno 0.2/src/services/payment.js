@@ -121,13 +121,13 @@ const ws_payment = async (connection, details = new Object(null)) => {
     } = details;
 
 
-    // NOTE: CharityAccountId is not a required value anymore. since we dont have online paymentGateway
-    if (!(("CashAssistanceDetailId" && "PaymentPrice" && "PaymentDate" && "PaymentTime" && "PaymentStatus" && "TargetAccountNumber" && "FollowCode") in details))
+    // NOTE: CharityAccountId AND TargetAccountNumber is not a required columns anymore. since we dont have online paymentGateway
+    if (!(("CashAssistanceDetailId" && "PaymentPrice" && "PaymentDate" && "PaymentTime" && "PaymentStatus" && "FollowCode") in details))
         return {
             status: "Failed",
             msg: "Fill Parameters Utterly",
             // Not null Columns
-            required: ["CashAssistanceDetailId", "PaymentPrice", "PaymentDate", "PaymentTime", "PaymentStatus", "TargetAccountNumber", "CharityAccountId", "FollowCode"],
+            required: ["CashAssistanceDetailId", "PaymentPrice", "PaymentDate", "PaymentTime", "PaymentStatus", "CharityAccountId", "FollowCode"],
             details
         }
 
