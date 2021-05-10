@@ -199,8 +199,26 @@ async function sumSuccessfulPayments(connection, successMessage) {
         console.error("SQL Error on sumSuccessfulPayments method ", err);
     }
 }
+// NOTE: This method doesn't support bulk updating
+const ws_updatePayment = async (connection, paymentId, newValues = new Object(null)) => {
+    // Inputs and params: 
+    // DonatorId, CashAssistanceDetailId, PaymentPrice, PaymentGatewayId, PaymentDate, PaymentStatus, SourceAccountNumber, TargetAccountNumber, CharityAccoundId, FollowCode, NeedyId, PaymentTime, PaymentId
+
+
+    // TODO: you can update those that CharityAccountId is not null.
+    // TODO: you can update those that TargetAccountNumber has no value.
+    // TODO: you can update those that PaymentStatus is not successfull. 
+
+
+    // TODO: put neededPrice (from tblCashAssistanceDetail) into variable called C
+    // TODO: CashAssistanceDetailId AND PaymentStatus = "Successful" AND CharityAccountId IS NULL - SUM(PaymentPrice) into "A"
+    // TODO: CashAssistanceDetailId, PaymentPrice = "Successful" - SUM(PaymentPrice)
+    // TODO: B + newPaymentPrice Should not be bigger than 'C' AND 'A'
+    // TODO: update table
+}
 
 module.exports = {
     ws_loadPayment,
-    ws_payment
+    ws_payment,
+    ws_updatePayment,
 }
