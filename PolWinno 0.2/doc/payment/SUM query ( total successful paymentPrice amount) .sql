@@ -1,1 +1,1 @@
-SELECT SUM(PaymentPrice) as TotalAmount FROM [SabkadV01].[dbo].[tblPayment] WHERE PaymentStatus = 'Successful'
+SELECT SUM(PaymentPrice) as TotalAmount FROM [SabkadV01].[dbo].[tblPayment] WHERE PaymentStatus = 'Successful' AND CharityAccountId IS NULL;
