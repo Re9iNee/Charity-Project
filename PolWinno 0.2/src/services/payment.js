@@ -121,8 +121,8 @@ const ws_payment = async (connection, details = new Object(null)) => {
     } = details;
 
 
-
-    if (!(("CashAssistanceDetailId" && "PaymentPrice" && "PaymentDate" && "PaymentTime" && "PaymentStatus" && "TargetAccountNumber" && "CharityAccountId" && "FollowCode") in details))
+    // NOTE: CharityAccountId is not a required value anymore. since we dont have online paymentGateway
+    if (!(("CashAssistanceDetailId" && "PaymentPrice" && "PaymentDate" && "PaymentTime" && "PaymentStatus" && "TargetAccountNumber" && "FollowCode") in details))
         return {
             status: "Failed",
             msg: "Fill Parameters Utterly",
@@ -142,7 +142,7 @@ const ws_payment = async (connection, details = new Object(null)) => {
     const C = cashAssist.recordset[0].NeededPrice;
 
     // SUM up all successfull payments and store it in a variable called "A"‌
-    const A = await sumSuccessfulPayments(connection, paymentStaus.success);
+    const A = await sumSuccessfulPayments(connection, paymentStaus.success, " CharityAccountId IS NULL ") || 0;
 
     // A + newPaymentPrice should not be greater than needed price 
     if (A + Number(PaymentPrice) > C)
@@ -182,7 +182,7 @@ const ws_payment = async (connection, details = new Object(null)) => {
 }
 
 
-async function sumSuccessfulPayments(connection, successMessage) {
+async function sumSuccessfulPayments(connection, successMessage, customQuery) {
     const {
         pool,
         poolConnect
@@ -190,10 +190,13 @@ async function sumSuccessfulPayments(connection, successMessage) {
     // ensures that the pool has been created
     await poolConnect;
 
-    let SUM_QueryString = `SELECT SUM(PaymentPrice) as TotalAmount FROM [${DB_DATABASE}].[dbo].[tblPayment] WHERE PaymentStatus = '${successMessage}'`;
+    let queryString = `SELECT SUM(PaymentPrice) as TotalAmount FROM [${DB_DATABASE}].[dbo].[tblPayment] WHERE PaymentStatus = '${successMessage}' `;
+    if (customQuery) {
+        queryString += ` AND ${customQuery} `;
+    }
     try {
         const request = pool.request();
-        const result = await request.query(SUM_QueryString)
+        const result = await request.query(queryString)
         return result.recordset[0].TotalAmount;
     } catch (err) {
         console.error("SQL Error on sumSuccessfulPayments method ", err);
