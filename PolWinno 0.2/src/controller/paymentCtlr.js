@@ -1,7 +1,8 @@
 const {
     ws_loadPayment,
     ws_payment,
-    ws_updatePayment
+    ws_updatePayment,
+    ws_deletePayment
 } = require("../services/payment");
 const {
     poolConnect,
@@ -59,4 +60,17 @@ exports.updatePayment = async (req, res) => {
     res.send({
         result
     })
+}
+
+
+exports.deletePayment = async (req, res) => {
+    // T11 - ws_deletePayment
+    // parameters: sql connection, paymentId
+    const result = await ws_deletePayment({
+        pool,
+        poolConnect
+    }, req.body.paymentId);
+    res.send({
+        result
+    });
 }

@@ -1,0 +1,1 @@
+DELETE [SabkadV01].[dbo].[tblPayment] WHERE PaymentId = 5;

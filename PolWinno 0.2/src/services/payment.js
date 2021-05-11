@@ -316,8 +316,31 @@ const ws_updatePayment = async (connection, paymentId, newValues = new Object(nu
     }
 }
 
+
+const ws_deletePayment = async (connection, paymentId) => {
+    // TODO: return table
+    const {
+        pool,
+        poolConnect
+    } = connection;
+    // ensures that the pool has been created
+    await poolConnect;
+    let queryString = `DELETE 
+    ${DB_DATABASE}.[dbo].[tblPayment] 
+    WHERE PaymentId = ${paymentId};`
+    try {
+        const request = pool.request();
+        const deleteResult = await request.query(queryString)
+        const table = await ws_loadPayment(connection);
+        return table;
+    } catch (err) {
+        console.error("ws_deletePayment SQL error: ", err)
+    }
+}
+
 module.exports = {
     ws_loadPayment,
     ws_payment,
     ws_updatePayment,
+    ws_deletePayment
 }
