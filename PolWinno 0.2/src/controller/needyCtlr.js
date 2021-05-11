@@ -1,7 +1,7 @@
 const {
     pool,
     poolConnect
-} = require('../utils/charityDb ');
+} = require('../utils/charityDb');
 const {
     ws_loadNeedyAccount,
     ws_createNeedyAccount,
@@ -62,8 +62,6 @@ exports.updateNeedyAccount = async (req, res) => {
         let newValues = req.body.newValues;
         let filters = req.body.filters;
 
-        console.log(newValues);
-        console.log(filters);
         const result = await ws_updateNeedyAccount({
             pool,
             poolConnect

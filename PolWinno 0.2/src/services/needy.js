@@ -144,8 +144,8 @@ const ws_createNeedyAccount = async (connection, values) => {
         if (!duplicateUniqueValue) {
             return {
                 status: "Failed",
-                msg: "Error Updating Row, Duplicate Record",
-                uniqueColumn: "ShebaNumber, AccountNumber, NeedyId",
+                msg: "Error Creating Row, Duplicate Record",
+                uniqueColumns: "ShebaNumber, AccountNumber, NeedyId",
             }
         }
 
@@ -154,14 +154,14 @@ const ws_createNeedyAccount = async (connection, values) => {
         [${DB_DATABASE}].[dbo].[tblNeedyAccounts]
         (BankId,NeedyId,OwnerName,CardNumber,AccountNumber,AccountName,ShebaNumber)
         VALUES 
-        ('${BankId}','${NeedyId}','${OwnerName}','${CardNumber}','${AccountNumber}','${AccountName}','${ShebaNumber}'); 
+        ('${BankId}','${NeedyId}',N'${OwnerName}','${CardNumber}','${AccountNumber}',N'${AccountName}','${ShebaNumber}'); 
         SELECT SCOPE_IDENTITY() AS NeedyAccountId;`
 
     try {
         const request = pool.request();
         const result = request.query(queryString);
-        const id = result.recordset[0].NeedyAccountId;
-        return id;
+        console.dir(result);
+        return result;
 
     } catch (err) {
         console.error("ws_createNeedyAccount error:", err)
@@ -184,7 +184,7 @@ const ws_updateNeedyAccount = async (connection, filters, newValues) => {
             return {
                 status: "Failed",
                 msg: "Error Updating Row, Duplicate Record",
-                uniqueColumn: "ShebaNumber, AccountNumber, NeedyId",
+                uniqueColumns: "ShebaNumber, AccountNumber, NeedyId",
                 newValues
             }
         }

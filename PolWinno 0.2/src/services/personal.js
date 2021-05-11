@@ -1,6 +1,11 @@
 const crypto = require('crypto');
-const {normalizeQueryString,setToQueryString,validateNationalCode,checkDuplicate} = require("../utils/commonModules");
-
+const {normalizeQueryString,setToQueryString,validateNationalCode,checkDuplicate, checkForeignKey} = require("../utils/commonModules");
+require("dotenv").config({
+    path: "../utils/config.env"
+});
+const {
+    DB_DATABASE
+} = process.env
 
 
 
@@ -20,7 +25,8 @@ const ws_loadPersonal = async (connection, filters, customeQuery = null, resultL
         [BirthDate], 
         [BirthPlace], 
         [PersonType], 
-        [PersonPhoto] 
+        [PersonPhoto],
+        [SecretCode] 
     FROM [${DB_DATABASE}].[dbo].[tblPersonal]
     WHERE 1=1`;
 
@@ -58,49 +64,58 @@ const ws_createPersonal = async (connection,values,PersonPhoto) => {
                 CardNumber
             }
         }
-    }
-
-    // these values are required
-    if (!Name || !Family || !Sex || !PersonType) {
-        return {
-            status: "Failed",
-            msg: "Fill Parameters Utterly",
-            values
-        }
     };
 
-    
+
+
     // if the personType is needy we should encrypt it.
 
     if( PersonType === "3" ){
         
+
+        // these values are required
+        if (!Name || !Family || !NationalCode || !IdNumber || !Sex || !BirthDate || !BirthPlace  || !PersonType || !PersonPhoto) {
+            return {
+                status: "Failed",
+                msg: "Fill Parameters Utterly",
+                values
+            }
+        };
+
+
+        const duplicateId = await checkDuplicate(connection, {NationalCode , PersonType} , ws_loadPersonal);
+        if (duplicateId)
+            return {
+                status: "Failed",
+                msg: "Error Creating Row, Duplicate Record",
+                uniqueColumn: "NationalCode, PersonType"
+            };
+
+
+
         const person = {
             Name ,
             Family,
             NationalCode
         };
+
+        const personString = JSON.stringify(person);
         
-        const hashPerson = crypto.createHash( 'sha1' , person).digest('hex');
+        let hashPerson = crypto.createHash( 'sha1' ).update(personString).digest('hex');
+        hashPerson = hashPerson.substring(0 , 20);
 
         let queryString = `INSERT INTO 
-        [SabkadV01].[dbo].[tblPersonal]
-        (Name,Family,NationalCode,IdNumber,Sex,BirthDate,BirthPlace,PersonType,PersonPhoto)
+        [${DB_DATABASE}].[dbo].[tblPersonal]
+        (Name,Family,NationalCode,IdNumber,Sex,BirthDate,BirthPlace,PersonType,PersonPhoto,SecretCode)
         VALUES 
-        ('${hashPerson}','${hashPerson}',${NationalCode},${IdNumber},${Sex},${BirthDate},${BirthPlace},${PersonType},CONVERT(varbinary ,'${PersonPhoto}')); 
+        ('${Name}','${Family}',${NationalCode},${IdNumber},${Sex},${BirthDate},${BirthPlace},${PersonType},CONVERT(varbinary ,'${PersonPhoto}'),'${hashPerson}'); 
         SELECT SCOPE_IDENTITY() AS PersonId;`
 
 
-        const duplicateId = await checkDuplicate(connection, IdNumber , ws_loadPersonal);
-        if (duplicateId)
-            return {
-                status: "Failed",
-                msg: "Error Creating Row, Duplicate Record",
-                IdNumber
-            };
 
         try {
             const request = pool.request();
-            const result = request.query(queryString);
+            const result = await request.query(queryString);
     
             console.dir(result);
             return result;
@@ -109,25 +124,37 @@ const ws_createPersonal = async (connection,values,PersonPhoto) => {
             console.error("SQL error:", err)
         }
 
+
+
     } else{
 
         
+        // these values are required
+        if (!Name || !Family || !Sex || !PersonType) {
+            return {
+                status: "Failed",
+                msg: "Fill Parameters Utterly",
+                values
+            }
+        };
+
+        const duplicateId = await checkDuplicate(connection, NationalCode , ws_loadPersonal);
+        if (duplicateId)
+            return {
+                status: "Failed",
+                msg: "Error Creating Row, Duplicate Record",
+                NationalCode
+            };
+
+
         let queryString = `INSERT INTO 
-            [SabkadV01].[dbo].[tblPersonal]
-            (Name,Family,NationalCode,IdNumber,Sex,BirthDate,BirthPlace,PersonType,PersonPhoto)
+            [${DB_DATABASE}].[dbo].[tblPersonal]
+            (Name,Family,NationalCode,IdNumber,Sex,BirthDate,BirthPlace,PersonType,PersonPhoto,SecretCode)
             VALUES 
-            ('${Name}','${Family}','${NationalCode}','${IdNumber}','${Sex}','${BirthDate}','${BirthPlace}','${PersonType}',CONVERT(varbinary ,'${PersonPhoto}'));
+            (N'${Name}',N'${Family}','${NationalCode}','${IdNumber}','${Sex}','${BirthDate}',N'${BirthPlace}','${PersonType}',CONVERT(varbinary ,'${PersonPhoto}'),'${SecretCode}');
             SELECT SCOPE_IDENTITY() AS PersonId;`
 
-            const duplicateId = await checkDuplicate(connection, IdNumber , ws_loadPersonal);
-            if (duplicateId)
-                return {
-                    status: "Failed",
-                    msg: "Error Creating Row, Duplicate Record",
-                    IdNumber
-                };
-    
-
+          
             try {
                 const request = pool.request();
                 const result = request.query(queryString);
@@ -143,25 +170,15 @@ const ws_createPersonal = async (connection,values,PersonPhoto) => {
 };
 
 
-const ws_updatePersonal = async (connection , filters , newValues) => {
+
+const ws_updatePersonal = async (connection , newValues , filters) => {
     
     const {pool,poolConnect} = connection;
     await poolConnect;
 
-    if (newValues.IdNumber) {
-        const DuplicateId = await checkDuplicateId(connection, newValues.IdNumber);
-        if (DuplicateId)
-            return {
-                status: "Failed",
-                msg: "Error Creating Row, Duplicate IdNumber",
-                ...newValues.IdNumber,
-            };
-    }
-
     
     if (newValues.NationalCode) {
-        const valid = await validateNationalCode(String(NationalCode));
-        console.log('NationalCode run');
+        const valid = await validateNationalCode(String(newValues.NationalCode));
         if (!valid) {
             return {
                 status: "Failed",
@@ -169,9 +186,18 @@ const ws_updatePersonal = async (connection , filters , newValues) => {
                 NationalCode
             }
         }
-    }
+        const duplicateId = await checkDuplicate(connection, newValues.NationalCode  , ws_loadPersonal);
+        if (duplicateId)
+            return {
+                status: "Failed",
+                msg: "Error Updating Row, Duplicate Record",
+                uniqueColumns: "NationalCode, PersonType"
+            };
+    };
 
 
+
+  
     let queryString = `UPDATE [${DB_DATABASE}].[dbo].[tblPersonal] SET `;
 
     // update our query string
@@ -187,7 +213,6 @@ const ws_updatePersonal = async (connection , filters , newValues) => {
     } catch (err) {
         console.error("SQL error:", err);
     }
-
 };
 
 
@@ -197,12 +222,16 @@ const ws_deletePersonal = async (connection, PersonId) => {
     await poolConnect;
 
    
-    await ws_loadPersonal(connection, {
-        PersonId
-    });
+    const canRemove = await checkForeignKey(connection, "tblPersonal", PersonId);
+    if (!canRemove) return {
+        status: "Failed",
+        msg: "Can not remove this ID",
+        PersonId,
+        dependencies: ["tblNeedyAccounts" , "tblPayment" , "tblAssignNeedyToPlans"]
+    };
 
  
-    let queryString = `DELETE [SabkadV01].[dbo].[tblPersonal] WHERE PersonId = ${PersonId};`
+    let queryString = `DELETE [${DB_DATABASE}].[dbo].[tblPersonal] WHERE PersonId = ${PersonId};`
 
     try {
         const request = pool.request();
