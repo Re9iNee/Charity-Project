@@ -1,6 +1,8 @@
 const {
     ws_loadPayment,
-    ws_payment
+    ws_payment,
+    ws_updatePayment,
+    ws_deletePayment
 } = require("../services/payment");
 const {
     poolConnect,
@@ -41,6 +43,33 @@ exports.makePayment = async (req, res) => {
         poolConnect
     }, req.body);
     // sending req.body directly causing program more error prone since there might be a typo, we will deconstruct object in that method.
+    res.send({
+        result
+    });
+}
+
+
+exports.updatePayment = async (req, res) => {
+    // T11 - ws_updatePayment
+    // Attach paymentId and newValues to request.body
+    // parameters sql connection, paymentId, newValues
+    const result = await ws_updatePayment({
+        pool,
+        poolConnect
+    }, req.body.paymentId, req.body.newValues);
+    res.send({
+        result
+    })
+}
+
+
+exports.deletePayment = async (req, res) => {
+    // T11 - ws_deletePayment
+    // parameters: sql connection, paymentId
+    const result = await ws_deletePayment({
+        pool,
+        poolConnect
+    }, req.body.paymentId);
     res.send({
         result
     });
