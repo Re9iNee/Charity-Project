@@ -107,31 +107,7 @@ const {
     pool,
     poolConnect
 } = require("./utils/charityDb");
-const { ws_payment, ws_loadPayment, ws_updatePayment } = require("./services/payment");
-(async () => {
-    // insert payment
-    // const result = await ws_payment({
-    //     pool,
-    //     poolConnect
-    // }, {
-
-    // })
-    // update payment
-    const result = await ws_updatePayment({
-        pool,
-        poolConnect
-    }, 34, {
-        PaymentPrice: 2.6
-    });
-    console.log(result)
-    // const filteredRow = await ws_loadPayment({
-    //     pool,
-    //     poolConnect
-    // }, {
-    //     PaymentId: 5
-    // }, null, 1);
-    // console.log(filteredRow);
-})();
+(async () => {})();
 /* -----  End of Testing Area ---- */
 
 app.listen(port, () => console.log(`Listening on ${port}`));

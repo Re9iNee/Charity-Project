@@ -1,6 +1,7 @@
 const {
     ws_loadPayment,
-    ws_payment
+    ws_payment,
+    ws_updatePayment
 } = require("../services/payment");
 const {
     poolConnect,
@@ -44,4 +45,18 @@ exports.makePayment = async (req, res) => {
     res.send({
         result
     });
+}
+
+
+exports.updatePayment = async (req, res) => {
+    // T11 - ws_updatePayment
+    // Attach paymentId and newValues to request.body
+    // parameters sql connection, paymentId, newValues
+    const result = await ws_updatePayment({
+        pool,
+        poolConnect
+    }, req.body.paymentId, req.body.newValues);
+    res.send({
+        result
+    })
 }
