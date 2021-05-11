@@ -1,6 +1,7 @@
 const {
     normalizeQueryString,
-    normalizeQueryString_Create
+    normalizeQueryString_Create,
+    setToQueryString,
 } = require("../utils/commonModules");
 
 require("dotenv").config({
@@ -9,6 +10,12 @@ require("dotenv").config({
 const {
     DB_DATABASE
 } = process.env;
+
+
+const paymentStatusMsg = {
+    success: "Successful",
+    fail: "Failed"
+}
 
 const ws_loadPayment = async (connection, filters = new Object(null), customQuery = null, resultLimit = 1000) => {
     // in older version of this code. filters object hadn't any default value - Issue #42 - filters object should not be empty
@@ -96,10 +103,6 @@ const ws_loadPayment = async (connection, filters = new Object(null), customQuer
 
 
 const ws_payment = async (connection, details = new Object(null)) => {
-    const paymentStaus = {
-        success: "Successful",
-        fail: "Failed"
-    }
     // details are the parameters sent for creating table
     // TODO: this method written based on Mrs.Vahidi messages not Documents. This method will be completed via Settlement file.
 
@@ -142,7 +145,7 @@ const ws_payment = async (connection, details = new Object(null)) => {
     const C = cashAssist.recordset[0].NeededPrice;
 
     // SUM up all successfull payments and store it in a variable called "A"‌
-    const A = await sumSuccessfulPayments(connection, paymentStaus.success, " CharityAccountId IS NULL ") || 0;
+    const A = await sumSuccessfulPayments(connection, paymentStatusMsg.success, " CharityAccountId IS NULL ") || 0;
 
     // A + newPaymentPrice should not be greater than needed price 
     if (A + Number(PaymentPrice) > C)
@@ -206,18 +209,111 @@ async function sumSuccessfulPayments(connection, successMessage, customQuery) {
 const ws_updatePayment = async (connection, paymentId, newValues = new Object(null)) => {
     // Inputs and params: 
     // DonatorId, CashAssistanceDetailId, PaymentPrice, PaymentGatewayId, PaymentDate, PaymentStatus, SourceAccountNumber, TargetAccountNumber, CharityAccoundId, FollowCode, NeedyId, PaymentTime, PaymentId
+    if (!Object.keys(newValues).length)
+        return {
+            status: "Failed", 
+            msg: "Error Updating payment, give some newValues"
+        }
+
+    const {
+        PaymentPrice
+    } = newValues;
+    
+
+    const filteredRow = await ws_loadPayment(connection, {
+        PaymentId: paymentId
+    }, null, 1);
+    if (!filteredRow.recordset.length)
+        return {
+            stauts: "Failed",
+            msg: "error updating payment, This paymentID is undefined",
+            paymentId
+        }
+    // NOTE: you can update those that CharityAccountId is not null.
+    const charityAccountId = filteredRow.recordset[0].CharityAccountId;
+    if (!charityAccountId)
+        return {
+            status: "Failed",
+            msg: `error updating payment, update if charityAccountId is not null`,
+            paymentId,
+            newValues,
+            "table record": filteredRow
+        }
+    // NOTE: you can update those that TargetAccountNumber has no value.
+    const targetAccountNumber = filteredRow.recordset[0].TargetAccountNumber;
+    if (targetAccountNumber)
+        return {
+            status: "Failed",
+            msg: "error updating payment, targetAccountNumber must not have any value",
+            paymentId,
+            newValues,
+            "table record": filteredRow
+        }
+
+    // NOTE: you can update those that PaymentStatus is not successfull. 
+    const paymentStatus = filteredRow.recordset[0].PaymentStatus;
+    if (paymentStatus == paymentStatusMsg.success)
+        return {
+            status: "Failed",
+            msg: "error updating payment, paymentStatus is successful",
+            paymentId,
+            newValues,
+            "table record": filteredRow
+        }
 
 
-    // TODO: you can update those that CharityAccountId is not null.
-    // TODO: you can update those that TargetAccountNumber has no value.
-    // TODO: you can update those that PaymentStatus is not successfull. 
 
+    // NOTE: put neededPrice (from tblCashAssistanceDetail) into variable called C
+    if ("PaymentPrice" in newValues) {
+        const {
+            ws_loadCashAssistanceDetail
+        } = require("./cashAssistanceDetail");
+        const cashAssistId = filteredRow.recordset[0].CashAssistanceDetailId;
+        const cashAssistRow = await ws_loadCashAssistanceDetail(connection, {
+            CashAssistanceDetailId: cashAssistId
+        });
+        const C = cashAssistRow.recordset[0].NeededPrice;
+        // NOTE: CashAssistanceDetailId AND PaymentStatus = "Successful" AND CharityAccountId IS NULL - SUM(PaymentPrice) into "A"
+        const A = await sumSuccessfulPayments(connection, paymentStatusMsg.success, " CharityAccountId IS NULL ") || 0;
+        // NOTE: CashAssistanceDetailId, PaymentPrice = "Successful" - SUM(PaymentPrice) -> "B"
+        const B = await sumSuccessfulPayments(connection, paymentStatusMsg.success, " CharityAccountId IS NOT NULL ") || 0;
+        // NOTE: B + newPaymentPrice Should not be bigger than 'C' AND 'A'
+        const accumulated = Number(B) + Number(PaymentPrice);
 
-    // TODO: put neededPrice (from tblCashAssistanceDetail) into variable called C
-    // TODO: CashAssistanceDetailId AND PaymentStatus = "Successful" AND CharityAccountId IS NULL - SUM(PaymentPrice) into "A"
-    // TODO: CashAssistanceDetailId, PaymentPrice = "Successful" - SUM(PaymentPrice)
-    // TODO: B + newPaymentPrice Should not be bigger than 'C' AND 'A'
-    // TODO: update table
+        if (accumulated > Number(C) || accumulated > Number(A))
+            return {
+                status: "Failed",
+                msg: "Error Updating Row, Sucessfull Payments + newPaymentPrice should not be bigger than TotalAmount or NeededPrice",
+                "NeededPrice": C,
+                "Total Amount of Successful payments (charityId null) ": A,
+                "Total Amount of Successful payments": B,
+                accumulated
+            }
+    }
+    // NOTE: update table
+    let queryString = `UPDATE 
+    [${DB_DATABASE}].[dbo].[tblPayment] 
+    SET `;
+    queryString = setToQueryString(queryString, newValues) + " WHERE 1=1 ";
+    queryString = normalizeQueryString(queryString, {
+        PaymentId: paymentId
+    });
+
+    const {
+        pool,
+        poolConnect
+    } = connection;
+    // ensures that the pool has been created
+    await poolConnect;
+    try {
+        const request = pool.request();
+        const updateResult = await request.query(queryString);
+        // return table records
+        const table = await ws_loadPayment(connection);
+        return table
+    } catch (err) {
+        console.error("ws_updatePayment SQL Error: ", err);
+    }
 }
 
 module.exports = {
