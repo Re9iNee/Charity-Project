@@ -21,14 +21,10 @@ exports.getCommonBaseData = async (req, res) => {
 exports.createCommonBaseData = async (req, res) => {
     // T02 - Method 02
     // Attach baseValue and commonBaseTypeId to request body
-    let {
-        baseValue,
-        commonBaseTypeId
-    } = req.body;
     const result = await ws_createBaseValue({
         pool,
         poolConnect
-    }, baseValue, commonBaseTypeId)
+    }, req.body)
     res.send({result});
 };
 

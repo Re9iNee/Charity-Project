@@ -1,6 +1,8 @@
 const {
     normalizeQueryString,
-    addZero
+    addZero,
+    NotNullColumnsFilled,
+    normalizeQueryString_Create
 } = require("../utils/commonModules");
 
 require("dotenv").config({
@@ -29,25 +31,24 @@ const ws_loadBaseValue = async (connection, filters, customeQuery = null, result
     try {
         const request = pool.request();
         const result = await request.query(queryString);
-        console.dir(result);
         return result;
     } catch (err) {
-        console.error("SQL error: ", err);
+        console.error("ws_loadBaseValue SQL error: ", err);
     }
 }
 
 
-const ws_createBaseValue = async (connection, baseValue, commonBaseTypeId) => {
+const ws_createBaseValue = async (connection, details = new Object(null)) => {
+    // details are the parameters sent for creating table
     const {
-        pool,
-        poolConnect
-    } = connection;
-    // ensures that the pool has been created
-    await poolConnect;
-
-    let baseCode = await generateBaseCode(connection, commonBaseTypeId);
+        CommonBaseTypeId,
+        BaseValue
+    } = details;
+    let baseCode = await generateBaseCode(connection, CommonBaseTypeId);
+    details.BaseCode = baseCode;
     // Not Null values
-    if (!baseValue || !baseCode || !commonBaseTypeId)
+    // NOTE: NotNullColumnsFilled params: (obj, [...not null columns])
+    if (!NotNullColumnsFilled(details, "BaseValue", "CommonBaseTypeId"))
         return {
             status: "Failed",
             msg: "Error Creating Row, Fill Parameters Utterly"
@@ -55,7 +56,7 @@ const ws_createBaseValue = async (connection, baseValue, commonBaseTypeId) => {
 
     // Issue #9
     // Check if commonBaseTypeId exists on commonBaseType table - returns true -> exist ||| false -> doesn't exist 
-    const canAdd = await availableTypeId(connection, commonBaseTypeId)
+    const canAdd = await availableTypeId(connection, CommonBaseTypeId)
     if (!canAdd)
         return {
             status: "Failed",
@@ -63,14 +64,24 @@ const ws_createBaseValue = async (connection, baseValue, commonBaseTypeId) => {
         }
 
 
-    try {
-        // Select Scope Identity is for returning id of affected row(s)
-        let queryString = `INSERT INTO 
+    // Select Scope Identity is for returning id of affected row(s)
+    let queryString = `INSERT INTO 
         [${DB_DATABASE}].[dbo].[tblCommonBaseData]
-        (BaseCode, BaseValue, CommonBaseTypeId)
+        ($COLUMN)
         VALUES 
-        ('${baseCode}', N'${baseValue}', ${commonBaseTypeId}); 
+        ($VALUE); 
         SELECT SCOPE_IDENTITY() AS CommonBaseDataId;`;
+
+
+    queryString = normalizeQueryString_Create(queryString, details);
+
+    const {
+        pool,
+        poolConnect
+    } = connection;
+    // ensures that the pool has been created
+    await poolConnect;
+    try {
         const request = pool.request();
         const result = await request.query(queryString);
         const id = result.recordset[0].CommonBaseDataId;
@@ -93,7 +104,6 @@ async function availableTypeId(connection, commonBaseTypeId) {
 async function getLastBaseCode(connection) {
     let code = await ws_loadBaseValue(connection, null, "ORDER BY BaseCode DESC;", 1);
     code = code.recordset[0].BaseCode;
-    console.log(code);
     return code;
 };
 
@@ -139,7 +149,6 @@ const ws_updateBaseValue = async (connection, filters, newValues) => {
     queryString += " WHERE 1=1 ";
     queryString = normalizeQueryString(queryString, filters);
 
-    console.log(queryString);
 
     try {
         const request = pool.request();
@@ -148,7 +157,7 @@ const ws_updateBaseValue = async (connection, filters, newValues) => {
         const table = await ws_loadBaseValue(connection);
         return table;
     } catch (err) {
-        console.error("SQL error: ", err);
+        console.error("ws_updateBaseValue SQL error: ", err);
     }
 };
 
@@ -178,7 +187,7 @@ const ws_deleteBaseValue = async (connection, commonBaseDataId) => {
         const table = await ws_loadBaseValue(connection);
         return table;
     } catch (err) {
-        console.error("SQL error: ", err)
+        console.error("ws_deleteBaseValue SQL error: ", err)
     }
 };
 

@@ -1,7 +1,7 @@
 const normalizeQueryString = (queryString, filters) => {
     for (let property in filters) {
         const filterValue = filters[property];
-        if (filterValue != undefined || filterValue != null ) {
+        if (filterValue != undefined || filterValue != null) {
             if (typeof filterValue !== "string")
                 queryString += ` AND ${property}=${filterValue}`;
             else
@@ -182,6 +182,17 @@ const sqlDate = function ([year, month, day]) {
 
 const endIsLenghty = (start, end) => (end.year > start.year) ? true : (end.year == start.year) ? (end.month > start.month) ? true : (end.month == start.month) ? (end.day >= start.day) ? true : false : false : false;
 
+const NotNullColumnsFilled = (obj, ...columns) => {
+    // returns true if all columns entered.
+    let keys = Object.keys(obj);
+    for (let column of columns) {
+        if (!(keys.includes(column))) {
+            return false
+        }
+    }
+    return true;
+}
+
 module.exports = {
     normalizeQueryString,
     toHex,
@@ -194,4 +205,5 @@ module.exports = {
     checkDuplicate,
     sqlDate,
     endIsLenghty,
+    NotNullColumnsFilled,
 }
