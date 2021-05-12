@@ -12,6 +12,7 @@
 const {
     normalizeQueryString,
     addZero,
+    checkDuplicate,
 } = require("../utils/commonModules");
 
 
@@ -43,7 +44,7 @@ const ws_loadBaseType = async (connection, filters, costumeQuery = null, resultL
         const result = await request.query(queryString);
         return result;
     } catch (err) {
-        console.error("SQL error: ", err);
+        console.error("ws_loadBaseType SQL error: ", err);
     }
 };
 
@@ -60,7 +61,9 @@ const ws_createBaseType = async (connection, baseTypeTitle) => {
             msg: "Error Creating Row, Fill Parameters Utterly"
         };
     // check for baseTypeTitle duplicates - returns: true -> duplicate | false -> unique
-    const duplicateBaseTypeTitle = await checkDuplicateTitle(connection, baseTypeTitle);
+    const duplicateBaseTypeTitle = await checkDuplicate(connection, {
+        BaseTypeTitle: baseTypeTitle
+    }, ws_loadBaseType);
     if (duplicateBaseTypeTitle)
         return {
             status: "Failed",
@@ -85,15 +88,6 @@ const ws_createBaseType = async (connection, baseTypeTitle) => {
         console.error("ws_createBaseType error: ", err)
     }
 };
-async function checkDuplicateTitle(connection, baseTypeTitle) {
-    let result = await ws_loadBaseType(connection, {
-        BaseTypeTitle: baseTypeTitle
-    }, null, 1);
-    // 0 -> unique 
-    // 1 -> duplicate
-    let duplicate = !(!result.recordset.length);
-    return duplicate;
-}
 async function getLastBaseCode(connection) {
     let code = await ws_loadBaseType(connection, null, "ORDER BY BaseTypeCode DESC;", 1);
     try {
@@ -115,7 +109,9 @@ const ws_updateBaseType = async (connection, filters, newBaseTypeTitle) => {
     let queryString = `UPDATE [${DB_DATABASE}].[dbo].[tblCommonBaseType] SET BaseTypeTitle = N'${newBaseTypeTitle}' WHERE 1=1 `
     queryString = normalizeQueryString(queryString, filters)
     // check for baseTypeTitle duplicates - returns: true -> duplicate | false -> unique
-    const duplicateBaseTypeTitle = await checkDuplicateTitle(connection, newBaseTypeTitle);
+    const duplicateBaseTypeTitle = await checkDuplicate(connection, {
+        BaseTypeTitle: newBaseTypeTitle
+    }, ws_loadBaseType);
     if (duplicateBaseTypeTitle)
         return {
             status: "Failed",
@@ -128,7 +124,7 @@ const ws_updateBaseType = async (connection, filters, newBaseTypeTitle) => {
         const table = await ws_loadBaseType(connection)
         return table;
     } catch (err) {
-        console.error("SQL error: ", err);
+        console.error("ws_updateBaseType SQL error: ", err);
     }
 };
 
@@ -159,7 +155,7 @@ const ws_deleteBaseType = async (connection, commonBaseTypeId) => {
         const table = ws_loadBaseType(connection);
         return table;
     } catch (err) {
-        console.error("SQL error: ", err)
+        console.error("ws_deleteBaseType SQL error: ", err)
     }
 };
 
