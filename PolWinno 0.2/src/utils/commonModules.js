@@ -5,7 +5,7 @@ const normalizeQueryString = (queryString, filters) => {
             if (typeof filterValue !== "string")
                 queryString += ` AND ${property}=${filterValue}`;
             else
-                queryString += ` AND ${property}='${filterValue}'`;
+                queryString += ` AND ${property}=N'${filterValue}'`;
         }
     }
     return queryString;
