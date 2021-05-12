@@ -1,5 +1,13 @@
-const {ws_loadBaseValue,ws_createBaseValue,ws_updateBaseValue,ws_deleteBaseValue} = require("../services/commonBaseData");
-const {poolConnect , pool} = require('../utils/charityDb');
+const {
+    ws_loadBaseValue,
+    ws_createBaseValue,
+    ws_updateBaseValue,
+    ws_deleteBaseValue
+} = require("../services/commonBaseData");
+const {
+    poolConnect,
+    pool
+} = require('../utils/charityDb');
 
 
 exports.getCommonBaseData = async (req, res) => {
@@ -15,7 +23,9 @@ exports.getCommonBaseData = async (req, res) => {
         BaseValue: query.BaseValue,
         CommonBaseTypeId: query.CommonBaseTypeId
     });
-    res.send({result})
+    res.send({
+        result
+    })
 };
 
 exports.createCommonBaseData = async (req, res) => {
@@ -25,7 +35,9 @@ exports.createCommonBaseData = async (req, res) => {
         pool,
         poolConnect
     }, req.body)
-    res.send({result});
+    res.send({
+        result
+    });
 };
 
 exports.updateCommonBaseData = async (req, res) => {
@@ -35,7 +47,9 @@ exports.updateCommonBaseData = async (req, res) => {
         pool,
         poolConnect
     }, req.body.filters, req.body.newValues);
-    res.send({result});
+    res.send({
+        result
+    });
 };
 
 exports.deleteCommonBaseData = async (req, res) => {
@@ -45,5 +59,7 @@ exports.deleteCommonBaseData = async (req, res) => {
         pool,
         poolConnect
     }, req.body.commonBaseDataId);
-    res.send({result});
+    res.send({
+        result
+    });
 };
