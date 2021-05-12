@@ -102,7 +102,7 @@ async function availableTypeId(connection, commonBaseTypeId) {
 }
 
 async function getLastBaseCode(connection) {
-    let code = await ws_loadBaseValue(connection, null, "ORDER BY BaseCode DESC;", 1);
+    let code = await ws_loadBaseValue(connection, null, "ORDER BY CommonBaseDataId DESC;", 1);
     code = code.recordset[0].BaseCode;
     return code;
 };
