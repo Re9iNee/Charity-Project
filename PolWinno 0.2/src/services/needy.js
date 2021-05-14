@@ -9,7 +9,7 @@ const {
 } = require("../utils/bankCardNumber");
 
 require("dotenv").config({
-    path: "../utils/config.env"
+    path: "../utils/.env"
 });
 
 const {ws_loadBaseValue} = require("./commonBaseData");
@@ -124,7 +124,7 @@ const ws_createNeedyAccount = async (connection, values) => {
     }
 
     // these values are required
-    if (!BankId || !NeedyId || !OwnerName || !AccountNumber || !ShebaNumber) {
+    if (!( ("BankId" && "NeedyId" && "OwnerName" && "AccountNumber" && "ShebaNumber") )) {
         return {
             status: "Failed",
             msg: "Fill Parameters Utterly",
@@ -177,7 +177,7 @@ const ws_updateNeedyAccount = async (connection, filters, newValues) => {
     } = connection;
     await poolConnect;
 
-    const {ShebaNumber , AccountNumber , NeedyId} = newValues;
+    const {ShebaNumber , AccountNumber , NeedyId , CardNumber} = newValues;
     if ( ShebaNumber || AccountNumber || NeedyId) {
         const duplicateUniqueValue = checkDuplicate(connection, {ShebaNumber,AccountNumber,NeedyId} , ws_loadNeedyAccount);
         if (!duplicateUniqueValue) {
@@ -190,8 +190,7 @@ const ws_updateNeedyAccount = async (connection, filters, newValues) => {
         }
     };
 
-    if (newValues.CardNumber) {
-        CardNumber = newValues.CardNumber;
+    if (CardNumber) {
         const valid = validateCreditCard(String(CardNumber));
         if (!valid) {
             return {
@@ -222,13 +221,15 @@ const ws_updateNeedyAccount = async (connection, filters, newValues) => {
 };
 
 
-const ws_deleteNeedyAccount = async (connection, NeedyAccountId , NeedyId , AccountNumber) => {
+const ws_deleteNeedyAccount = async (connection, values) => {
 
     const {
         pool,
         poolConnect
     } = connection;
     await poolConnect;
+
+    const {NeedyAccountId , NeedyId , AccountNumber} = values;
 
     const canRemove = await checkForeignKey(connection, "tblNeedyAccounts", {NeedyId , AccountNumber});
     if (!canRemove){

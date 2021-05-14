@@ -1,7 +1,7 @@
 const crypto = require('crypto');
 const {normalizeQueryString,setToQueryString,validateNationalCode,checkDuplicate, checkForeignKey} = require("../utils/commonModules");
 require("dotenv").config({
-    path: "../utils/config.env"
+    path: "../utils/.env"
 });
 const {
     DB_DATABASE
@@ -68,13 +68,13 @@ const ws_createPersonal = async (connection,values,PersonPhoto) => {
 
 
 
-    // if the personType is needy we should encrypt it.
+    // if the personType is needy we use a encrypted key.
 
     if( PersonType === "3" ){
         
 
         // these values are required
-        if (!Name || !Family || !NationalCode || !IdNumber || !Sex || !BirthDate || !BirthPlace  || !PersonType || !PersonPhoto) {
+        if (!( ("Name" && "Family" && "NationalCode" && "IdNumber" && "Sex" && "BirthDate" && "BirthPlace" && "PersonType" && "PersonPhoto") )){
             return {
                 status: "Failed",
                 msg: "Fill Parameters Utterly",
@@ -83,12 +83,12 @@ const ws_createPersonal = async (connection,values,PersonPhoto) => {
         };
 
 
-        const duplicateId = await checkDuplicate(connection, {NationalCode , PersonType} , ws_loadPersonal);
+        const duplicateId = await checkDuplicate(connection, NationalCode , ws_loadPersonal);
         if (duplicateId)
             return {
                 status: "Failed",
                 msg: "Error Creating Row, Duplicate Record",
-                uniqueColumn: "NationalCode, PersonType"
+                uniqueColumn: "NationalCode"
             };
 
 
@@ -130,7 +130,7 @@ const ws_createPersonal = async (connection,values,PersonPhoto) => {
 
         
         // these values are required
-        if (!Name || !Family || !Sex || !PersonType) {
+        if (!( ("Name" && "Family" && "Sex" && "PersonType") )) {
             return {
                 status: "Failed",
                 msg: "Fill Parameters Utterly",
@@ -176,9 +176,10 @@ const ws_updatePersonal = async (connection , newValues , filters) => {
     const {pool,poolConnect} = connection;
     await poolConnect;
 
+    const {NationalCode} = newValues;
     
-    if (newValues.NationalCode) {
-        const valid = await validateNationalCode(String(newValues.NationalCode));
+    if (NationalCode) {
+        const valid = await validateNationalCode(String(NationalCode));
         if (!valid) {
             return {
                 status: "Failed",
@@ -186,12 +187,12 @@ const ws_updatePersonal = async (connection , newValues , filters) => {
                 NationalCode
             }
         }
-        const duplicateId = await checkDuplicate(connection, newValues.NationalCode  , ws_loadPersonal);
+        const duplicateId = await checkDuplicate(connection, NationalCode  , ws_loadPersonal);
         if (duplicateId)
             return {
                 status: "Failed",
                 msg: "Error Updating Row, Duplicate Record",
-                uniqueColumns: "NationalCode, PersonType"
+                uniqueColumns: "NationalCode"
             };
     };
 

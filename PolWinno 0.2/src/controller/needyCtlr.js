@@ -80,11 +80,12 @@ exports.deleteNeedyAccount = async (req, res) => {
 
     try {
         const {NeedyAccountId , NeedyId , AccountNumber} = req.body;
+        const values = {NeedyAccountId , NeedyId , AccountNumber};
 
         const result = await ws_deleteNeedyAccount({
             pool,
             poolConnect
-        }, NeedyAccountId , NeedyId , AccountNumber);
+        }, values );
 
         res.send({
             result

@@ -11,8 +11,9 @@ const personalInfoRoutes = require('./router/personalInfo');
 const needyAccountRoutes = require('./router/needyAccount');
 const plansRoutes = require('./router/plan');
 const cashAssistanceDetailRouter = require("./router/cashAssistanceDetail");
-const assignNeedyToPlansRouter = require("./router/assignNeedyToPlans")
-const paymentRouter = require("./router/payment")
+const assignNeedyToPlansRouter = require("./router/assignNeedyToPlans");
+const paymentRouter = require("./router/payment");
+const settlementRouter = require("./router/settlement");
 
 
 
@@ -97,6 +98,10 @@ app.use(cashAssistanceDetailRouter)
 /*  TASK 10 */
 
 app.use(paymentRouter);
+
+/*  TASK 11 */
+
+app.use(settlementRouter);
 
 //-----------------------------------
 

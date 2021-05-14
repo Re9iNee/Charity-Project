@@ -5,7 +5,7 @@ const {
 } = require("../utils/commonModules");
 
 require("dotenv").config({
-    path: "../utils/config.env"
+    path: "../utils/.env"
 });
 const {
     DB_DATABASE
@@ -36,7 +36,7 @@ const availableId = async(connection, PlanId , NeedyId) => {
 
 
 
-const ws_loadNeedyForPlan = async (connection, filters, customQuery = null, resultLimit = 1000) => {
+const ws_loadNeedyForPlan = async (connection, filters= new Object(null) , customQuery = null, resultLimit = 1000) => {
     const {
         pool,
         poolConnect
@@ -74,18 +74,17 @@ const ws_loadNeedyForPlan = async (connection, filters, customQuery = null, resu
             on assNeedy.PlanId = plans.PlanId
 
     WHERE 1 = 1 `;
-    
     // abmbiguous column names
-    if(filters){
-        if ("NeedyId" in filters) {
-            filters["assNeedy.NeedyId"] = filters.NeedyId;
-            delete filters.NeedyId;
-        }
-        if ("PlanId" in filters) {
-            filters["plans.PlanId"] = filters.PlanId;
-            delete filters.PlanId;
-        }
-    };
+
+    if ("NeedyId" in filters) {
+        filters["assNeedy.NeedyId"] = filters.NeedyId;
+        delete filters.NeedyId;
+    }
+    if ("PlanId" in filters) {
+        filters["plans.PlanId"] = filters.PlanId;
+        delete filters.PlanId;
+    }
+
     
     queryString = normalizeQueryString(queryString, filters);
     if (customQuery)
@@ -120,7 +119,7 @@ const ws_AssignNeedyToPlan = async (connection, values) => {
 
    
     // these values are required
-    if (!PlanId || !NeedyId || !Fdate || !Tdate) {
+    if (!( ("PlanId" && "NeedyId" && "Fdate" && "Tdate") in values)) {
         return {
             status: "Failed",
             msg: "Fill Parameters Utterly",
