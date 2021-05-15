@@ -10,70 +10,87 @@ const {
 } = require('../services/needy');
 
 
-exports.getNeedyAccount = async (res, req) => {
+exports.getNeedyAccount = async (req, res) => {
 
-    let query = req.query;
+    try {
+        let query = req.query;
 
-    const result = await ws_loadNeedyAccount({
-        pool,
-        poolConnect
-    }, {
-        BankId: query.BankId,
-        NeedyId: query.NeedyId,
-        OwnerName: query.OwnerName,
-        CardNumber: query.CardNumber,
-        AccountNumber: query.AccountNumber,
-        AccountName: query.AccountName,
-        ShebaNumber: query.ShebaNumber,
-    });
+        const result = await ws_loadNeedyAccount({
+            pool,
+            poolConnect
+        }, {
+            BankId: query.BankId,
+            NeedyId: query.NeedyId,
+            OwnerName: query.OwnerName,
+            CardNumber: query.CardNumber,
+            AccountNumber: query.AccountNumber,
+            AccountName: query.AccountName,
+            ShebaNumber: query.ShebaNumber,
+        });
 
-    res.send({
-        result
-    });
+        res.send({
+            result
+        });
+    } catch (err) {
+        console.log(err);
+    }
 };
 
 
 exports.createNeedyAccount = async (req, res) => {
 
-    let values = req.body;
+    try {
+        let values = req.body;
 
-    const result = await ws_createNeedyAccount({
-        pool,
-        poolConnect
-    }, values);
+        const result = await ws_createNeedyAccount({
+            pool,
+            poolConnect
+        }, values);
 
-    res.send({
-        resault: result
-    });
+        res.send({
+            result
+        });
+
+    } catch (err) {
+        console.log(err);
+    }
 };
-
 
 exports.updateNeedyAccount = async (req, res) => {
 
-    let newValues = req.body.newValues;
-    let filters = req.body.filters;
+    try {
+        let newValues = req.body.newValues;
+        let filters = req.body.filters;
 
-    const result = await ws_updateNeedyAccount({
-        pool,
-        poolConnect
-    }, filters, newValues);
+        const result = await ws_updateNeedyAccount({
+            pool,
+            poolConnect
+        }, filters, newValues);
 
-    res.send({
-        resault: result
-    });
+        res.send({
+            result
+        });
+    } catch (err) {
+        console.log(err);
+    }
 };
 
 
 exports.deleteNeedyAccount = async (req, res) => {
 
-    const accountId = req.body.NeedyAccountId;
+    try {
+        const {NeedyAccountId , NeedyId , AccountNumber} = req.body;
+        const values = {NeedyAccountId , NeedyId , AccountNumber};
 
-    const result = await ws_deleteNeedyAccount({
-        pool,
-        poolConnect
-    }, accountId);
+        const result = await ws_deleteNeedyAccount({
+            pool,
+            poolConnect
+        }, values );
 
-    res.send({
-        result
-    });
+        res.send({
+            result
+        });
+    } catch (err) {
+        console.log(err);
+    }
 };

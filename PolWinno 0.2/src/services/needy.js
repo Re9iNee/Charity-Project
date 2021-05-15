@@ -9,7 +9,7 @@ const {
 } = require("../utils/bankCardNumber");
 
 require("dotenv").config({
-    path: "./utils/.env"
+    path: "../utils/.env"
 });
 
 const {ws_loadBaseValue} = require("./commonBaseData");
@@ -124,7 +124,7 @@ const ws_createNeedyAccount = async (connection, values) => {
     }
 
     // these values are required
-    if (!BankId || !NeedyId || !OwnerName || !AccountNumber || !ShebaNumber) {
+    if (!( ("BankId" && "NeedyId" && "OwnerName" && "AccountNumber" && "ShebaNumber") )) {
         return {
             status: "Failed",
             msg: "Fill Parameters Utterly",
@@ -140,26 +140,26 @@ const ws_createNeedyAccount = async (connection, values) => {
         }
     };
 
-    const duplicateId = await checkDuplicate(connection, AccountNumber , ws_loadNeedyAccount);
-        if (duplicateId){
+    const duplicateUniqueValue = checkDuplicate(connection, {ShebaNumber,AccountNumber,NeedyId} , ws_loadNeedyAccount);
+        if (!duplicateUniqueValue) {
             return {
                 status: "Failed",
                 msg: "Error Creating Row, Duplicate Record",
-                AccountNumber
-            };
+                uniqueColumns: "ShebaNumber, AccountNumber, NeedyId",
+            }
         }
+
 
     let queryString = `INSERT INTO 
         [${DB_DATABASE}].[dbo].[tblNeedyAccounts]
         (BankId,NeedyId,OwnerName,CardNumber,AccountNumber,AccountName,ShebaNumber)
         VALUES 
-        ('${BankId}','${NeedyId}',${OwnerName},${CardNumber},${AccountNumber},${AccountName},${ShebaNumber}); 
+        ('${BankId}','${NeedyId}',N'${OwnerName}','${CardNumber}','${AccountNumber}',N'${AccountName}','${ShebaNumber}'); 
         SELECT SCOPE_IDENTITY() AS NeedyAccountId;`
 
     try {
         const request = pool.request();
         const result = request.query(queryString);
-
         console.dir(result);
         return result;
 
@@ -177,15 +177,20 @@ const ws_updateNeedyAccount = async (connection, filters, newValues) => {
     } = connection;
     await poolConnect;
 
-    let queryString = `UPDATE [${DB_DATABASE}].[dbo].[tblNeedyAccounts] SET `;
+    const {ShebaNumber , AccountNumber , NeedyId , CardNumber} = newValues;
+    if ( ShebaNumber || AccountNumber || NeedyId) {
+        const duplicateUniqueValue = checkDuplicate(connection, {ShebaNumber,AccountNumber,NeedyId} , ws_loadNeedyAccount);
+        if (!duplicateUniqueValue) {
+            return {
+                status: "Failed",
+                msg: "Error Updating Row, Duplicate Record",
+                uniqueColumns: "ShebaNumber, AccountNumber, NeedyId",
+                newValues
+            }
+        }
+    };
 
-    // update our query string 
-    queryString = setToQueryString(queryString, newValues) + " WHERE 1=1 ";
-    queryString = normalizeQueryString(queryString, filters);
-    console.log(queryString);
-
-    if (newValues.CardNumber) {
-        CardNumber = newValues.CardNumber;
+    if (CardNumber) {
         const valid = validateCreditCard(String(CardNumber));
         if (!valid) {
             return {
@@ -194,7 +199,14 @@ const ws_updateNeedyAccount = async (connection, filters, newValues) => {
                 CardNumber
             }
         }
-    }
+    };
+
+
+    let queryString = `UPDATE [${DB_DATABASE}].[dbo].[tblNeedyAccounts] SET `;
+
+    // update our query string 
+    queryString = setToQueryString(queryString, newValues) + " WHERE 1=1 ";
+    queryString = normalizeQueryString(queryString, filters);
 
 
     try {
@@ -209,7 +221,7 @@ const ws_updateNeedyAccount = async (connection, filters, newValues) => {
 };
 
 
-const ws_deleteNeedyAccount = async (connection, NeedyAccountId) => {
+const ws_deleteNeedyAccount = async (connection, values) => {
 
     const {
         pool,
@@ -217,13 +229,19 @@ const ws_deleteNeedyAccount = async (connection, NeedyAccountId) => {
     } = connection;
     await poolConnect;
 
-    const canRemove = await checkForeignKey(connection, "tblNeedyAccounts", NeedyAccountId);
-    if (!canRemove)
+    const {NeedyAccountId , NeedyId , AccountNumber} = values;
+
+    const canRemove = await checkForeignKey(connection, "tblNeedyAccounts", {NeedyId , AccountNumber});
+    if (!canRemove){
         return {
             status: "Failed",
             msg: "Can not remove this ID",
             NeedyAccountId
         };
+    }
+
+    await ws_loadNeedyAccount(connection , {NeedyAccountId});
+
 
     let queryString = `DELETE [${DB_DATABASE}].[dbo].[tblNeedyAccounts] WHERE NeedyAccountId = ${NeedyAccountId};`
 
