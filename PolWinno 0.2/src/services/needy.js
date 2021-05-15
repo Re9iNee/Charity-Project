@@ -124,7 +124,7 @@ const ws_createNeedyAccount = async (connection, values) => {
     }
 
     // these values are required
-    if (!( ("BankId" && "NeedyId" && "OwnerName" && "AccountNumber" && "ShebaNumber") )) {
+    if (!( ("BankId" && "NeedyId" && "OwnerName" && "AccountNumber" && "ShebaNumber") in  values )) {
         return {
             status: "Failed",
             msg: "Fill Parameters Utterly",
