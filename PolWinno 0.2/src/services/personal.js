@@ -74,7 +74,7 @@ const ws_createPersonal = async (connection,values,PersonPhoto) => {
         
 
         // these values are required
-        if (!( ("Name" && "Family" && "NationalCode" && "IdNumber" && "Sex" && "BirthDate" && "BirthPlace" && "PersonType" && "PersonPhoto") )){
+        if (!( ("Name" && "Family" && "NationalCode" && "IdNumber" && "Sex" && "BirthDate" && "BirthPlace" && "PersonType" && "PersonPhoto") in  values )){
             return {
                 status: "Failed",
                 msg: "Fill Parameters Utterly",
@@ -130,7 +130,7 @@ const ws_createPersonal = async (connection,values,PersonPhoto) => {
 
         
         // these values are required
-        if (!( ("Name" && "Family" && "Sex" && "PersonType") )) {
+        if (!( ("Name" && "Family" && "Sex" && "PersonType") in  values)) {
             return {
                 status: "Failed",
                 msg: "Fill Parameters Utterly",
