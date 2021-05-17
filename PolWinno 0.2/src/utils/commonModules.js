@@ -2,7 +2,9 @@ const normalizeQueryString = (queryString, filters) => {
     for (let property in filters) {
         const filterValue = filters[property];
         if (filterValue != undefined || filterValue != null) {
-            if (typeof filterValue !== "string")
+            if (typeof filterValue == "boolean")
+                queryString += ` AND ${property}='${(filterValue) ? 1 : 0 }'`
+            else if (typeof filterValue !== "string")
                 queryString += ` AND ${property}=${filterValue}`;
             else
                 queryString += ` AND ${property}=N'${filterValue}'`;
@@ -153,11 +155,12 @@ const normalizeQueryString_Create = (queryString, details, ...configs) => {
     for (let column in details) {
         columns.push(column);
         let value = details[column];
-        if (typeof value == "string") {
+        if (typeof value == "string")
             values.push(`N'${value}'`);
-        } else {
+        else if (typeof value == "boolean")
+            values.push(`'${value ? 1 : 0 }'`)
+        else
             values.push(value);
-        }
     }
     queryString = queryString.replace("$COLUMN", columns.join(', '))
     queryString = queryString.replace("$VALUE", values.join(', '));
