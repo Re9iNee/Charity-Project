@@ -11,7 +11,7 @@ const {
 
 
 exports.getAssignNeedyToPlans = async (req, res) => {
- 
+
     try {
         let query = req.query;
         // T08 - Method 01
@@ -59,12 +59,15 @@ exports.assignNeedyToPlans = async (req, res) => {
 exports.deleteNeedyFromPlans = async (req, res) => {
 
     try {
-        const {AssignNeedyPlanId , PlanId} = req.body;
+        const {
+            AssignNeedyPlanId,
+            PlanId
+        } = req.body;
 
         const result = await ws_deleteNeedyFromPlan({
             pool,
             poolConnect
-        }, AssignNeedyPlanId , PlanId);
+        }, AssignNeedyPlanId, PlanId);
 
         res.send({
             result

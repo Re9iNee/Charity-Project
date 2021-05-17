@@ -5,9 +5,9 @@ const assignNeedyToPlansCtlr = require('../controller/assignNeedyToPlansCtlr');
 
 const router = express.Router();
 
-router.get("/assignNeedyToPlans" , assignNeedyToPlansCtlr.getAssignNeedyToPlans );
-router.post("/assignNeedyToPlans" , assignNeedyToPlansCtlr.assignNeedyToPlans );
-router.delete("/assignNeedyToPlans" , assignNeedyToPlansCtlr.deleteNeedyFromPlans );
+router.get("/assignNeedyToPlans", assignNeedyToPlansCtlr.getAssignNeedyToPlans);
+router.post("/assignNeedyToPlans", assignNeedyToPlansCtlr.assignNeedyToPlans);
+router.delete("/assignNeedyToPlans", assignNeedyToPlansCtlr.deleteNeedyFromPlans);
 
 
 

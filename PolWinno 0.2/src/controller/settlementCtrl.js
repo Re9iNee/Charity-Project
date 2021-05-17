@@ -19,7 +19,9 @@ exports.createSettlement = async (req, res) => {
             poolConnect
         }, values);
 
-        res.send( {result} );
+        res.send({
+            result
+        });
 
     } catch (err) {
         console.log(err);
