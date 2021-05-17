@@ -2,7 +2,9 @@ const normalizeQueryString = (queryString, filters) => {
     for (let property in filters) {
         const filterValue = filters[property];
         if (filterValue != undefined || filterValue != null) {
-            if (typeof filterValue !== "string")
+            if (typeof filterValue == "boolean") 
+                queryString += ` AND ${property}='${(filterValue) ? 1 : 0 }'`
+            else if (typeof filterValue !== "string")
                 queryString += ` AND ${property}=${filterValue}`;
             else
                 queryString += ` AND ${property}=N'${filterValue}'`;
