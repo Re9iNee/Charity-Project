@@ -125,6 +125,7 @@ const ws_payment = async (connection, details = new Object(null)) => {
 
 
     // NOTE: CharityAccountId AND TargetAccountNumber is not a required columns anymore. since we dont have online paymentGateway
+    // TODO: This if statement is not good(checked on sandbox).
     if (!(("CashAssistanceDetailId" && "PaymentPrice" && "PaymentDate" && "PaymentTime" && "PaymentStatus" && "FollowCode") in details))
         return {
             status: "Failed",
