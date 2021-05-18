@@ -159,6 +159,11 @@ const ws_updatePlan = async (connection, filters = new Object(null), newValues =
     if ("PlanName" in newValues || "PlanNature" in newValues || "ParentPlanId" in newValues) {
         // check for unique values if they've entered.
         let filteredRow = await ws_loadPlan(connection, filters);
+        if (!filteredRow.recordset.length) 
+            return {
+                status: "Failed",
+                msg: "This PlanId doesn't exist"
+            }
         let filteredVals = {
             ParentPlanId: filteredRow.recordset[0].ParentPlanId,
             PlanNature: filteredRow.recordset[0].PlanNature,
@@ -185,30 +190,22 @@ const ws_updatePlan = async (connection, filters = new Object(null), newValues =
         const {
             ws_loadCashAssistanceDetail
         } = require("./cashAssistanceDetail")
-        let planIdExist = null;
-        // get the PlanId base on the filters object. (load table based on filters object and get their planIds)
-        const result = await ws_loadPlan(connection, filters, "ORDER BY PlanId ");
-        for (let record of result.recordset) {
-            // check for duplicates on dependent tables. if it doesn't have any conflicts UPDATE!
-            let PlanId = record.PlanId;
-            // checkPlanId in cashAssistanceDetails table - returns true -> if planId exists || false -> planId doesn't Exist.
-            // check for duplicates - returns: true -> duplicate | false -> unique
-            planIdExist = planIdExist || await checkDuplicate(connection, {
-                PlanId
-            }, ws_loadCashAssistanceDetail);
-            // todo: also check PlanId in nonCashAssistanceDetails table (This table doesn't exists at this point)
-            if (planIdExist) break;
-        }
-
-        if (planIdExist) {
+        let PlanId = filters.PlanId;
+        // check for duplicates on dependent tables. if it doesn't have any conflicts UPDATE!
+        // checkPlanId in cashAssistanceDetails table - returns true -> if planId exists || false -> planId doesn't Exist.
+        // NOTE:check for duplicates - returns: true -> duplicate | false -> unique
+        let planIdExist = await checkDuplicate(connection, {
+            PlanId
+        }, ws_loadCashAssistanceDetail);
+        // TODO: also check PlanId in nonCashAssistanceDetails table (This table doesn't exists at this point)
+        if (planIdExist) 
             return {
                 status: "Failed",
                 msg: "Error Updating Row, Can not change PlanNature due to PlanId depends on cashAssistanceDetail and nonCashAssistanceDetails tables",
                 dependencies: ["cashAssistanceDetails", "nonCashAssistanceDetails"],
-                PlanNature,
+                PlanNature: newValues.PlanNature,
                 "PlanId": filters.PlanId
             }
-        }
     }
 
 
@@ -234,18 +231,12 @@ const ws_updatePlan = async (connection, filters = new Object(null), newValues =
         const {
             ws_loadNeedyForPlan
         } = require("./assignNeedyToPlans");
-        let planIdExist;
-        // get the PlanId base on the filters object. (load table based on filters object and get their PlanId s)
-        const result = await ws_loadPlan(connection, filters, "ORDER BY PlanId ");
-        for (let record of result.recordset) {
-            // check for duplicates on dependent tables. if it doesn't have any conflicts UPDATE!
-            let PlanId = record.PlanId;
-            // check for duplicates - returns: true -> duplicate | false -> unique
-            planIdExist = planIdExist || await checkDuplicate(connection, {
-                PlanId
-            }, ws_loadNeedyForPlan);
-            if (planIdExist) break;
-        }
+        let PlanId = filters.PlanId;
+        // check for duplicates on dependent tables. if it doesn't have any conflicts UPDATE!
+        // check for duplicates - returns: true -> duplicate | false -> unique
+        let planIdExist = await checkDuplicate(connection, {
+            PlanId
+        }, ws_loadNeedyForPlan);
         if (planIdExist)
             return {
                 status: "Failed",
