@@ -67,18 +67,17 @@ const ws_createPersonal = async (connection,values,PersonPhoto) => {
     };
 
 
-
     // if the personType is needy we use a encrypted key.
 
     if( PersonType === "3" ){
         
 
         // these values are required
-        if (!( ("Name" && "Family" && "NationalCode" && "IdNumber" && "Sex" && "BirthDate" && "BirthPlace" && "PersonType" && "PersonPhoto") in  values )){
+        if (!( ("Name" && "Family" && "NationalCode" && "IdNumber" && "Sex" && "BirthDate" && "BirthPlace" && "PersonType" && "PersonPhoto") in values) ){
             return {
                 status: "Failed",
                 msg: "Fill Parameters Utterly",
-                values
+                values,PersonPhoto
             }
         };
 
@@ -130,7 +129,7 @@ const ws_createPersonal = async (connection,values,PersonPhoto) => {
 
         
         // these values are required
-        if (!( ("Name" && "Family" && "Sex" && "PersonType") in  values)) {
+        if (!( ("Name" && "Family" && "Sex" && "PersonType") in values)) {
             return {
                 status: "Failed",
                 msg: "Fill Parameters Utterly",
@@ -149,15 +148,15 @@ const ws_createPersonal = async (connection,values,PersonPhoto) => {
 
         let queryString = `INSERT INTO 
             [${DB_DATABASE}].[dbo].[tblPersonal]
-            (Name,Family,NationalCode,IdNumber,Sex,BirthDate,BirthPlace,PersonType,PersonPhoto,SecretCode)
+            (Name,Family,NationalCode,IdNumber,Sex,BirthDate,BirthPlace,PersonType,PersonPhoto)
             VALUES 
-            (N'${Name}',N'${Family}','${NationalCode}','${IdNumber}','${Sex}','${BirthDate}',N'${BirthPlace}','${PersonType}',CONVERT(varbinary ,'${PersonPhoto}'),'${SecretCode}');
+            (N'${Name}',N'${Family}','${NationalCode}','${IdNumber}','${Sex}','${BirthDate}',N'${BirthPlace}','${PersonType}',CONVERT(varbinary ,'${PersonPhoto}'));
             SELECT SCOPE_IDENTITY() AS PersonId;`
 
           
             try {
                 const request = pool.request();
-                const result = request.query(queryString);
+                const result = await request.query(queryString);
         
                 console.dir(result);
                 return result;
