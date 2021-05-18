@@ -212,14 +212,14 @@ const ws_updatePayment = async (connection, paymentId, newValues = new Object(nu
     // DonatorId, CashAssistanceDetailId, PaymentPrice, PaymentGatewayId, PaymentDate, PaymentStatus, SourceAccountNumber, TargetAccountNumber, CharityAccoundId, FollowCode, NeedyId, PaymentTime, PaymentId
     if (!Object.keys(newValues).length)
         return {
-            status: "Failed", 
+            status: "Failed",
             msg: "Error Updating payment, give some newValues"
         }
 
     const {
         PaymentPrice
     } = newValues;
-    
+
 
     const filteredRow = await ws_loadPayment(connection, {
         PaymentId: paymentId

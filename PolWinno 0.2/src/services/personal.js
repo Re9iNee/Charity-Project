@@ -1,5 +1,11 @@
 const crypto = require('crypto');
-const {normalizeQueryString,setToQueryString,validateNationalCode,checkDuplicate, checkForeignKey} = require("../utils/commonModules");
+const {
+    normalizeQueryString,
+    setToQueryString,
+    validateNationalCode,
+    checkDuplicate,
+    checkForeignKey
+} = require("../utils/commonModules");
 require("dotenv").config({
     path: "../utils/.env"
 });
@@ -12,7 +18,10 @@ const {
 const ws_loadPersonal = async (connection, filters, customeQuery = null, resultLimit = 1000) => {
 
     //connection set
-    const {pool , poolConnect} = connection; 
+    const {
+        pool,
+        poolConnect
+    } = connection;
     await poolConnect;
 
     //get all datas from ppersonal table
@@ -46,13 +55,25 @@ const ws_loadPersonal = async (connection, filters, customeQuery = null, resultL
 };
 
 
-const ws_createPersonal = async (connection,values,PersonPhoto) => {
+const ws_createPersonal = async (connection, values, PersonPhoto) => {
 
-    const {pool,poolConnect} = connection;
+    const {
+        pool,
+        poolConnect
+    } = connection;
     await poolConnect;
 
     // destruct our input values
-    const {Name,Family,NationalCode,IdNumber,Sex,BirthDate,BirthPlace,PersonType} = values;
+    const {
+        Name,
+        Family,
+        NationalCode,
+        IdNumber,
+        Sex,
+        BirthDate,
+        BirthPlace,
+        PersonType
+    } = values;
 
     // national card validation
     if (NationalCode) {
@@ -69,11 +90,12 @@ const ws_createPersonal = async (connection,values,PersonPhoto) => {
 
     // if the personType is needy we use a encrypted key.
 
-    if( PersonType === "3" ){
-        
+    if (PersonType === "3") {
+
 
         // these values are required
-        if (!( ("Name" && "Family" && "NationalCode" && "IdNumber" && "Sex" && "BirthDate" && "BirthPlace" && "PersonType" && "PersonPhoto") in values) ){
+
+        if (!(("Name" && "Family" && "NationalCode" && "IdNumber" && "Sex" && "BirthDate" && "BirthPlace" && "PersonType" && "PersonPhoto") in values)) {
             return {
                 status: "Failed",
                 msg: "Fill Parameters Utterly",
@@ -82,7 +104,7 @@ const ws_createPersonal = async (connection,values,PersonPhoto) => {
         };
 
 
-        const duplicateId = await checkDuplicate(connection, NationalCode , ws_loadPersonal);
+        const duplicateId = await checkDuplicate(connection, NationalCode, ws_loadPersonal);
         if (duplicateId)
             return {
                 status: "Failed",
@@ -93,15 +115,15 @@ const ws_createPersonal = async (connection,values,PersonPhoto) => {
 
 
         const person = {
-            Name ,
+            Name,
             Family,
             NationalCode
         };
 
         const personString = JSON.stringify(person);
-        
-        let hashPerson = crypto.createHash( 'sha1' ).update(personString).digest('hex');
-        hashPerson = hashPerson.substring(0 , 20);
+
+        let hashPerson = crypto.createHash('sha1').update(personString).digest('hex');
+        hashPerson = hashPerson.substring(0, 20);
 
         let queryString = `INSERT INTO 
         [${DB_DATABASE}].[dbo].[tblPersonal]
@@ -115,21 +137,22 @@ const ws_createPersonal = async (connection,values,PersonPhoto) => {
         try {
             const request = pool.request();
             const result = await request.query(queryString);
-    
+
             console.dir(result);
             return result;
-    
+
         } catch (err) {
             console.error("SQL error:", err)
         }
 
 
 
-    } else{
+    } else {
 
-        
+
         // these values are required
-        if (!( ("Name" && "Family" && "Sex" && "PersonType") in values)) {
+
+        if (!(("Name" && "Family" && "Sex" && "PersonType") in values)) {
             return {
                 status: "Failed",
                 msg: "Fill Parameters Utterly",
@@ -137,7 +160,7 @@ const ws_createPersonal = async (connection,values,PersonPhoto) => {
             }
         };
 
-        const duplicateId = await checkDuplicate(connection, NationalCode , ws_loadPersonal);
+        const duplicateId = await checkDuplicate(connection, NationalCode, ws_loadPersonal);
         if (duplicateId)
             return {
                 status: "Failed",
@@ -153,30 +176,37 @@ const ws_createPersonal = async (connection,values,PersonPhoto) => {
             (N'${Name}',N'${Family}','${NationalCode}','${IdNumber}','${Sex}','${BirthDate}',N'${BirthPlace}','${PersonType}',CONVERT(varbinary ,'${PersonPhoto}'));
             SELECT SCOPE_IDENTITY() AS PersonId;`
 
-          
-            try {
-                const request = pool.request();
-                const result = await request.query(queryString);
-        
-                console.dir(result);
-                return result;
-        
-            } catch (err) {
-                console.error("SQL error:", err)
-            }
+
+
+        try {
+            const request = pool.request();
+            const result = request.query(queryString);
+
+            console.dir(result);
+            return result;
+
+        } catch (err) {
+            console.error("SQL error:", err)
+        }
+
     }
 
 };
 
 
 
-const ws_updatePersonal = async (connection , newValues , filters) => {
-    
-    const {pool,poolConnect} = connection;
+const ws_updatePersonal = async (connection, newValues, filters) => {
+
+    const {
+        pool,
+        poolConnect
+    } = connection;
     await poolConnect;
 
-    const {NationalCode} = newValues;
-    
+    const {
+        NationalCode
+    } = newValues;
+
     if (NationalCode) {
         const valid = await validateNationalCode(String(NationalCode));
         if (!valid) {
@@ -186,7 +216,7 @@ const ws_updatePersonal = async (connection , newValues , filters) => {
                 NationalCode
             }
         }
-        const duplicateId = await checkDuplicate(connection, NationalCode  , ws_loadPersonal);
+        const duplicateId = await checkDuplicate(connection, NationalCode, ws_loadPersonal);
         if (duplicateId)
             return {
                 status: "Failed",
@@ -197,7 +227,7 @@ const ws_updatePersonal = async (connection , newValues , filters) => {
 
 
 
-  
+
     let queryString = `UPDATE [${DB_DATABASE}].[dbo].[tblPersonal] SET `;
 
     // update our query string
@@ -209,7 +239,7 @@ const ws_updatePersonal = async (connection , newValues , filters) => {
         const updateResult = await request.query(queryString);
         console.dir(updateResult);
         const table = await ws_loadPersonal(connection);
-            return table;
+        return table;
     } catch (err) {
         console.error("SQL error:", err);
     }
@@ -218,19 +248,22 @@ const ws_updatePersonal = async (connection , newValues , filters) => {
 
 const ws_deletePersonal = async (connection, PersonId) => {
 
-    const {pool,poolConnect} = connection;
+    const {
+        pool,
+        poolConnect
+    } = connection;
     await poolConnect;
 
-   
+
     const canRemove = await checkForeignKey(connection, "tblPersonal", PersonId);
     if (!canRemove) return {
         status: "Failed",
         msg: "Can not remove this ID",
         PersonId,
-        dependencies: ["tblNeedyAccounts" , "tblPayment" , "tblAssignNeedyToPlans"]
+        dependencies: ["tblNeedyAccounts", "tblPayment", "tblAssignNeedyToPlans"]
     };
 
- 
+
     let queryString = `DELETE [${DB_DATABASE}].[dbo].[tblPersonal] WHERE PersonId = ${PersonId};`
 
     try {
@@ -248,4 +281,9 @@ const ws_deletePersonal = async (connection, PersonId) => {
 
 
 
-module.exports = {ws_loadPersonal , ws_createPersonal , ws_updatePersonal , ws_deletePersonal};
+module.exports = {
+    ws_loadPersonal,
+    ws_createPersonal,
+    ws_updatePersonal,
+    ws_deletePersonal
+};

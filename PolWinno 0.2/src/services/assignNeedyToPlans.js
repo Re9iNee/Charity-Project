@@ -11,21 +11,25 @@ const {
     DB_DATABASE
 } = process.env
 
-const {ws_loadPlan} = require("./plan");
-const {ws_loadPersonal} = require("./personal");
+const {
+    ws_loadPlan
+} = require("./plan");
+const {
+    ws_loadPersonal
+} = require("./personal");
 
 
 
-const availableId = async(connection, PlanId , NeedyId) => {
-   
+const availableId = async (connection, PlanId, NeedyId) => {
 
-    if(PlanId){
+
+    if (PlanId) {
         const availablePlanId = await ws_loadPlan(connection, {
             PlanId: PlanId
         }, null, 1);
         return !(!availablePlanId.recordset.length);
 
-    } else if(NeedyId){
+    } else if (NeedyId) {
         const availablePersonId = await ws_loadPersonal(connection, {
             PersonId: NeedyId
         }, null, 1);
@@ -36,7 +40,7 @@ const availableId = async(connection, PlanId , NeedyId) => {
 
 
 
-const ws_loadNeedyForPlan = async (connection, filters= new Object(null) , customQuery = null, resultLimit = 1000) => {
+const ws_loadNeedyForPlan = async (connection, filters = new Object(null), customQuery = null, resultLimit = 1000) => {
     const {
         pool,
         poolConnect
@@ -85,7 +89,7 @@ const ws_loadNeedyForPlan = async (connection, filters= new Object(null) , custo
         delete filters.PlanId;
     }
 
-    
+
     queryString = normalizeQueryString(queryString, filters);
     if (customQuery)
         queryString += ` ${customQuery}`;
@@ -117,9 +121,9 @@ const ws_AssignNeedyToPlan = async (connection, values) => {
         Tdate
     } = values;
 
-   
+
     // these values are required
-    if (!( ("PlanId" && "NeedyId" && "Fdate" && "Tdate") in values)) {
+    if (!(("PlanId" && "NeedyId" && "Fdate" && "Tdate") in values)) {
         return {
             status: "Failed",
             msg: "Fill Parameters Utterly",
@@ -133,40 +137,46 @@ const ws_AssignNeedyToPlan = async (connection, values) => {
         return {
             status: "Failed",
             msg: "Can't Add with these IDs, These IDs Doesn't Exist",
-            PlanId,NeedyId
+            PlanId,
+            NeedyId
         }
     };
 
     // planid and needyid are unique 
-    const duplicateId = await checkDuplicate(connection, {NeedyId,PlanId} , ws_loadNeedyForPlan);
-    if (duplicateId){
+    const duplicateId = await checkDuplicate(connection, {
+        NeedyId,
+        PlanId
+    }, ws_loadNeedyForPlan);
+    if (duplicateId) {
         return {
             status: "Failed",
             msg: "Error Creating Row, Duplicate Record",
-            uniqueColumn: "NeedyId, PlanId" 
+            uniqueColumn: "NeedyId, PlanId"
         };
     }
 
-      
+
     // fromDate must be less than the toDate
     const startDate = Fdate.split('/');
     const endDate = Tdate.split('/');
 
-    const numericStartDate= new Date().setFullYear(startDate[0] , startDate[1] , startDate[2] );
-    const numericEndDate= new Date().setFullYear(endDate[0] , endDate[1] , endDate[2] );
+    const numericStartDate = new Date().setFullYear(startDate[0], startDate[1], startDate[2]);
+    const numericEndDate = new Date().setFullYear(endDate[0], endDate[1], endDate[2]);
 
-    if(!numericStartDate < numericEndDate) {
+    if (!numericStartDate < numericEndDate) {
         return {
             status: "Failed",
             msg: "ending date must be bigger than initial date",
         }
     };
-    
+
 
     // fromDate and toDate form tblAssignNeedyToPlans should be in tblPlan dates range
 
     //get tblplan items from plan id
-    const planList = await ws_loadPlan(connection, {PlanId}, null , 1 );
+    const planList = await ws_loadPlan(connection, {
+        PlanId
+    }, null, 1);
 
     //tblPlan dates
     const tblPlanFdate = planList.recordset[0].Fdate;
@@ -175,10 +185,10 @@ const ws_AssignNeedyToPlan = async (connection, values) => {
     const tblPlanStartDate = tblPlanFdate.split('/');
     const tblPlanEndDate = tblPlanTdate.split('/');
 
-    const numericPlanStartDate= new Date().setFullYear(tblPlanStartDate[0] , tblPlanStartDate[1] , tblPlanStartDate[2] );
-    const numericPlanEndDate= new Date().setFullYear(tblPlanEndDate[0] , tblPlanEndDate[1] , tblPlanEndDate[2] );
+    const numericPlanStartDate = new Date().setFullYear(tblPlanStartDate[0], tblPlanStartDate[1], tblPlanStartDate[2]);
+    const numericPlanEndDate = new Date().setFullYear(tblPlanEndDate[0], tblPlanEndDate[1], tblPlanEndDate[2]);
 
-    if( numericStartDate < numericPlanStartDate ||  numericEndDate > numericPlanEndDate ) {
+    if (numericStartDate < numericPlanStartDate || numericEndDate > numericPlanEndDate) {
         return {
             status: "Failed",
             msg: "ending date and initial date must be in tblPlan dates range",
@@ -208,7 +218,7 @@ const ws_AssignNeedyToPlan = async (connection, values) => {
 };
 
 
-const ws_deleteNeedyFromPlan = async (connection, AssignNeedyPlanId , PlanId) => {
+const ws_deleteNeedyFromPlan = async (connection, AssignNeedyPlanId, PlanId) => {
 
     const {
         pool,
@@ -216,32 +226,32 @@ const ws_deleteNeedyFromPlan = async (connection, AssignNeedyPlanId , PlanId) =>
     } = connection;
     await poolConnect;
 
-    if(PlanId && !AssignNeedyPlanId){
+    if (PlanId && !AssignNeedyPlanId) {
 
-        const idList = await ws_loadNeedyForPlan(connection , PlanId);
-        
+        const idList = await ws_loadNeedyForPlan(connection, PlanId);
+
         const AssignNeedyPlanId = idList.AssignNeedyPlanId;
         const canRemove = await checkForeignKey(connection, "tblAssignNeedyToPlans", AssignNeedyPlanId);
         if (!canRemove)
-        return {
-            status: "Failed",
-            msg: "Can not remove this ID",
-            AssignNeedyPlanId,
-            dependencies: ["tblCashAssistanceDetail", "tblNonCashAssistanceDetail"]
-        };
+            return {
+                status: "Failed",
+                msg: "Can not remove this ID",
+                AssignNeedyPlanId,
+                dependencies: ["tblCashAssistanceDetail", "tblNonCashAssistanceDetail"]
+            };
 
-    }else {
+    } else {
         const canRemove = await checkForeignKey(connection, "tblAssignNeedyToPlans", AssignNeedyPlanId);
         if (!canRemove)
-        return {
-            status: "Failed",
-            msg: "Can not remove this ID",
-            AssignNeedyPlanId,
-            dependencies: ["tblCashAssistanceDetail" , "tblNonCashAssistanceDetail"]
-        };
+            return {
+                status: "Failed",
+                msg: "Can not remove this ID",
+                AssignNeedyPlanId,
+                dependencies: ["tblCashAssistanceDetail", "tblNonCashAssistanceDetail"]
+            };
     }
 
-    
+
     let queryString = `DELETE [${DB_DATABASE}].[dbo].[tblAssignNeedyToPlans] WHERE AssignNeedyPlanId = ${AssignNeedyPlanId};`
 
     try {

@@ -12,8 +12,12 @@ require("dotenv").config({
     path: "../utils/.env"
 });
 
-const {ws_loadBaseValue} = require("./commonBaseData");
-const {ws_loadPersonal} = require("./personal");
+const {
+    ws_loadBaseValue
+} = require("./commonBaseData");
+const {
+    ws_loadPersonal
+} = require("./personal");
 
 const {
     DB_DATABASE
@@ -21,16 +25,16 @@ const {
 
 
 
-const availableId = async(connection, BankId , NeedyId) => {
-   
+const availableId = async (connection, BankId, NeedyId) => {
 
-    if(BankId){
+
+    if (BankId) {
         const availableDataId = await ws_loadBaseValue(connection, {
             CommonBaseDataId: BankId
         }, null, 1);
         return !(!availableDataId.recordset.length);
 
-    } else if(NeedyId){
+    } else if (NeedyId) {
         const availablePersonId = await ws_loadPersonal(connection, {
             PersonId: NeedyId
         }, null, 1);
@@ -124,7 +128,7 @@ const ws_createNeedyAccount = async (connection, values) => {
     }
 
     // these values are required
-    if (!( ("BankId" && "NeedyId" && "OwnerName" && "AccountNumber" && "ShebaNumber") in  values )) {
+    if (!(("BankId" && "NeedyId" && "OwnerName" && "AccountNumber" && "ShebaNumber") in values)) {
         return {
             status: "Failed",
             msg: "Fill Parameters Utterly",
@@ -140,14 +144,18 @@ const ws_createNeedyAccount = async (connection, values) => {
         }
     };
 
-    const duplicateUniqueValue = checkDuplicate(connection, {ShebaNumber,AccountNumber,NeedyId} , ws_loadNeedyAccount);
-        if (!duplicateUniqueValue) {
-            return {
-                status: "Failed",
-                msg: "Error Creating Row, Duplicate Record",
-                uniqueColumns: "ShebaNumber, AccountNumber, NeedyId",
-            }
+    const duplicateUniqueValue = checkDuplicate(connection, {
+        ShebaNumber,
+        AccountNumber,
+        NeedyId
+    }, ws_loadNeedyAccount);
+    if (!duplicateUniqueValue) {
+        return {
+            status: "Failed",
+            msg: "Error Creating Row, Duplicate Record",
+            uniqueColumns: "ShebaNumber, AccountNumber, NeedyId",
         }
+    }
 
 
     let queryString = `INSERT INTO 
@@ -177,9 +185,18 @@ const ws_updateNeedyAccount = async (connection, filters, newValues) => {
     } = connection;
     await poolConnect;
 
-    const {ShebaNumber , AccountNumber , NeedyId , CardNumber} = newValues;
-    if ( ShebaNumber || AccountNumber || NeedyId) {
-        const duplicateUniqueValue = checkDuplicate(connection, {ShebaNumber,AccountNumber,NeedyId} , ws_loadNeedyAccount);
+    const {
+        ShebaNumber,
+        AccountNumber,
+        NeedyId,
+        CardNumber
+    } = newValues;
+    if (ShebaNumber || AccountNumber || NeedyId) {
+        const duplicateUniqueValue = checkDuplicate(connection, {
+            ShebaNumber,
+            AccountNumber,
+            NeedyId
+        }, ws_loadNeedyAccount);
         if (!duplicateUniqueValue) {
             return {
                 status: "Failed",
@@ -229,10 +246,17 @@ const ws_deleteNeedyAccount = async (connection, values) => {
     } = connection;
     await poolConnect;
 
-    const {NeedyAccountId , NeedyId , AccountNumber} = values;
+    const {
+        NeedyAccountId,
+        NeedyId,
+        AccountNumber
+    } = values;
 
-    const canRemove = await checkForeignKey(connection, "tblNeedyAccounts", {NeedyId , AccountNumber});
-    if (!canRemove){
+    const canRemove = await checkForeignKey(connection, "tblNeedyAccounts", {
+        NeedyId,
+        AccountNumber
+    });
+    if (!canRemove) {
         return {
             status: "Failed",
             msg: "Can not remove this ID",
@@ -240,7 +264,9 @@ const ws_deleteNeedyAccount = async (connection, values) => {
         };
     }
 
-    await ws_loadNeedyAccount(connection , {NeedyAccountId});
+    await ws_loadNeedyAccount(connection, {
+        NeedyAccountId
+    });
 
 
     let queryString = `DELETE [${DB_DATABASE}].[dbo].[tblNeedyAccounts] WHERE NeedyAccountId = ${NeedyAccountId};`

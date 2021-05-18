@@ -1,5 +1,7 @@
 const {
     normalizeQueryString,
+    checkDuplicate,
+    NotNullColumnsFilled,
 } = require("../utils/commonModules");
 
 
@@ -10,7 +12,7 @@ const {
     DB_DATABASE
 } = process.env
 
-const ws_loadCharityAccounts = async (connection, filters, customQuery = null, resultLimit = 1000) => {
+const ws_loadCharityAccounts = async (connection, filters = new Object(null), customQuery = null, resultLimit = 1000) => {
     const {
         pool,
         poolConnect
@@ -41,23 +43,12 @@ const ws_loadCharityAccounts = async (connection, filters, customQuery = null, r
     try {
         const request = pool.request();
         const result = await request.query(queryString);
-        console.dir(result);
         return result;
     } catch (err) {
         console.error("SQL error: ", err);
     }
 }
 
-
-async function checkDuplicateAccountNumber(connection, accountNumber) {
-    let result = await ws_loadCharityAccounts(connection, {
-        AccountNumber: accountNumber
-    }, null, 1);
-    // 0 -> unique 
-    // 1 -> duplicate
-    let duplicate = !(!result.recordset.length);
-    return duplicate;
-}
 
 const ws_createCharityAccounts = async (connection, details = new Object(null)) => {
     // default parameter for details will be null object. (to avoid throwing error - we search in this object later)
@@ -73,22 +64,15 @@ const ws_createCharityAccounts = async (connection, details = new Object(null)) 
 
 
     // Not Null Values
-    if (!("BankId" in details) || !("OwnerName" in details) || !("BranchName" in details) || !("AccountNumber") in details) {
+    if (!NotNullColumnsFilled(details, "BankId", "OwnerName", "BranchName", "AccountNumber")) {
         return {
             status: "Failed",
             msg: "Fill Parameters Utterly",
+            requiredColumns: ["BankId", "OwnerName", "BranchName", "AccountNumber"],
             details
         }
     }
 
-    // check for baseTypeTitle duplicates - returns: true -> duplicate | false -> unique
-    const duplicateAccountNumber = await checkDuplicateAccountNumber(connection, AccountNumber);
-    if (duplicateAccountNumber)
-        return {
-            status: "Failed",
-            msg: "Error Creating Row, Duplicate AccountNumber",
-            AccountNumber,
-        };
     // Credit Card Validation if it exists
     if ("CardNumber" in details) {
         const {
@@ -106,6 +90,18 @@ const ws_createCharityAccounts = async (connection, details = new Object(null)) 
         }
     }
 
+    // check for baseTypeTitle duplicates - returns: true -> duplicate | false -> unique
+    const duplicateAccountNumber = await checkDuplicate(connection, {
+        AccountNumber
+    }, ws_loadCharityAccounts);
+    if (duplicateAccountNumber)
+        return {
+            status: "Failed",
+            msg: "Error Creating Row, Duplicate AccountNumber",
+            AccountNumber,
+        };
+    
+
 
     const {
         pool,
@@ -122,19 +118,41 @@ const ws_createCharityAccounts = async (connection, details = new Object(null)) 
     SELECT SCOPE_IDENTITY() AS charityAccountId;`
     try {
         const request = pool.request();
-        const result = request.query(queryString);
-        console.dir(result);
+        const result = await request.query(queryString);
         return result;
     } catch (err) {
         console.error("ws_createCharityAccount error: ", err)
+        return {
+            status: "Failed",
+            method: "ws_createCharityAccount",
+            msg: err
+        }
     }
 
 }
 
-const ws_updateCharityAccounts = async (connection, filters, newValues) => {
+const ws_updateCharityAccounts = async (connection, filters, newValues = new Object(null)) => {
+
+    if ("CardNumber" in newValues) {
+        CardNumber = newValues.CardNumber;
+        const {
+            validateCreditCard,
+        } = require("../utils/bankCardNumber");
+        // returns true if valid.
+        const valid = validateCreditCard(String(CardNumber));
+        if (!valid)
+            return {
+                status: "Failed",
+                msg: "The Credit Card Number is Incorrect.",
+                CardNumber
+            }
+    }
+
     // check wheter Account Number is Unique or not.
-    if (newValues.AccountNumber) {
-        const duplicateAccountNumber = await checkDuplicateAccountNumber(connection, newValues.AccountNumber);
+    if ("AccountNumber" in newValues) {
+        const duplicateAccountNumber = await checkDuplicate(connection, {
+            AccountNumber: newValues.AccountNumber
+        }, ws_loadCharityAccounts);
         if (duplicateAccountNumber)
             return {
                 status: "Failed",
@@ -152,20 +170,6 @@ const ws_updateCharityAccounts = async (connection, filters, newValues) => {
     queryString = setToQueryString(queryString, newValues) + " WHERE 1=1 ";
     queryString = normalizeQueryString(queryString, filters);
 
-    if (newValues.CardNumber) {
-        CardNumber = newValues.CardNumber;
-        const {
-            validateCreditCard,
-        } = require("../utils/bankCardNumber");
-        // returns true if valid.
-        const valid = validateCreditCard(String(CardNumber));
-        if (!valid)
-            return {
-                status: "Failed",
-                msg: "The Credit Card Number is Incorrect.",
-                CardNumber
-            }
-    }
 
     const {
         pool,
@@ -182,6 +186,11 @@ const ws_updateCharityAccounts = async (connection, filters, newValues) => {
         return table;
     } catch (err) {
         console.error("SQL error: ", err);
+        return {
+            status: "Failed",
+            method: "ws_updateCharityAccount",
+            mgs: err
+        }
     }
 }
 
@@ -192,8 +201,9 @@ const ws_deleteCharityAccounts = async (connection, charityAccountId) => {
     const canRemove = await checkForeignKey(connection, "tblCharityAccounts", charityAccountId);
     if (!canRemove) return {
         status: "Failed",
-        msg: "Can not remove this ID",
-        charityAccountId
+        msg: "Can not remove this ID, this ID depend on tblPayment",
+        charityAccountId,
+        dependency: ["tblPayment"]
     };
 
     const {
@@ -211,6 +221,11 @@ const ws_deleteCharityAccounts = async (connection, charityAccountId) => {
         return table;
     } catch (err) {
         console.log("SQL error: ", err);
+        return {
+            status: "Failed",
+            method: "ws_deleteCharityAccount",
+            msg: err
+        }
     }
 }
 
