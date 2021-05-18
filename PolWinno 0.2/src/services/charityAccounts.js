@@ -131,10 +131,28 @@ const ws_createCharityAccounts = async (connection, details = new Object(null)) 
 
 }
 
-const ws_updateCharityAccounts = async (connection, filters, newValues) => {
+const ws_updateCharityAccounts = async (connection, filters, newValues = new Object(null)) => {
+
+    if ("CardNumber" in newValues) {
+        CardNumber = newValues.CardNumber;
+        const {
+            validateCreditCard,
+        } = require("../utils/bankCardNumber");
+        // returns true if valid.
+        const valid = validateCreditCard(String(CardNumber));
+        if (!valid)
+            return {
+                status: "Failed",
+                msg: "The Credit Card Number is Incorrect.",
+                CardNumber
+            }
+    }
+
     // check wheter Account Number is Unique or not.
-    if (newValues.AccountNumber) {
-        const duplicateAccountNumber = await checkDuplicateAccountNumber(connection, newValues.AccountNumber);
+    if ("AccountNumber" in newValues) {
+        const duplicateAccountNumber = await checkDuplicate(connection, {
+            AccountNumber: newValues.AccountNumber
+        }, ws_loadCharityAccounts);
         if (duplicateAccountNumber)
             return {
                 status: "Failed",
@@ -152,20 +170,6 @@ const ws_updateCharityAccounts = async (connection, filters, newValues) => {
     queryString = setToQueryString(queryString, newValues) + " WHERE 1=1 ";
     queryString = normalizeQueryString(queryString, filters);
 
-    if (newValues.CardNumber) {
-        CardNumber = newValues.CardNumber;
-        const {
-            validateCreditCard,
-        } = require("../utils/bankCardNumber");
-        // returns true if valid.
-        const valid = validateCreditCard(String(CardNumber));
-        if (!valid)
-            return {
-                status: "Failed",
-                msg: "The Credit Card Number is Incorrect.",
-                CardNumber
-            }
-    }
 
     const {
         pool,
@@ -182,6 +186,11 @@ const ws_updateCharityAccounts = async (connection, filters, newValues) => {
         return table;
     } catch (err) {
         console.error("SQL error: ", err);
+        return {
+            status: "Failed",
+            method: "ws_updateCharityAccount",
+            mgs: err
+        }
     }
 }
 
