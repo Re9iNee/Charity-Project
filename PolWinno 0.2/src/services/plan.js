@@ -54,7 +54,7 @@ const ws_loadPlan = async (connection, filters = new Object(null), customQuery =
     }
 }
 
-const ws_createPlan = async (connection, details) => {
+const ws_createPlan = async (connection, details = new Object(null)) => {
     // details are the parameters sent for creating table
 
     const {
