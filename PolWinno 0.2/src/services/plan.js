@@ -4,6 +4,7 @@ const {
     checkDuplicate,
     sqlDate,
     endIsLenghty,
+    NotNullColumnsFilled,
 } = require("../utils/commonModules");
 
 require("dotenv").config({
@@ -45,6 +46,11 @@ const ws_loadPlan = async (connection, filters = new Object(null), customQuery =
         return result;
     } catch (err) {
         console.error("SQL error: ", err);
+        return {
+            status: "Failed",
+            method: "ws_loadPlan",
+            msg: err
+        }
     }
 }
 
@@ -63,12 +69,13 @@ const ws_createPlan = async (connection, details) => {
     } = details;
 
     // Not Null Values
-    if (!PlanName) {
+    if (!NotNullColumnsFilled(details, "PlanName")) {
         // Other Not Null Columns that actually have an default values => PlanNature - neededLogin
         return {
             status: "Failed",
             msg: "Fill Parameters Utterly",
             required: ["PlanName", "PlanNature", "neededLogin"],
+            note: "required columns that have default value: PlanNature - neededLogin",
             details
         }
     }
@@ -132,6 +139,11 @@ const ws_createPlan = async (connection, details) => {
         return id;
     } catch (err) {
         console.error("ws_createPlan error: ", err)
+        return {
+            status: "Failed",
+            method: "ws_createPlan",
+            msg: err
+        }
     }
 
 }
@@ -277,6 +289,11 @@ const ws_updatePlan = async (connection, filters = new Object(null), newValues =
         return table;
     } catch (err) {
         console.error("ws_updatePlan - SQL  error: ", err);
+        return {
+            status: "Failed",
+            method: "ws_updatePlan",
+            msg: err
+        }
     }
 }
 
@@ -310,6 +327,11 @@ const ws_deletePlan = async (connection, planId) => {
         return table;
     } catch (err) {
         console.error("ws_deletePlan - SQL error: ", err);
+        return {
+            status: "Failed",
+            method: "ws_deletePlan",
+            msg: err
+        }
     }
 }
 module.exports = {
