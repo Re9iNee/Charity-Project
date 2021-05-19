@@ -49,12 +49,17 @@ exports.createPersonalData = async (req, res) => {
       let values = req.body;
       let image = req.files;
 
+      // TODO: Migrate upload codes to another file and folders (like ./services)
+      // TODO: make upload directory if it doesn't exist.
+      // LINK: use https://attacomsian.com/blog/nodejs-create-directory
+
       const imagePath = fs.readFileSync(image[0].path);
       const encode_image = imagePath.toString('base64');
       let PersonPhoto = {
          contentType: image[0].mimetype,
          image: new Buffer.from(encode_image, 'base64')
       };
+
 
 
       const result = await ws_createPersonal({

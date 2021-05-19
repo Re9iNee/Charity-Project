@@ -18,7 +18,7 @@ const pool = new sql.ConnectionPool(config);
 
 const poolConnect = pool.connect();
 
-
+// TODO: on database load and other errors.
 pool.on("error", err => {
     console.log("Could not Connect to the Database", err);
 });
