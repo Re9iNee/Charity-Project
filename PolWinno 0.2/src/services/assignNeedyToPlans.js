@@ -1,7 +1,8 @@
 const {
     normalizeQueryString,
     checkDuplicate,
-    checkForeignKey
+    checkForeignKey,
+    NotNullColumnsFilled
 } = require("../utils/commonModules");
 
 require("dotenv").config({
@@ -105,7 +106,8 @@ const ws_loadNeedyForPlan = async (connection, filters = new Object(null), custo
 
 
 
-const ws_AssignNeedyToPlan = async (connection, values) => {
+const ws_AssignNeedyToPlan = async (connection, details = new Object(null)) => {
+    // NOTE: details object should have default value in order not to throw any errors
 
     const {
         pool,
@@ -119,15 +121,17 @@ const ws_AssignNeedyToPlan = async (connection, values) => {
         PlanId,
         Fdate,
         Tdate
-    } = values;
+    } = details;
 
 
-    // these values are required
-    if (!(("PlanId" && "NeedyId" && "Fdate" && "Tdate") in values)) {
+    // these values are required (NotNullColumns)
+
+    if (!NotNullColumnsFilled(details, "PlanId", "NeedyId", "Fdate", "Tdate")) {
         return {
             status: "Failed",
             msg: "Fill Parameters Utterly",
-            values
+            values: details,
+            required: ["PlanId", "NeedyId", "Fdate", "Tdate"]
         }
     };
 
@@ -157,8 +161,9 @@ const ws_AssignNeedyToPlan = async (connection, values) => {
 
 
     // fromDate must be less than the toDate
-    const startDate = Fdate.split('/');
-    const endDate = Tdate.split('/');
+    // NOTE: Date Format is: YYYY-MM-DD
+    const startDate = Fdate.split('-');
+    const endDate = Tdate.split('-');
 
     const numericStartDate = new Date().setFullYear(startDate[0], startDate[1], startDate[2]);
     const numericEndDate = new Date().setFullYear(endDate[0], endDate[1], endDate[2]);
@@ -181,9 +186,9 @@ const ws_AssignNeedyToPlan = async (connection, values) => {
     //tblPlan dates
     const tblPlanFdate = planList.recordset[0].Fdate;
     const tblPlanTdate = planList.recordset[0].Tdate;
-
-    const tblPlanStartDate = tblPlanFdate.split('/');
-    const tblPlanEndDate = tblPlanTdate.split('/');
+    // NOTE: Date Format is: YYYY-MM-DD
+    const tblPlanStartDate = tblPlanFdate.split('-');
+    const tblPlanEndDate = tblPlanTdate.split('-');
 
     const numericPlanStartDate = new Date().setFullYear(tblPlanStartDate[0], tblPlanStartDate[1], tblPlanStartDate[2]);
     const numericPlanEndDate = new Date().setFullYear(tblPlanEndDate[0], tblPlanEndDate[1], tblPlanEndDate[2]);
