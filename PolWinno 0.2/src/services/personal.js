@@ -4,7 +4,8 @@ const {
     setToQueryString,
     validateNationalCode,
     checkDuplicate,
-    checkForeignKey
+    checkForeignKey,
+    NotNullColumnsFilled
 } = require("../utils/commonModules");
 require("dotenv").config({
     path: "../utils/.env"
@@ -55,7 +56,8 @@ const ws_loadPersonal = async (connection, filters, customeQuery = null, resultL
 };
 
 
-const ws_createPersonal = async (connection, values, PersonPhoto) => {
+const ws_createPersonal = async (connection, details = new Object(null), PersonPhoto) => {
+    // NOTE: because we search using "in" keyword, details should have an default value
 
     const {
         pool,
@@ -73,16 +75,16 @@ const ws_createPersonal = async (connection, values, PersonPhoto) => {
         BirthDate,
         BirthPlace,
         PersonType
-    } = values;
+    } = details;
 
     // national card validation
-    if (NationalCode) {
+    if ("NationalCode" in details) {
         const valid = validateNationalCode(String(NationalCode));
         if (!valid) {
             return {
                 status: "Failed",
                 msg: "Your National Code is Incorrect.",
-                CardNumber
+                NationalCode
             }
         }
     };
@@ -94,12 +96,12 @@ const ws_createPersonal = async (connection, values, PersonPhoto) => {
 
 
         // these values are required
-
-        if (!(("Name" && "Family" && "NationalCode" && "IdNumber" && "Sex" && "BirthDate" && "BirthPlace" && "PersonType" && "PersonPhoto") in values)) {
+        if (!NotNullColumnsFilled(details, "Name", "Family", "NationalCode", "Sex", "IdNumber", "BirthDate", "BirthPlace", "PersonType", "PersonPhoto")) {
             return {
                 status: "Failed",
                 msg: "Fill Parameters Utterly",
-                values,PersonPhoto
+                required: ["Name", "Family", "NationalCode", "IdNumber", "Sex", "BirthDate", "BirthPlace", "PersonType", "PersonPhoto"],
+                details,
             }
         };
 
@@ -124,7 +126,7 @@ const ws_createPersonal = async (connection, values, PersonPhoto) => {
 
         let hashPerson = crypto.createHash('sha1').update(personString).digest('hex');
         hashPerson = hashPerson.substring(0, 20);
-
+        // FIXME: this doesn't support UTF-8
         let queryString = `INSERT INTO 
         [${DB_DATABASE}].[dbo].[tblPersonal]
         (Name,Family,NationalCode,IdNumber,Sex,BirthDate,BirthPlace,PersonType,PersonPhoto,SecretCode)
@@ -148,15 +150,16 @@ const ws_createPersonal = async (connection, values, PersonPhoto) => {
 
 
     } else {
-
+        // TODO: optimize your codes - make sure that you won't rewrite them again
+        // TODO: try using normalizeQueryString_Create && setToQueryString method it will help
 
         // these values are required
 
-        if (!(("Name" && "Family" && "Sex" && "PersonType") in values)) {
+        if (!NotNullColumnsFilled(details, "Name", "Family", "Sex", "PersonType")) {
             return {
                 status: "Failed",
                 msg: "Fill Parameters Utterly",
-                values
+                details
             }
         };
 
@@ -168,7 +171,7 @@ const ws_createPersonal = async (connection, values, PersonPhoto) => {
                 NationalCode
             };
 
-
+        // NOTE: notice that by rewriting your codes you fixed a problem but you didn't in a pervious "if" statement. (line 130)
         let queryString = `INSERT INTO 
             [${DB_DATABASE}].[dbo].[tblPersonal]
             (Name,Family,NationalCode,IdNumber,Sex,BirthDate,BirthPlace,PersonType,PersonPhoto)
