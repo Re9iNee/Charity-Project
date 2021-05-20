@@ -84,7 +84,7 @@ const ws_loadPayment = async (connection, filters = new Object(null), customQuer
         delete filters.CashAssistanceDetailId;
     }
     if ("CharityAccountId" in filters) {
-        filters["filters.CharityAccountId"] = filters.CharityAccountId;
+        filters["charityAccounts.CharityAccountId"] = filters.CharityAccountId;
         delete filters.CharityAccountId;
     }
 
