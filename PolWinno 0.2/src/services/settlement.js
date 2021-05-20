@@ -27,6 +27,11 @@ const sumSuccessfulPayments = async (pool, poolConnect, successMessage, customQu
         return result.recordset[0].TotalAmount;
     } catch (err) {
         console.error("SQL Error on sumSuccessfulCashAssistance method ", err);
+        return {
+            status: "Failed",
+            method: "sumSuccessfulPayments",
+            msg: err
+        }
     }
 };
 
@@ -139,6 +144,11 @@ const ws_Settelment = async (connection, values) => {
 
         } catch (err) {
             console.error("ws_settlement error: ", err);
+            return {
+                status: "Failed",
+                method: "ws_settlement",
+                msg: err
+            }
         }
 
     }

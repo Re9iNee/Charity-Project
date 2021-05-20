@@ -97,7 +97,12 @@ const ws_loadPayment = async (connection, filters = new Object(null), customQuer
         const result = await request.query(queryString);
         return result;
     } catch (err) {
-        console.error("SQL error: ", err)
+        console.error("ws_loadPayment SQL error: ", err)
+        return {
+            status: "Failed",
+            method: "ws_loadPayment",
+            msg: err
+        }
     }
 }
 
@@ -182,6 +187,11 @@ const ws_payment = async (connection, details = new Object(null)) => {
         return id;
     } catch (err) {
         console.error("ws_payment error: ", err);
+        return {
+            stauts: "Failed",
+            method: "ws_payment",
+            msg: err
+        }
     }
 }
 
@@ -314,6 +324,11 @@ const ws_updatePayment = async (connection, paymentId, newValues = new Object(nu
         return table
     } catch (err) {
         console.error("ws_updatePayment SQL Error: ", err);
+        return {
+            status: "Failed",
+            method: "ws_updatePayment",
+            msg: err
+        }
     }
 }
 
@@ -336,6 +351,11 @@ const ws_deletePayment = async (connection, paymentId) => {
         return table;
     } catch (err) {
         console.error("ws_deletePayment SQL error: ", err)
+        return {
+            status: "Failed",
+            method: "ws_deletePayment",
+            msg: err
+        }
     }
 }
 

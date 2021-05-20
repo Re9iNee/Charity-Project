@@ -51,7 +51,12 @@ const ws_loadPersonal = async (connection, filters, customeQuery = null, resultL
         console.dir(result);
         return result;
     } catch (err) {
-        console.error("SQL error: ", err);
+        console.error("ws_loadPersonal SQL error: ", err);
+        return {
+            status: "Failed",
+            method: "ws_loadPersonal",
+            msg: err
+        }
     }
 };
 
@@ -134,8 +139,7 @@ const ws_createPersonal = async (connection, details = new Object(null), PersonP
         ('${Name}','${Family}',${NationalCode},${IdNumber},${Sex},${BirthDate},${BirthPlace},${PersonType},CONVERT(varbinary ,'${PersonPhoto}'),'${hashPerson}'); 
         SELECT SCOPE_IDENTITY() AS PersonId;`
 
-
-
+        
         try {
             const request = pool.request();
             const result = await request.query(queryString);
@@ -144,7 +148,12 @@ const ws_createPersonal = async (connection, details = new Object(null), PersonP
             return result;
 
         } catch (err) {
-            console.error("SQL error:", err)
+            console.error("ws_createPersonal SQL error:", err)
+            return {
+                status: "Failed",
+                method: "ws_createPersonal", 
+                msg: err
+            }
         }
 
 
@@ -190,6 +199,11 @@ const ws_createPersonal = async (connection, details = new Object(null), PersonP
 
         } catch (err) {
             console.error("SQL error:", err)
+            return {
+                status: "Failed",
+                method: "ws_createPersonal",
+                msg: err
+            }
         }
 
     }
@@ -244,7 +258,12 @@ const ws_updatePersonal = async (connection, newValues, filters) => {
         const table = await ws_loadPersonal(connection);
         return table;
     } catch (err) {
-        console.error("SQL error:", err);
+        console.error("ws_updatePersonal SQL error:", err);
+        return {
+            status: "Failed",
+            method: "ws_updatePersonal",
+            msg: err
+        }
     }
 };
 
@@ -277,7 +296,12 @@ const ws_deletePersonal = async (connection, PersonId) => {
         const table = await ws_loadPersonal(connection);
         return table;
     } catch (err) {
-        console.log("SQL error: ", err);
+        console.log("ws_deletePersonal SQL error: ", err);
+        return {
+            status: "Failed",
+            method: "ws_deletePersonal",
+            msg: err
+        }
     }
 };
 

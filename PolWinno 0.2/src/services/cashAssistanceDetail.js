@@ -66,7 +66,12 @@ const ws_loadCashAssistanceDetail = async (connection, filters = new Object(null
         console.dir(result);
         return result;
     } catch (err) {
-        console.error("SQL error: ", err);
+        console.error("ws_loadCashAssistanceDetail SQL error: ", err);
+        return {
+            status: "Failed",
+            method: "ws_loadCashAssistanceDetail",
+            msg: err
+        }
     }
 }
 
@@ -143,6 +148,11 @@ const ws_createCashAssistanceDetail = async (connection, details) => {
         return id;
     } catch (err) {
         console.error("ws_createCashAssistanceDetail error: ", err);
+        return {
+            status: "Failed",
+            method: "ws_createCashAssistanceDetail",
+            msg: err
+        }
     }
 }
 
@@ -243,6 +253,11 @@ const ws_updateCashAssistanceDetail = async (connection, filters, newValues) => 
         return table;
     } catch (err) {
         console.error("ws_updateCashAssistanceDetail SQL erorr: ", err);
+        return {
+            status: "Failed",
+            method: "ws_updateCashAssistanceDetail",
+            msg: err
+        }
     }
 }
 
@@ -274,6 +289,11 @@ const ws_deleteCashAssistanceDetail = async (connection, cashAssistanceDetailId)
         return table;
     } catch (err) {
         console.error("ws_deleteCashAssistanceDetail - SQL Error: ", err);
+        return {
+            status: "Failed",
+            method: "ws_deleteCashAssistanceDetail",
+            msg: err
+        }
     }
 }
 
