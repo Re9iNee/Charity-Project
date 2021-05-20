@@ -56,7 +56,7 @@ exports.updatePayment = async (req, res) => {
     const result = await ws_updatePayment({
         pool,
         poolConnect
-    }, req.body.paymentId, req.body.newValues);
+    }, req.body.PaymentId, req.body.newValues);
     res.send({
         result
     })
