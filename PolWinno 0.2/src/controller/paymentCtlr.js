@@ -19,14 +19,14 @@ exports.getPayment = async (req, res) => {
         pool,
         poolConnect
     }, {
-        CashAssistanceDetailId: query.cashAssistanceDetailid,
-        PaymentGatewayId: query.paymentGatewayId,
-        PaymentDate: query.paymentDate,
-        PaymentStatus: query.paymentStatus,
-        CharityAccountId: query.harityAccountId,
-        FollowCode: query.followCode,
-        NeedyId: query.needyId,
-        PaymentId: query.paymentId
+        CashAssistanceDetailId: query.CashAssistanceDetailid,
+        PaymentGatewayId: query.PaymentGatewayId,
+        PaymentDate: query.PaymentDate,
+        PaymentStatus: query.PaymentStatus,
+        CharityAccountId: query.CharityAccountId,
+        FollowCode: query.FollowCode,
+        NeedyId: query.NeedyId,
+        PaymentId: query.PaymentId
     });
     // Easier way to send request is to send query object itself, but when it comes to typo it throws an error
     res.send({
