@@ -19,7 +19,7 @@ exports.getPayment = async (req, res) => {
         pool,
         poolConnect
     }, {
-        CashAssistanceDetailId: query.CashAssistanceDetailid,
+        CashAssistanceDetailId: query.CashAssistanceDetailId,
         PaymentGatewayId: query.PaymentGatewayId,
         PaymentDate: query.PaymentDate,
         PaymentStatus: query.PaymentStatus,
