@@ -255,7 +255,7 @@ const ws_updatePayment = async (connection, paymentId, newValues = new Object(nu
     if (targetAccountNumber)
         return {
             status: "Failed",
-            msg: "error updating payment, targetAccountNumber must not have any value",
+            msg: "error updating payment, targetAccountNumber on this row must not have any value",
             paymentId,
             newValues,
             "table record": filteredRow
