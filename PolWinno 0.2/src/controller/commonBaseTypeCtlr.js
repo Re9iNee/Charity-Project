@@ -57,7 +57,7 @@ exports.creatCommonBaseType = async (req, res) => {
                 pool,
                 poolConnect
             }, {
-                CommonBaseTypeId: result.recordset[0].CommonBaseTypeId
+                CommonBaseTypeId: result
             });
 
             res.status(201).json({
