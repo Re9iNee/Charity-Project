@@ -25,7 +25,7 @@ const settlementRouter = require("./router/settlement");
 dotEnv.config({
     path: "./utils/.env"
 });
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 4000;
 
 
 // express
@@ -48,6 +48,19 @@ app.use(bodyPaser.urlencoded({
 app.use(upload.any());
 
 
+//set header
+app.use( (req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+    res.setHeader(
+        'Access-Control-Allow-Headers',
+        'Content-Type, Authorization'
+    );
+    next();
+    }
+);
+
+
 app.use(express.json({
     limit: '1mb'
 }));
@@ -57,38 +70,38 @@ app.use(express.json({
 
 /*  TASK 2 */
 
-app.use(commonBaseTypeRoutes);
+app.use("/api/" , commonBaseTypeRoutes);
 
 
 /*  TASK 3 */
 
-app.use(commonBaseDataRoutes);
+app.use("/api/" , commonBaseDataRoutes);
 
 
 /*  TASK 4 */
 
-app.use(charityAccountsRoutes);
+app.use("/api/" , charityAccountsRoutes);
 
 
 /*  TASK 5 */
 
-app.use(personalInfoRoutes);
+app.use("/api/" , personalInfoRoutes);
 
 
 /*  TASK 6 */
 
-app.use(needyAccountRoutes);
+app.use("/api/" , needyAccountRoutes);
 
 
 /*  TASK 7 */
 
-app.use(plansRoutes)
+app.use("/api/" , plansRoutes)
 
 
 
 /*  TASK 8 */
 
-app.use(assignNeedyToPlansRouter);
+app.use("/api/" , assignNeedyToPlansRouter);
 
 
 /*  TASK 9 */
