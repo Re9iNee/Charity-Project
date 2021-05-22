@@ -11,22 +11,27 @@ const {
 
 
 exports.getCommonBaseData = async (req, res) => {
-    let query = req.query;
-    // T02 - Method 01
-    // path: /commonBaseData/?CommonBaseDataId=4&BaseCode=3&BaseValue=Asghar&CommonBaseTypeId=1
-    const result = await ws_loadBaseValue({
-        pool,
-        poolConnect
-    }, {
-        CommonBaseDataId: query.CommonBaseDataId,
-        BaseCode: query.BaseCode,
-        BaseValue: query.BaseValue,
-        CommonBaseTypeId: query.CommonBaseTypeId
-    });
-    res.send({
-        result
-    })
-};
+    try {
+         let query = req.query;
+         // T02 - Method 01
+         // path: /commonBaseData/?CommonBaseDataId=4&BaseCode=3&BaseValue=Asghar&CommonBaseTypeId=1
+         const result = await ws_loadBaseValue({
+             pool,
+             poolConnect
+         }, {
+             CommonBaseDataId: query.CommonBaseDataId,
+             BaseCode: query.BaseCode,
+             BaseValue: query.BaseValue,
+             CommonBaseTypeId: query.CommonBaseTypeId
+         });
+         res.status(200).json({result});
+    } catch (err) {
+     console.log(err);
+     if (!err.statusCode) {
+         err.statusCode = 500;
+     }
+    }
+ };
 
 exports.createCommonBaseData = async (req, res) => {
     // T02 - Method 02
