@@ -25,7 +25,7 @@ export const createCharityAcc = (charityAcc) => {
 
         await dispatch({
             type: "ADD_CHARITYACC",
-            payload: [...getState().charityAccount , data.result.recordset[0] ]
+            payload: [...getState().charityAccount , data.charityAccount.recordset[0] ]
         });
     }
 };
@@ -51,7 +51,7 @@ export const updateCharityAcc = (charityAccId , charityAcc) => {
 
             await dispatch({
                 type: "UPDATE_CHARITYACC",
-                payload: [...filteredCharityAccounts, data.result.recordset[0]],
+                payload: [...filteredCharityAccounts, data.charityAccount.recordset[0]],
             });
 
         } catch (ex) {
