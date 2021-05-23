@@ -11,7 +11,7 @@ const {
 
 
 exports.getAssignNeedyToPlans = async (req, res) => {
-
+ 
     try {
         let query = req.query;
         // T08 - Method 01
@@ -20,16 +20,18 @@ exports.getAssignNeedyToPlans = async (req, res) => {
             pool,
             poolConnect
         }, {
-            NeedyId: query.NeedyId,
-            PlanId: query.PlanId,
+            NeedyId: query.needyId,
+            PlanId: query.planId,
             AssignNeedyPlanId: query.AssignNeedyPlanId
         });
         // Easier way to send request is to send query object itself, but when it comes to typo it throws an error
-        res.send({
-            result
-        })
+        res.status(200).json({result});
+
     } catch (err) {
         console.log(err);
+        if (!err.statusCode) {
+            err.statusCode = 500;
+        }
     }
 };
 
@@ -45,12 +47,31 @@ exports.assignNeedyToPlans = async (req, res) => {
             poolConnect
         }, values);
 
-        res.send({
-            result
-        });
+        if(result.status === 'Failed'){
+
+            res.status(422).json({
+                result
+            });
+
+        } else {
+                    
+            const assignNeedyToPlans = await ws_loadNeedyForPlan({
+                pool,
+                poolConnect
+            }, {
+                AssignNeedyPlanId: result.recordset[0].AssignNeedyPlanId
+            });
+
+            res.status(201).json({
+                assignNeedyToPlans
+            });
+        }
 
     } catch (err) {
         console.log(err);
+        if (!err.statusCode) {
+            err.statusCode = 500;
+        }
     }
 };
 
@@ -59,19 +80,23 @@ exports.assignNeedyToPlans = async (req, res) => {
 exports.deleteNeedyFromPlans = async (req, res) => {
 
     try {
-        const {
-            AssignNeedyPlanId,
-            PlanId
-        } = req.body;
 
+        let AssignNeedyPlanId = req.params.assignNeedyPlanId;
+        console.log(AssignNeedyPlanId);
         const result = await ws_deleteNeedyFromPlan({
             pool,
             poolConnect
-        }, AssignNeedyPlanId, PlanId);
+        }, AssignNeedyPlanId );
 
-        res.send({
-            result
-        });
+        if(result.status === 'Failed'){
+            res.status(422).json({
+                result
+            });
+        } else {
+            res.status(200).json({
+                result
+            });
+        }
     } catch (err) {
         console.log(err);
     }
