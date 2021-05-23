@@ -26,7 +26,7 @@ export const createBaseType = (baseTypeTitle) => {
 
         await dispatch({
             type: "ADD_BASETYPE",
-            payload: [...getState().baseType , data.baseType.recordset[0] ]
+            payload: [...getState().baseType , data.result.recordset[0] ]
         });
     }
 };
@@ -53,7 +53,7 @@ export const updateBaseType = (baseTypeId, baseTypeTitle) => {
 
             await dispatch({
                 type: "UPDATE_BASETYPE",
-                payload: [...filteredBaseTypes, data.baseType.recordset[0]],
+                payload: [...filteredBaseTypes, data.result.recordset[0]],
             });
 
         } catch (ex) {
