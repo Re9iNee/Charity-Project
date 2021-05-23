@@ -51,7 +51,7 @@ export const updateCharityAcc = (charityAccId , charityAcc) => {
 
             await dispatch({
                 type: "UPDATE_CHARITYACC",
-                payload: [...filteredCharityAccounts, data.baseType.recordset[0]],
+                payload: [...filteredCharityAccounts, data.charityAccount.recordset[0]],
             });
 
         } catch (ex) {
