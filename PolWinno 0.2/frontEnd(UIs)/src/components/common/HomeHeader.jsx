@@ -40,6 +40,9 @@ const HomeHeader = () => {
                                     <br className="d-none d-sm-block" /> 
                                          NODE-B گروه  
                                     </h1>
+                                    <h3> 
+                                       رضا عطارزاده - اردشیر امام بخش
+                                    </h3>
                                     <div className="gaps size-1x d-none d-md-block"></div>
                                     <div className="gaps size-1x d-none d-md-block"></div>
                                 </div>

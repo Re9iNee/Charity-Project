@@ -3,7 +3,7 @@ import { useDispatch } from 'react-redux';
 import Modal from 'react-modal';
 import { toast } from 'react-toastify';
 import ComboBox from 'react-responsive-combo-box';
-import _, { constant } from 'lodash';
+import _ from 'lodash';
 import { createAssignNeedyToPlans } from '../../../action/assNeedyToPlans';
 
 
@@ -95,25 +95,25 @@ const AddModal = ({showMoldal , closeMoldal , needies , plans}) => {
                 <form onSubmit={handleSubmit} id="Form" >
                     <div className="row" style={{margin:"50px 0"}} >
                         <div className="col-md-12 ">
-                            <ComboBox style={{width:"100%",height:"60px",fontSize:"18px"}} className="text-center" placeholder='نام و نام خانوادگی نیازمند' options={needyData} enableAutocomplete value={needyName}
+                            <ComboBox style={{width:"100%",height:"60px",fontSize:"18px"}} className="text-center" required placeholder='نام و نام خانوادگی نیازمند' options={needyData} enableAutocomplete value={needyName}
                                onSelect ={ (option) => setNeedyName(option) }
                             />
                         </div>
                     </div>
                     <div className="row" style={{margin:"50px 0"}}>
                         <div className="col-md-12">
-                            <ComboBox style={{width:"100%",height:"60px",fontSize:"18px"}} className="text-center" placeholder='نام طرح' options={planData} enableAutocomplete value={planName}
+                            <ComboBox style={{width:"100%",height:"60px",fontSize:"18px"}} className="text-center" required placeholder='نام طرح' options={planData} enableAutocomplete value={planName}
                                onSelect ={ (option) => setPlanName(option) }
                             />
                         </div>
                     </div>
                     <div className="row" style={{margin:"50px 0"}}>
                         <div className="col-md-6">
-                            <input type="text" className="form-control text-center" placeholder="تاریخ پایان " value={Tdate}
+                            <input type="text" className="form-control text-center" placeholder="تاریخ پایان " required value={Tdate}
                                 onChange={e => setTdate(e.target.value) } />
                         </div>
                         <div className="col-md-6">
-                            <input type="text" className="form-control text-center" placeholder=" تاریخ شروع " value={Fdate}
+                            <input type="text" className="form-control text-center" placeholder=" تاریخ شروع " required value={Fdate}
                                 onChange={e => setFdate(e.target.value) } />
                         </div>
                     </div>

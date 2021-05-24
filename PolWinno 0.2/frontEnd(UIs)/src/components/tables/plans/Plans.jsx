@@ -17,6 +17,7 @@ const Plans = () => {
     const plans = useSelector(state => state.plans);
 
     const [currentPlan, setCurrentPlan] = useState('');
+    const [parentPlan, setParentPlan] = useState('');
 
     const [addModalIsOpen, setAddModalIsOpen] = useState(false);
     const [editModalIsOpen, setEditModalIsOpen] = useState(false);
@@ -24,6 +25,7 @@ const Plans = () => {
     
     const openAddModal = () => {
         setAddModalIsOpen(true);
+        setParentPlan(plans[plans.length - 1].PlanId)
     };
     const openEditModal = (id) => {
         setEditModalIsOpen(true);
@@ -63,6 +65,7 @@ const Plans = () => {
                             <AddModal 
                                 showMoldal = {addModalIsOpen}
                                 closeMoldal = {closeAddModal}
+                                parentPlan = {parentPlan}
                             />
 
                             <EditModal 
