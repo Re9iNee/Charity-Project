@@ -49,7 +49,7 @@ app.use(upload.any());
 
 
 //set header
-app.use( (req, res, next) => {
+app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
     res.setHeader(
@@ -57,8 +57,7 @@ app.use( (req, res, next) => {
         'Content-Type, Authorization'
     );
     next();
-    }
-);
+});
 
 
 app.use(express.json({
@@ -70,51 +69,51 @@ app.use(express.json({
 
 /*  TASK 2 */
 
-app.use("/api/" , commonBaseTypeRoutes);
+app.use("/api/", commonBaseTypeRoutes);
 
 
 /*  TASK 3 */
 
-app.use("/api/" , commonBaseDataRoutes);
+app.use("/api/", commonBaseDataRoutes);
 
 
 /*  TASK 4 */
 
-app.use("/api/" , charityAccountsRoutes);
+app.use("/api/", charityAccountsRoutes);
 
 
 /*  TASK 5 */
 
-app.use("/api/" , personalInfoRoutes);
+app.use("/api/", personalInfoRoutes);
 
 
 /*  TASK 6 */
 
-app.use("/api/" , needyAccountRoutes);
+app.use("/api/", needyAccountRoutes);
 
 
 /*  TASK 7 */
 
-app.use("/api/" , plansRoutes)
+app.use("/api/", plansRoutes)
 
 
 
 /*  TASK 8 */
 
-app.use("/api/" , assignNeedyToPlansRouter);
+app.use("/api/", assignNeedyToPlansRouter);
 
 
 /*  TASK 9 */
 
-app.use("/api/" cashAssistanceDetailRouter)
+app.use("/api/", cashAssistanceDetailRouter)
 
 /*  TASK 10 */
 
-app.use("/api/" paymentRouter);
+app.use("/api/", paymentRouter);
 
 /*  TASK 11 */
 
-app.use("/api/" settlementRouter);
+app.use("/api/", settlementRouter);
 
 //-----------------------------------
 
