@@ -7,9 +7,10 @@ const config = {
     password: process.env.DB_PWD,
     server: process.env.DB_SERVER,
     database: process.env.DB_DATABASE,
-    "options": {
-        "encrypt": true,
-        "enableArithAbort": true
+    options: {
+        encrypt: true,
+        enableArithAbort: true,
+        trustedconnection: true
     }
 };
 

@@ -55,7 +55,7 @@ exports.createCharityAccount = async (req, res) => {
             poolConnect
         }, req.body);
         
-        
+       
         if(result.status === 'Failed'){
 
             res.status(422).json({
@@ -68,7 +68,7 @@ exports.createCharityAccount = async (req, res) => {
                 pool,
                 poolConnect
             }, {
-                charityAccountId: result.recordset[0].CharityAccountId
+                CharityAccountId: result.recordset[0].CharityAccountId
             });
 
             res.status(201).json({
@@ -112,7 +112,7 @@ exports.updateCharityAccount = async (req, res) => {
                 pool,
                 poolConnect
             }, {
-                charityAccountId: result.recordset[0].CharityAccountId
+                CharityAccountId: result.recordset[0].CharityAccountId
             });
 
             res.status(200).json({

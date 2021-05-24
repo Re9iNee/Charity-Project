@@ -211,11 +211,9 @@ const ws_AssignNeedyToPlan = async (connection, details = new Object(null)) => {
 
     try {
         const request = pool.request();
-        const result = request.query(queryString);
+        const result = await request.query(queryString);
         console.dir(result);
-
-        const table = await ws_loadNeedyForPlan(connection);
-        return table;
+        return result;
 
     } catch (err) {
         console.error("ws_AssignNeedyToPlan error:", err)

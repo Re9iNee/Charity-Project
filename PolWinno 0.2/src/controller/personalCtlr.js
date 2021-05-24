@@ -43,8 +43,8 @@ exports.createPersonalData = async (req, res) => {
    let values = req.body;
    let image = req.files;
    
-      
-    if(image !== []){
+  
+    if( !(typeof image[0] === 'undefined') ){
         const imagePath = fs.readFileSync(image[0].path);
         const encode_image = imagePath.toString('base64');
         let PersonPhoto = {contentType: image[0].mimetype , image: new Buffer.from(encode_image , 'base64')};

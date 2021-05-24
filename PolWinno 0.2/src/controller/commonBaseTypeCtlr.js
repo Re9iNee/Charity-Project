@@ -84,7 +84,7 @@ exports.updateCommonBaseType = async (req, res) => {
         const result = await ws_updateBaseType({
             pool,
             poolConnect
-        }, {CommonBaseTypeId : filters}, {BaseTypeTitle : newBaseTypeTitle});
+        }, {CommonBaseTypeId : filters}, newBaseTypeTitle);
 
      
 

@@ -106,15 +106,15 @@ app.use("/api/" , assignNeedyToPlansRouter);
 
 /*  TASK 9 */
 
-app.use(cashAssistanceDetailRouter)
+app.use("/api/" cashAssistanceDetailRouter)
 
 /*  TASK 10 */
 
-app.use(paymentRouter);
+app.use("/api/" paymentRouter);
 
 /*  TASK 11 */
 
-app.use(settlementRouter);
+app.use("/api/" settlementRouter);
 
 //-----------------------------------
 
