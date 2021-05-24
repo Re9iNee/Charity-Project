@@ -7,13 +7,11 @@ import { createPlan } from '../../../action/plans';
 
 
 
-const AddModal = ({showMoldal , closeMoldal , parentPlan}) => {
+const AddModal = ({showMoldal , closeMoldal , ParentPlanId}) => {
 
-console.log(parentPlan);
     const [PlanName , setPlanName] = useState("");
     const [Description , setDescription] = useState("");
     const [PlanNature , setPlanNature] = useState(false);
-    const [ParentPlanId , setParentPlanId] = useState(parentPlan);
     const [Fdate , setFdate] = useState("");
     const [Tdate , setTdate] = useState("");
     const [neededLogin , setNeededLogin] = useState(false);
@@ -26,7 +24,6 @@ console.log(parentPlan);
         setPlanName('');
         setDescription('');
         setPlanNature('');
-        setParentPlanId('');
         setFdate('');
         setTdate('');
         setNeededLogin();
@@ -47,6 +44,7 @@ console.log(parentPlan);
         plan.append("neededLogin" , neededLogin);
         plan.append("ParentPlanId" , ParentPlanId);
         
+
         try {
             dispatch(createPlan(plan));
             

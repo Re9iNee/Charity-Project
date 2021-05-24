@@ -65,7 +65,7 @@ const Plans = () => {
                             <AddModal 
                                 showMoldal = {addModalIsOpen}
                                 closeMoldal = {closeAddModal}
-                                parentPlan = {parentPlan}
+                                ParentPlanId = {parentPlan}
                             />
 
                             <EditModal 

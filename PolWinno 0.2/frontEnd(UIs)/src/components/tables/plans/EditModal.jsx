@@ -26,7 +26,7 @@ const EditModal = ({showMoldal , closeMoldal , Plan}) => {
         setPlanName(Plan.PlanName);
         setDescription(Plan.Description);
         setPlanNature(Plan.PlanNature);
-        setParentPlanId(Plan.PlanId);
+        setParentPlanId(Plan.ParentPlanId);
         setFdate(Plan.Fdate);
         setTdate(Plan.Tdate);
         setNeededLogin(Plan.neededLogin);
@@ -67,14 +67,13 @@ const EditModal = ({showMoldal , closeMoldal , Plan}) => {
 
         let plan = new FormData()
 
-        // plan.append("iconUrl" , event.target.iconUrl.files[0]);
         plan.append("PlanName" , PlanName);
         plan.append("Description" , Description);
         plan.append("Fdate" , Fdate);
         plan.append("Tdate" , Tdate);
         plan.append("PlanNature" , PlanNature);
         plan.append("neededLogin" , neededLogin);
-        // plan.append("ParentPlanId" , ParentPlanId);
+        plan.append("ParentPlanId" , ParentPlanId);
         
         try {
            
