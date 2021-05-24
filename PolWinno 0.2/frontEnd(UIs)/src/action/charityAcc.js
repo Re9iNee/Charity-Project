@@ -34,7 +34,7 @@ export const createCharityAcc = (charityAcc) => {
 export const updateCharityAcc = (charityAccId , charityAcc) => {
     
     return async (dispatch, getState) => {
-        const charityAccounts = [...getState().baseType];
+        const charityAccounts = [...getState().charityAccount];
         const filteredCharityAccounts = charityAccounts.filter(
             (charityAccount) => charityAccount.CharityAccountId !== charityAccId
         );

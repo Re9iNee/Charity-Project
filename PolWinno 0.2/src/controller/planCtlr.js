@@ -44,7 +44,6 @@ exports.getPlans = async (req, res) => {
 exports.postPlans = async (req, res) => {
 
     try {
-        
         // T07 - Method 02
         // Attach params to body as an JSON format - Postman Request: 
         const result = await ws_createPlan({
@@ -52,7 +51,6 @@ exports.postPlans = async (req, res) => {
             poolConnect
         }, req.body);
         // sending req.body directly causing program more error prone base on a typo, we will deconstruct object in that method.
-        
         if(result.status === 'Failed'){
 
             res.status(422).json({
@@ -65,7 +63,7 @@ exports.postPlans = async (req, res) => {
                 pool,
                 poolConnect
             }, {
-                PlanId: result.recordset[0].PlanId
+                PlanId: result
             });
 
             res.status(201).json({

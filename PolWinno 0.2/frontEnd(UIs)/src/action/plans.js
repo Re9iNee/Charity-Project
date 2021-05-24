@@ -16,7 +16,6 @@ export const createPlan = (plan) => {
 
     return async (dispatch , getState) => {
         const { data , status} = await newPlan(plan);
-       console.log('data' , data);
         if (status === 201) {
             toast.success("رکورد جدید با موفقیت ساخته شد", {
                 position: "bottom-right",

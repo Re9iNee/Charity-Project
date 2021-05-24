@@ -7,12 +7,11 @@ import { createPlan } from '../../../action/plans';
 
 
 
-const AddModal = ({showMoldal , closeMoldal }) => {
+const AddModal = ({showMoldal , closeMoldal , ParentPlanId}) => {
 
     const [PlanName , setPlanName] = useState("");
     const [Description , setDescription] = useState("");
     const [PlanNature , setPlanNature] = useState(false);
-    const [ParentPlanId , setParentPlanId] = useState("");
     const [Fdate , setFdate] = useState("");
     const [Tdate , setTdate] = useState("");
     const [neededLogin , setNeededLogin] = useState(false);
@@ -25,7 +24,6 @@ const AddModal = ({showMoldal , closeMoldal }) => {
         setPlanName('');
         setDescription('');
         setPlanNature('');
-        setParentPlanId('');
         setFdate('');
         setTdate('');
         setNeededLogin();
@@ -38,15 +36,15 @@ const AddModal = ({showMoldal , closeMoldal }) => {
 
         let plan = new FormData()
 
-        // plan.append("iconUrl" , event.target.iconUrl.files[0]);
         plan.append("PlanName" , PlanName);
         plan.append("Description" , Description);
         plan.append("Fdate" , Fdate);
         plan.append("Tdate" , Tdate);
         plan.append("PlanNature" , PlanNature);
         plan.append("neededLogin" , neededLogin);
-        // plan.append("ParentPlanId" , ParentPlanId);
+        plan.append("ParentPlanId" , ParentPlanId);
         
+
         try {
             dispatch(createPlan(plan));
             
@@ -100,7 +98,7 @@ const AddModal = ({showMoldal , closeMoldal }) => {
                             </label>
                         </div>
                         <div className="col-md-6">
-                            <input type="text" className="form-control" placeholder="نام طرح" name="PlanName" value={PlanName}
+                            <input type="text" className="form-control" placeholder="نام طرح" required name="PlanName" value={PlanName}
                                 onChange={e => setPlanName(e.target.value) } />
                         </div>
                     </div>

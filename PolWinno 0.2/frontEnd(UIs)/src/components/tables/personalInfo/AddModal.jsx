@@ -97,11 +97,11 @@ const AddModal = ({showMoldal , closeMoldal }) => {
                 <form onSubmit={handleSubmit} id="Form" >
                     <div className="row">
                         <div className="col-md-6">
-                            <input type="text" className="form-control" placeholder="نام خانوادگي" name="Family" value={Family}
+                            <input type="text" className="form-control" placeholder="نام خانوادگي" required name="Family" value={Family}
                                 onChange={e => setFamily(e.target.value) } />
                         </div>
                         <div className="col-md-6">
-                            <input type="text" className="form-control" placeholder="نام " name="Name" value={Name}
+                            <input type="text" className="form-control" placeholder="نام " required name="Name" value={Name}
                                 onChange={e => setName(e.target.value) } />
                         </div>
                     </div>

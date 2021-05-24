@@ -54,7 +54,7 @@ const ws_createCharityAccounts = async (connection, details = new Object(null)) 
     // default parameter for details will be null object. (to avoid throwing error - we search in this object later)
     // details are the parameters sent for creating table
     const {
-        BankId,
+        BankID,
         BranchName,
         OwnerName,
         CardNumber,
@@ -64,7 +64,7 @@ const ws_createCharityAccounts = async (connection, details = new Object(null)) 
 
 
     // Not Null Values
-    if (!NotNullColumnsFilled(details, "BankId", "OwnerName", "BranchName", "AccountNumber")) {
+    if (!NotNullColumnsFilled(details, "BankID", "OwnerName", "BranchName", "AccountNumber")) {
         return {
             status: "Failed",
             msg: "Fill Parameters Utterly",
@@ -80,7 +80,6 @@ const ws_createCharityAccounts = async (connection, details = new Object(null)) 
         } = require("../utils/bankCardNumber");
         // returns true if valid.
         const valid = validateCreditCard(String(CardNumber));
-        console.log(valid);
         if (!valid) {
             return {
                 status: "Failed",
@@ -112,10 +111,10 @@ const ws_createCharityAccounts = async (connection, details = new Object(null)) 
 
     let queryString = `INSERT INTO 
     [${DB_DATABASE}].[dbo].[tblCharityAccounts]
-    (BankId, BranchName, OwnerName, CardNumber, AccountNumber, AccountName)
+    (BankID, BranchName, OwnerName, CardNumber, AccountNumber, AccountName)
     VALUES 
-    ('${BankId}', N'${BranchName}', N'${OwnerName}', '${CardNumber}', '${AccountNumber}', N'${AccountName}'); 
-    SELECT SCOPE_IDENTITY() AS charityAccountId;`
+    ('${BankID}', N'${BranchName}', N'${OwnerName}', '${CardNumber}', '${AccountNumber}', N'${AccountName}'); 
+    SELECT SCOPE_IDENTITY() AS CharityAccountId;`
     try {
         const request = pool.request();
         const result = await request.query(queryString);

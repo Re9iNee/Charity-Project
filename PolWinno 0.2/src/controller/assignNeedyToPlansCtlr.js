@@ -20,8 +20,8 @@ exports.getAssignNeedyToPlans = async (req, res) => {
             pool,
             poolConnect
         }, {
-            NeedyId: query.needyId,
-            PlanId: query.planId,
+            NeedyId: query.NeedyId,
+            PlanId: query.PlanId,
             AssignNeedyPlanId: query.AssignNeedyPlanId
         });
         // Easier way to send request is to send query object itself, but when it comes to typo it throws an error

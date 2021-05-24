@@ -90,7 +90,7 @@ const ws_createPersonal = async (connection,values,PersonPhoto) => {
 
 
         const duplicateId = await checkDuplicate(connection, NationalCode , ws_loadPersonal);
-        if (duplicateId)
+        if (!duplicateId)
             return {
                 status: "Failed",
                 msg: "Error Creating Row, Duplicate Record",
@@ -152,7 +152,7 @@ const ws_createPersonal = async (connection,values,PersonPhoto) => {
         };
 
         const duplicateId = await checkDuplicate(connection, NationalCode , ws_loadPersonal);
-        if (duplicateId)
+        if (!duplicateId)
             return {
                 status: "Failed",
                 msg: "Error Creating Row, Duplicate Record",

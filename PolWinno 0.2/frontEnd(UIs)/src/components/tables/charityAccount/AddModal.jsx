@@ -43,7 +43,7 @@ const AddModal = ({showMoldal , closeMoldal , baseData}) => {
 
         try {
 
-            await dispatch(createCharityAcc(charityAcc));
+            dispatch(createCharityAcc(charityAcc));
             
             resetState();
 
@@ -90,11 +90,11 @@ const AddModal = ({showMoldal , closeMoldal , baseData}) => {
                 <form onSubmit={handleSubmit} id="Form" >
                     <div className="row">
                         <div className="col-md-6">
-                            <input type="text" className="form-control" placeholder="نام شعبه" value={BranchName}
+                            <input type="text" className="form-control" placeholder="نام شعبه" required value={BranchName}
                                 onChange={e => setBranchName(e.target.value) } />
                         </div>
                         <div className="col-md-6">
-                            <ComboBox style={{width : "100%"}} placeholder='نام بانک' options={data} enableAutocomplete value={BankID}
+                            <ComboBox style={{width : "100%"}} placeholder='نام بانک' options={data} required enableAutocomplete value={BankID}
                                 onSelect={(option) => 
                                     {if(option === 'بانک ملت 1') {
                                         setBankID(baseData[0].CommonBaseDataId) 
@@ -107,7 +107,7 @@ const AddModal = ({showMoldal , closeMoldal , baseData}) => {
                     </div>
                     <div className="row">
                         <div className="col-md-6">
-                            <input type="text" className="form-control" placeholder="نام صاحب حساب" value={OwnerName}
+                            <input type="text" className="form-control" placeholder="نام صاحب حساب" required value={OwnerName}
                                 onChange={e => setOwnerName(e.target.value) } />
                         </div>
                         <div className="col-md-6">
@@ -117,7 +117,7 @@ const AddModal = ({showMoldal , closeMoldal , baseData}) => {
                     </div>
                     <div className="row">
                         <div className="col-md-6">
-                            <input type="text" className="form-control" placeholder="شماره حساب" value={AccountNumber}
+                            <input type="text" className="form-control" placeholder="شماره حساب" required value={AccountNumber}
                                 onChange={e => setAccountNumber(e.target.value) } />
                         </div>
                         <div className="col-md-6">
