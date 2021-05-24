@@ -6,6 +6,7 @@ import CommonBaseType from '../components/tables/baseTypes/CommonBaseType';
 import CharityAccount from '../components/tables/charityAccount/CharityAccount';
 import Plans from '../components/tables/plans/Plans';
 import PersonalInfo from '../components/tables/personalInfo/personalInfo';
+import AssignNeedyToPlans from '../components/tables/assignNeedyToPlans/AssignNeedyToPlans';
 
 
 
@@ -17,6 +18,7 @@ const Charity = () => {
             <Route path={["/tables"]}>
                 <MainLayout>
                     <Switch>
+                        <Route path="/tables/assignNeedyToPlans" component={AssignNeedyToPlans} />
                         <Route path="/tables/personalInfo" component={PersonalInfo} />
                         <Route path="/tables/plans" component={Plans} />
                         <Route path="/tables/charityAccount" component={CharityAccount} />

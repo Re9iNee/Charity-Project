@@ -127,7 +127,7 @@ const AddModal = ({showMoldal , closeMoldal , baseData}) => {
                     </div>
                     <div className="row">
                         <div className="col-md-6">
-                            <button className="btn" type="submit" form="baseTypeForm" value="Submit">ثبت</button>
+                            <button className="btn" type="submit" form="Form" value="Submit">ثبت</button>
                         </div>
                         <div className="col-md-6">
                             <button className="btn" onClick={closeMoldal} >خروج</button>
